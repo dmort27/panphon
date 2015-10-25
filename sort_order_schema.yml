@@ -1,0 +1,10 @@
+type: seq
+sequence:
+  - type: map
+    mapping:
+      "name":
+        type: str
+        required: yes
+      "reverse":
+        type: bool
+        required: yes

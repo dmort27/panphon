@@ -1,0 +1,209 @@
+type: map
+mapping:
+  "diacritics":
+    type: seq
+    sequence:
+      - type: map
+        mapping:
+          "marker":
+            type: str
+            required: yes
+          "name":
+            type: str
+            required: yes
+          "position":
+            type: str
+            required: no
+          "conditions":
+            type: seq
+            sequence:
+              - type: map
+                mapping:
+                  "syl":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "son":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "cons":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "cont":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "delrel":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "lat":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "nas":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "strid":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "voi":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "sg":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "cg":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "ant":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "cor":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "distr":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "lab":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "hi":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "lo":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "back":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "round":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "tense":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+                  "long":
+                    type: str
+                    enum: ["0", "-", "+"]
+                    required: no
+          "exclude":
+            type: seq
+            sequence:
+              - type: str
+          "content":
+            type: map
+            mapping:
+              "syl":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "son":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "cons":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "cont":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "delrel":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "lat":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "nas":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "strid":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "voi":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "sg":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "cg":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "ant":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "cor":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "distr":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "lab":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "hi":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "lo":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "back":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "round":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "tense":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+              "long":
+                type: str
+                enum: ["0", "-", "+"]
+                required: no
+
+  "combinations":
+    type: seq
+    sequence:
+      - type: map
+        mapping:
+          "name":
+            type: str
+            required: yes
+          "combines":
+            type: seq
+            sequence:
+              - type: str
