@@ -6,8 +6,6 @@ and the tool `apply_diacritics.py`, which allows the application of
 rules for diacritics and modifiers to collections of IPA characters,
 data files, and configuration/rule files.
 
-***ATTENTION:*** if you are only interested in the existing data, it is to be found in the Unicode UTF-8 CSV file `ipa_table.csv.` Documentation of this file is available in the section “IPA Character Database: ipa_table.csv,” below.
-
 ## Diacritic Application Tool: apply_diacritics.py
 
 This small, self-documenting Python program allows the user to apply
