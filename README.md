@@ -1,10 +1,32 @@
 # PanPhon
 
 These files constitute a preliminary database of segments in the
-International Phonetic Alphabet (IPA) and their equivalents in terms of (articulatory) phonological features. They include both data files
+International Phonetic Alphabet (IPA) and their equivalents in terms
+of (articulatory) phonological features. They include both data files
 and the tool `apply_diacritics.py`, which allows the application of
 rules for diacritics and modifiers to collections of IPA characters,
 data files, and configuration/rule files.
+
+## Python API for Accessing Phonological Features of IPA Segments
+
+The `panphon` module provides a simple, lightweight API allows users
+and developers to access the segment-feature relationships encoded in
+the fiel `panphon/data/segment_features.csv`.
+
+    >>> import panphon
+    >>> ft = panphon.FeatureTable()
+    >>> ft.feature_match(set([(u'+', u'syl')]), u'a')
+	True
+
+This interface consists of a single class with a couple of
+methods. The only exposed method is `self.feature_match(features,
+segment)`. It returns a boolean value depending on whether the
+features in *features* match the segment (a unicode string) in
+*segment*.
+
+While the interface is extraordinarily simple, it should be easy to
+subclass `FeatureTable` in order to develop more sophisticated
+interfaces.
 
 ## Diacritic Application Tool: apply_diacritics.py
 
