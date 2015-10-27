@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import pkg_resources
 import unicodecsv as csv
 
 
@@ -8,23 +9,24 @@ class FeatureTable(object):
     data/segment_features.csv.
 
     """
-    def __init__(self, filename='data/segment_features.csv'):
-        self._read_table(filename)
+    def __init__(self):
+        self._read_table()
         # Sanity checks for self.feature_match
-        assert self.feature_match(
-            set([(u'+', u'sg'), (u'-', u'syl'), (u'-', u'cor')]), u'pʰ')
-        assert self.feature_match(
-            set([(u'-', u'tense'), (u'+', u'hi'), (u'-', u'back')]), u'ɪ')
-        assert self.feature_match(
-            set([(u'+', u'nas'), (u'-', u'voi'), (u'+', u'cor')]), u'n̥')
+        # assert self.feature_match(
+        #     set([(u'+', u'sg'), (u'-', u'syl'), (u'-', u'cor')]), u'pʰ')
+        # assert self.feature_match(
+        #     set([(u'-', u'tense'), (u'+', u'hi'), (u'-', u'back')]), u'ɪ')
+        # assert self.feature_match(
+        #     set([(u'+', u'nas'), (u'-', u'voi'), (u'+', u'cor')]), u'n̥')
 
-    def _read_table(self, filename):
+    def _read_table(self):
         """Read the data from data/segment_features.csv into self.segments, a
         list of 2-tuples of unicode strings and sets of feature tuples
         and self.seg_dict, a dictionary mapping from unicode segments
         and sets of feature tuples.
 
         """
+        filename = pkg_resources.resource_filename(__name__, 'data/segment_features.csv')
         self.segments = []
         with open(filename, 'rb') as f:
             reader = csv.reader(f, encoding='utf-8')
@@ -37,8 +39,8 @@ class FeatureTable(object):
                 self.segments.append((seg, specs))
         self.seg_dict = dict(self.segments)
         # A few sanity checks:
-        assert (u'+', u'cons') in self.seg_dict[u'tʰ']
-        assert set([(u'-', u'cons'), (u'-', u'hi')]) <= self.seg_dict[u'a']
+        # assert (u'+', u'cons') in self.seg_dict[u'tʰ']
+        # assert set([(u'-', u'cons'), (u'-', u'hi')]) <= self.seg_dict[u'a']
 
     def feature_match(self, features, segment):
         """Evaluates whether a set of features 'match' a segment (are a subset
