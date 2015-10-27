@@ -10,6 +10,13 @@ class FeatureTable(object):
     """
     def __init__(self):
         self._read_table()
+        # Sanity checks for self.feature_match
+        assert self.feature_match(
+            set([(u'+', u'sg'), (u'-', u'syl'), (u'-', u'cor')]), u'pʰ')
+        assert self.feature_match(
+            set([(u'-', u'tense'), (u'+', u'hi'), (u'-', u'back')]), u'ɪ')
+        assert self.feature_match(
+            set([(u'+', u'nas'), (u'-', u'voi'), (u'+', u'cor')]), u'n̥')
 
     def _read_table(self):
         """Read the data from data/segment_features.csv into self.segments, a
@@ -31,12 +38,10 @@ class FeatureTable(object):
         self.seg_dict = dict(self.segments)
         # A few sanity checks:
         assert (u'+', u'cons') in self.seg_dict[u'tʰ']
-        assert set[(u'-', u'cons'), (u'-', u'hi')] < self.seg_dict[u'a']
+        assert set([(u'-', u'cons'), (u'-', u'hi')]) <= self.seg_dict[u'a']
 
     def feature_match(self, features, segment):
         """Evaluates whether a set of features 'match' a segment (are a subset
         of that segment's features).
         """
-        return segment in [s for (s, fts)
-                           in self.segments
-                           if features <= fts]
+        return features <= self.seg_dict[segment]
