@@ -8,8 +8,8 @@ class FeatureTable(object):
     data/segment_features.csv.
 
     """
-    def __init__(self):
-        self._read_table()
+    def __init__(self, filename='data/segment_features.csv'):
+        self._read_table(filename)
         # Sanity checks for self.feature_match
         assert self.feature_match(
             set([(u'+', u'sg'), (u'-', u'syl'), (u'-', u'cor')]), u'pʰ')
@@ -18,7 +18,7 @@ class FeatureTable(object):
         assert self.feature_match(
             set([(u'+', u'nas'), (u'-', u'voi'), (u'+', u'cor')]), u'n̥')
 
-    def _read_table(self):
+    def _read_table(self, filename):
         """Read the data from data/segment_features.csv into self.segments, a
         list of 2-tuples of unicode strings and sets of feature tuples
         and self.seg_dict, a dictionary mapping from unicode segments
@@ -26,7 +26,7 @@ class FeatureTable(object):
 
         """
         self.segments = []
-        with open('data/segment_features.csv', 'rb') as f:
+        with open(filename, 'rb') as f:
             reader = csv.reader(f, encoding='utf-8')
             header = reader.next()
             names = header[1:]
