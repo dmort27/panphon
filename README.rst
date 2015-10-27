@@ -17,7 +17,7 @@ the fiel ``panphon/data/segment_features.csv``.
 
 ::
 
-    >>> import panphon
+    >>> import panphon.panphon as panphon
     >>> ft = panphon.FeatureTable()
     >>> ft.feature_match(set([(u'+', u'syl')]), u'a')
     True

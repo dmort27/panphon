@@ -13,7 +13,7 @@ The `panphon` module provides a simple, lightweight API allows users
 and developers to access the segment-feature relationships encoded in
 the fiel `panphon/data/segment_features.csv`.
 
-    >>> import panphon
+    >>> import panphon.panphon as panphon
     >>> ft = panphon.FeatureTable()
     >>> ft.feature_match(set([(u'+', u'syl')]), u'a')
 	True
