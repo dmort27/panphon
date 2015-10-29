@@ -47,7 +47,7 @@ class FeatureTable(object):
                 specs = set(zip(vals, names))
                 self.segments.append((seg, specs))
         self.seg_dict = dict(self.segments)
-        # A few sanity checks:
+        # A couple of sanity checks:
         assert (u'+', u'cons') in self.seg_dict[u'tʰ']
         assert set([(u'-', u'cons'), (u'-', u'hi')]) <= self.seg_dict[u'a']
 
