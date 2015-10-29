@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
 import pkg_resources
 import unicodecsv as csv
 
@@ -8,8 +7,10 @@ import unicodecsv as csv
 class FeatureError(Exception):
     pass
 
+
 class SegmentError(Exception):
     pass
+
 
 class FeatureTable(object):
     """Encapsulate the segment <=> feature mapping in the file
@@ -33,7 +34,8 @@ class FeatureTable(object):
         and sets of feature tuples.
 
         """
-        filename = pkg_resources.resource_filename(__name__, 'data/segment_features.csv')
+        filename = pkg_resources.resource_filename(
+            __name__, 'data/segment_features.csv')
         self.segments = []
         with open(filename, 'rb') as f:
             reader = csv.reader(f, encoding='utf-8')
@@ -58,6 +60,10 @@ class FeatureTable(object):
             return features <= self.seg_dict[segment]
         else:
             return None
+
+    def segment_known(self, segment):
+        """Returns True if segment is in segment <=> features database."""
+        return segment in self.seg_dict
 
     def segment_features(self, segment):
         """Returns the features as a list of 2-tuples, given a segment as a
@@ -85,7 +91,7 @@ class FeatureTable(object):
             fts = fts & self.seg_dict[seg]
         return fts
 
-    def features_match_inv(self, fts, inv):
+    def features_match_any(self, fts, inv):
         """Returns a boolean based on whether there is a segment in 'inv'
         that matches all of the features in 'features'.
 
@@ -95,3 +101,14 @@ class FeatureTable(object):
 
         """
         return any([self.feature_match(fts, s) for s in inv])
+
+    def features_match_all(self, fts, inv):
+        """Returns a boolean based on whether all segments in 'inv'
+         matche all of the features in 'features'.
+
+        features -- a collection of feature 2-tuples <val, name>
+        inv -- a collection of segments represented as Unicode
+               strings
+
+        """
+        return all([self.feature_match(fts, s) for s in inv])
