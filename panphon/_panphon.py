@@ -56,6 +56,7 @@ class FeatureTable(object):
                 specs = set(zip(vals, names))
                 self.segments.append((seg, specs))
         self.seg_dict = dict(self.segments)
+        self.names = names
 
     def delete_ties(self):
         """Deletes ties from all segments."""
@@ -139,8 +140,17 @@ class FeatureTable(object):
         """
         def seg_to_dict(seg):
             return {k: v for (v, k) in seg}
-        assert seg_to_dict([(1, 2), (3, 4)]) == {1:2, 3:4}
-    
+        assert seg_to_dict([(1, 2), (3, 4)]) == {1: 2, 3: 4}
+
+    def fts_to_str(self, seg):
+        vals = {u'0': ' ', u'-': '0', u'+': '1'}
+        seg_dict = {n: v for (v, n) in seg}
+        vector = []
+        for name in self.names:
+            if name in seg_dict:
+                vector.append(vals[seg_dict[name]])
+        return ''.join(vector)
+
     def fts_contrast(self, ft_name, inv):
         """Return True if there is a segment in inv that contrasts in feature
         ft_name.
@@ -148,5 +158,24 @@ class FeatureTable(object):
         ft_name -- name of the feature where contrast must be present.
         inv -- collection of segments represented as Unicode segments.
         """
-        pass
-            
+        def disc_ft(ft_name, s):
+            s.discard((u'+', ft_name))
+            s.discard((u'-', ft_name))
+            return s
+        # Convert segment list to list of feature sets.
+        ft_inv = map(lambda x: self.fts(x), inv)
+        # Partition ft_inv int those that are plus and minus ft_name.
+        plus = filter(lambda x: (u'+', ft_name) in x, ft_inv)
+        minus = filter(lambda x: (u'-', ft_name) in x, ft_inv)
+        # Remove pivot feature
+        plus = map(lambda x: disc_ft(ft_name, x), plus)
+        minus = map(lambda x: disc_ft(ft_name, x), minus)
+        # Map partitions to sets of strings.
+        plus_str = map(lambda x: self.fts_to_str(x), plus)
+        minus_str = map(lambda x: self.fts_to_str(x), minus)
+        # Determine if two of the vectors are the same.
+        table = set(plus_str)
+        for m in minus_str:
+            if m in table:
+                return True
+        return False
