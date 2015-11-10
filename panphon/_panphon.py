@@ -179,3 +179,12 @@ class FeatureTable(object):
             if m in table:
                 return True
         return False
+
+    def fts_count(self, fts, inv):
+        """Returns the count of segments in an inventory matching a give
+        feature mask.
+
+        fts -- feature mask given as a set of <val, name> tuples
+        inv -- inventory of segments (as Unicode IPA strings)
+        """
+        return len(filter(lambda s: self.ft_match(fts, s), inv))
