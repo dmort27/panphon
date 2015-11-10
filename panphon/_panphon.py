@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from types import StringType, ListType, TupleType
+import regex as re
 import pkg_resources
 import unicodecsv as csv
 
@@ -11,11 +13,19 @@ class FeatureError(Exception):
 class SegmentError(Exception):
     pass
 
+
+FT_REGEX = re.compile(ur'([-+0])([a-z][A-Za-z]*)', re.U | re.X)
+
+
+def fts(s):
+    return [m.groups() for m in FT_REGEX.finditer(s)]
+
 filenames = {
     'spe+': 'data/segment_features.csv',
     'panphon': 'data/segment_features.csv',
     'phoible': 'data/segment_features_phoible.csv',
     }
+
 
 class FeatureTable(object):
     """Encapsulate the segment <=> feature mapping in the file
@@ -47,7 +57,12 @@ class FeatureTable(object):
                 self.segments.append((seg, specs))
         self.seg_dict = dict(self.segments)
 
-    def features(self, segment):
+    def delete_ties(self):
+        """Deletes ties from all segments."""
+        self.seg_dict = {k.replace(u'\u0361', u''): v
+                         for (k, v) in self.seg_dict.items()}
+
+    def fts(self, segment):
         """Returns features corresponding to segment as list of <feature,
         value> tuples."""
         if segment in self.seg_dict:
@@ -55,7 +70,7 @@ class FeatureTable(object):
         else:
             return None
 
-    def feature_match(self, features, segment):
+    def ft_match(self, features, segment):
         """Evaluates whether a set of features 'match' a segment (are a subset
         of that segment's features); returns 'None' if segment is unknown.
         """
@@ -65,11 +80,11 @@ class FeatureTable(object):
         else:
             return None
 
-    def segment_known(self, segment):
+    def seg_known(self, segment):
         """Returns True if segment is in segment <=> features database."""
         return segment in self.seg_dict
 
-    def segment_features(self, segment):
+    def seg_fts(self, segment):
         """Returns the features as a list of 2-tuples, given a segment as a
         Unicode string; returns 'None' if segment is unknown.
 
@@ -80,9 +95,9 @@ class FeatureTable(object):
         else:
             return None
 
-    def feature_intersection(self, segments):
+    def fts_intersection(self, segments):
         """Returns the features shared by all segments in the list/set of
-        segments. Segments that are not known are ignored error.
+        segments. Segments that are not known are ignored.
 
         segments -- set/list of features
         """
@@ -95,7 +110,7 @@ class FeatureTable(object):
             fts = fts & self.seg_dict[seg]
         return fts
 
-    def features_match_any(self, fts, inv):
+    def fts_match_any(self, fts, inv):
         """Returns a boolean based on whether there is a segment in 'inv'
         that matches all of the features in 'features'.
 
@@ -106,7 +121,7 @@ class FeatureTable(object):
         """
         return any([self.feature_match(fts, s) for s in inv])
 
-    def features_match_all(self, fts, inv):
+    def fts_match_all(self, fts, inv):
         """Returns a boolean based on whether all segments in 'inv'
          matche all of the features in 'features'.
 
@@ -117,7 +132,21 @@ class FeatureTable(object):
         """
         return all([self.feature_match(fts, s) for s in inv])
 
-    def delete_ties(self):
-        """Deletes ties from all segments."""
-        self.seg_dict = {k.replace(u'\u0361', u''): v
-                         for (k, v) in self.seg_dict.items()}
+    def seg_diff(self, seg1, seg2):
+        """Return the features by which seg1 and seg2 differ.
+
+        seg1, seg2 -- segments (lists of <value, name> pairs)
+        """
+        def seg_to_dict(seg):
+            return {k: v for (v, k) in seg}
+        assert seg_to_dict([(1, 2), (3, 4)]) == {1:2, 3:4}
+    
+    def fts_contrast(self, ft_name, inv):
+        """Return True if there is a segment in inv that contrasts in feature
+        ft_name.
+
+        ft_name -- name of the feature where contrast must be present.
+        inv -- collection of segments represented as Unicode segments.
+        """
+        pass
+            
