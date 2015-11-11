@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 
-from types import StringType, ListType, TupleType
-import regex as re
 import pkg_resources
+import regex as re
 import unicodecsv as csv
+import copy
 
 
 class FeatureError(Exception):
@@ -71,7 +72,7 @@ class FeatureTable(object):
         else:
             return None
 
-    def ft_match(self, features, segment):
+    def fts_match(self, features, segment):
         """Evaluates whether a set of features 'match' a segment (are a subset
         of that segment's features); returns 'None' if segment is unknown.
         """
@@ -120,7 +121,7 @@ class FeatureTable(object):
                strings
 
         """
-        return any([self.feature_match(fts, s) for s in inv])
+        return any([self.fts_match(fts, s) for s in inv])
 
     def fts_match_all(self, fts, inv):
         """Returns a boolean based on whether all segments in 'inv'
@@ -131,7 +132,7 @@ class FeatureTable(object):
                strings
 
         """
-        return all([self.feature_match(fts, s) for s in inv])
+        return all([self.fts_match(fts, s) for s in inv])
 
     def seg_diff(self, seg1, seg2):
         """Return the features by which seg1 and seg2 differ.
@@ -151,34 +152,17 @@ class FeatureTable(object):
                 vector.append(vals[seg_dict[name]])
         return ''.join(vector)
 
-    def fts_contrast(self, ft_name, inv):
+    def fts_contrast(self, fs, ft_name, inv):
         """Return True if there is a segment in inv that contrasts in feature
         ft_name.
 
         ft_name -- name of the feature where contrast must be present.
         inv -- collection of segments represented as Unicode segments.
         """
-        def disc_ft(ft_name, s):
-            s.discard((u'+', ft_name))
-            s.discard((u'-', ft_name))
-            return s
-        # Convert segment list to list of feature sets.
-        ft_inv = map(lambda x: self.fts(x), inv)
-        # Partition ft_inv int those that are plus and minus ft_name.
-        plus = filter(lambda x: (u'+', ft_name) in x, ft_inv)
-        minus = filter(lambda x: (u'-', ft_name) in x, ft_inv)
-        # Remove pivot feature
-        plus = map(lambda x: disc_ft(ft_name, x), plus)
-        minus = map(lambda x: disc_ft(ft_name, x), minus)
-        # Map partitions to sets of strings.
-        plus_str = map(lambda x: self.fts_to_str(x), plus)
-        minus_str = map(lambda x: self.fts_to_str(x), minus)
-        # Determine if two of the vectors are the same.
-        table = set(plus_str)
-        for m in minus_str:
-            if m in table:
-                return True
-        return False
+        plus, minus = (u'+', ft_name), (u'-', ft_name)
+        w_plus, w_minus = set(list(fs) + [plus]), set(list(fs) + [minus])
+        return any([self.fts_match(w_plus, s) for s in inv]) and \
+               any([self.fts_match(w_minus, s) for s in inv])
 
     def fts_count(self, fts, inv):
         """Returns the count of segments in an inventory matching a give
@@ -187,4 +171,4 @@ class FeatureTable(object):
         fts -- feature mask given as a set of <val, name> tuples
         inv -- inventory of segments (as Unicode IPA strings)
         """
-        return len(filter(lambda s: self.ft_match(fts, s), inv))
+        return len(filter(lambda s: self.fts_match(fts, s), inv))
