@@ -72,6 +72,14 @@ class FeatureTable(object):
         else:
             return None
 
+    def match(self, ft_mask, ft_seg):
+        """Evaluates whether a set of features (ft_mask) are a subset of another set of features (ft_seg).
+
+        ft_mask -- pattern defined as set of features (<val, name> tuples).
+        ft_seg -- segment defined as a set of features (<val, name> tuples).
+        """
+        return set(ft_mask) <= set(ft_seg)
+
     def fts_match(self, features, segment):
         """Evaluates whether a set of features 'match' a segment (are a subset
         of that segment's features); returns 'None' if segment is unknown.
@@ -172,3 +180,31 @@ class FeatureTable(object):
         inv -- inventory of segments (as Unicode IPA strings)
         """
         return len(filter(lambda s: self.fts_match(fts, s), inv))
+
+    def sonority_from_fts(self, seg):
+        """Returns the sonority of a segment, using 'spe+' feature system.
+
+        seg -- segment given as a set of <val, name> tuples
+        """
+        # Obstruents: [-son]
+        if self.match([(u'-', u'son')], seg):
+            return 1
+        # Nasal stops: [+son, -cont]
+        elif self.match([(u'-', u'cont')], seg):
+            return 2
+        # Liquids: [+son, +cont]
+        elif self.match([(u'+', u'cons')], seg):
+            return 3
+        # High vowels/glides: [+son, +cont, -cons, +hi]
+        elif self.match([(u'+', u'hi')], seg):
+            return 4
+        # Non-high vowels: [+son, +cont, -cons, -hi]
+        else:
+            return 5
+
+    def sonority(self, seg):
+        """Returns the sonority of a segment.
+
+        seg -- segment given as a Unicode IPA string
+        """
+        return self.sonority_from_fts(self.fts(seg))
