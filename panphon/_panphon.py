@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-
 import pkg_resources
 import regex as re
 import unicodecsv as csv
@@ -18,14 +17,33 @@ class SegmentError(Exception):
 FT_REGEX = re.compile(ur'([-+0])([a-z][A-Za-z]*)', re.U | re.X)
 
 
+SEG_REGEX = re.compile(ur'[\p{InBasic_Latin}\p{InGreek_and_Coptic}\p{InIPA_Extensions}œ\u00C0-\u00FF]' +
+                    ur'[\u0300-\u0360\u0362-\u036F]*\p{InSpacing_Modifier_Letters}*', re.U | re.X)
+
+
+def segment_text(text, seg_regex=SEG_REGEX):
+    """Return an iterator of segments in the text.
+
+    text -- string of IPA Unicode text
+    seg_regex -- compiled regex defining a segment (base + modifiers)
+    """
+    for m in seg_regex.finditer(text):
+        yield m.group(0)
+
+
 def fts(s):
+    """Given string with +/-[alphabetical sequence]s, return list of features.
+
+    s -- string with +/-[alphabetical sequence]s
+    """
     return [m.groups() for m in FT_REGEX.finditer(s)]
+
 
 filenames = {
     'spe+': 'data/segment_features.csv',
     'panphon': 'data/segment_features.csv',
     'phoible': 'data/segment_features_phoible.csv',
-    }
+}
 
 
 class FeatureTable(object):
@@ -33,16 +51,20 @@ class FeatureTable(object):
     data/segment_features.csv.
 
     """
+
     def __init__(self, feature_set='spe+'):
         filename = filenames[feature_set]
         self._read_table(filename)
+        assert self.sonority(u'p') == 1
+        assert self.sonority(u'a') == 5
+        assert self.sonority(u'pʰ') == 1
+        assert self.sonority(u'ã') == 5
 
     def _read_table(self, filename):
         """Read the data from data/segment_features.csv into self.segments, a
         list of 2-tuples of unicode strings and sets of feature tuples
         and self.seg_dict, a dictionary mapping from unicode segments
         and sets of feature tuples.
-
         """
         filename = pkg_resources.resource_filename(
             __name__, filename)
@@ -70,7 +92,7 @@ class FeatureTable(object):
         if segment in self.seg_dict:
             return self.seg_dict[segment]
         else:
-            return None
+            raise SegmentError
 
     def match(self, ft_mask, ft_seg):
         """Evaluates whether a set of features (ft_mask) are a subset of another set of features (ft_seg).
@@ -147,8 +169,10 @@ class FeatureTable(object):
 
         seg1, seg2 -- segments (lists of <value, name> pairs)
         """
+
         def seg_to_dict(seg):
             return {k: v for (v, k) in seg}
+
         assert seg_to_dict([(1, 2), (3, 4)]) == {1: 2, 3: 4}
 
     def fts_to_str(self, seg):
