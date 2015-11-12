@@ -15,7 +15,7 @@ the fiel `panphon/data/segment_features.csv`.
 
     >>> import panphon.panphon as panphon
     >>> ft = panphon.FeatureTable()
-    >>> ft.feature_match(set([(u'+', u'syl')]), u'a')
+    >>> ft.ftr_match(set([(u'+', u'syl')]), u'a')
 	True
 
 This interface consists of a single class with a couple of
