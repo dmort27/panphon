@@ -55,10 +55,10 @@ class FeatureTable(object):
     def __init__(self, feature_set='spe+'):
         filename = filenames[feature_set]
         self._read_table(filename)
-        assert self.sonority(u'p') == 1
-        assert self.sonority(u'a') == 5
-        assert self.sonority(u'pʰ') == 1
-        assert self.sonority(u'ã') == 5
+        # assert self.sonority(u'p') == 1
+        # assert self.sonority(u'a') == 5
+        # assert self.sonority(u'pʰ') == 1
+        # assert self.sonority(u'ã') == 5
 
     def _read_table(self, filename):
         """Read the data from data/segment_features.csv into self.segments, a
@@ -210,21 +210,30 @@ class FeatureTable(object):
 
         seg -- segment given as a set of <val, name> tuples
         """
-        # Obstruents: [-son]
-        if self.match([(u'-', u'son')], seg):
-            return 1
-        # Nasal stops: [+son, -cont]
-        elif self.match([(u'-', u'cont')], seg):
-            return 2
-        # Liquids: [+son, +cont]
-        elif self.match([(u'+', u'cons')], seg):
-            return 3
-        # High vowels/glides: [+son, +cont, -cons, +hi]
-        elif self.match([(u'+', u'hi')], seg):
-            return 4
-        # Non-high vowels: [+son, +cont, -cons, -hi]
+        if self.match([(u'-', u'cons')], seg):
+            if self.match([(u'+', u'lo')], seg):
+                return 9
+            elif self.match([(u'-', u'hi')], seg):
+                return 8
+            else:
+                return 7
         else:
-            return 5
+            if self.match([(u'+', u'son')], seg):
+                if self.match([(u'-', u'nas')], seg):
+                    return 6
+                else:
+                    return 5
+            elif self.match([(u'+', u'cont')], seg):
+                if self.match([(u'+', u'voi')], seg):
+                    return 4
+                else:
+                    return 3
+            else:
+                if self.match([(u'+', u'voi')], seg):
+                    return 2
+                else:
+                    return 1
+
 
     def sonority(self, seg):
         """Returns the sonority of a segment.
