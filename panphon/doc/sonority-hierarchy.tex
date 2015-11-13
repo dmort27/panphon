@@ -1,0 +1,53 @@
+\documentclass[10pt]{article}
+\usepackage[usenames]{color} %used for font color
+\usepackage{amssymb} %maths
+\usepackage{amsmath} %maths
+\usepackage{times}
+\usepackage[utf8]{inputenc} %useful to type directly diacritic characters
+\usepackage{forest}\begin{document}
+\begin{forest}
+[Segment, for tree={parent anchor=south, child anchor=north} 
+  [{-cons}
+    [{+lo}
+      [low vowels]
+    ] 
+    [{-lo} 
+      [{-hi}
+        [mid vowels]
+      ]
+      [{+hi}
+        [high vowels]
+      ]
+    ]
+  ]
+  [{+cons}
+    [{+son}
+      [{-nas}
+        [approximants]
+      ]
+      [{+nas}
+        [nasals]
+      ]
+    ]
+    [{-son}
+      [{+cont}
+        [{+voi}
+          [{voiced fricatives}]
+        ]
+        [{-voi}
+          [{voiceless fricatives}]
+        ]
+      ]
+      [{-cont}
+        [{+voi}
+          [voiced plosives]
+        ]
+        [{-voi}
+          [voiceless plosives]
+        ]
+      ]
+    ]
+  ]
+]
+\end{forest}
+\end{document}
