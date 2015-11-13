@@ -1,4 +1,4 @@
-PanPhon
+panphon
 =======
 
 These files constitute a preliminary database of segments in the
@@ -19,7 +19,7 @@ the fiel ``panphon/data/segment_features.csv``.
 
     >>> import panphon.panphon as panphon
     >>> ft = panphon.FeatureTable()
-    >>> ft.feature_match(set([(u'+', u'syl')]), u'a')
+    >>> ft.ftr_match(set([(u'+', u'syl')]), u'a')
     True
 
 This interface consists of a single class with a couple of methods. The
@@ -40,7 +40,7 @@ IPA segments based upon their phonological features. For a detailed help
 message, execute ``python apply_diacritics.py -h`` in the directory
 containing ``apply_diacritics.py``.
 
-``apply_diacritics.py`` has three library dependencies aside from the
+``apply_diacritics.py`` has a few library dependencies aside from the
 Python standard library:
 
 1. `PyYAML <http://pyyaml.org/wiki/PyYAML>`__. If ``pip`` is installed,
@@ -115,11 +115,9 @@ which takes three arguments:
 Data Files
 ----------
 
-This package also includes two data files. The most important of these
-is ipa\_table.csv, a CSV table of IPA characters with definitions in
-terms of phonological features. It also includes some data from the
-`PHOIBLE <http://phoible.org/>`__ database which, it is hoped, will be
-useful in testing the database and model.
+This package also includes one data file. The most important of these is
+ipa\_table.csv, a CSV table of IPA characters with definitions in terms
+of phonological features.
 
 IPA Character Database: ipa\_table.csv
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -158,14 +156,6 @@ The IPA Character Table is intended to contain all of the unmodified
 symbols in IPA, as well as all common affricates and dually-articulated
 segments. It is meant to be augmented by the rule-driven application of
 diacritics and modifiers.
-
-Phonemes from the PHOIBLE Database: phoible\_phonemes.csv
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The `PHOIBLE <http://phoible.org>`__ database is a large database of
-phonological inventories. The data included here is a list of phonemes
-included in PHOIBLE, against which the results of rule application to
-the IPA Character Table can tested.
 
 Configuration and Rule Files
 ----------------------------
