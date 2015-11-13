@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='panphon',
-      version='0.2',
+      version='0.3',
       description='Tools for using the International Phonetic' +
       'Alphabet with phonological features',
       url='http://www.davidmortensen.org/panphon',

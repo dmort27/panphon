@@ -3,7 +3,6 @@ from __future__ import print_function
 import pkg_resources
 import regex as re
 import unicodecsv as csv
-import copy
 
 
 class FeatureError(Exception):
@@ -42,7 +41,6 @@ def fts(s):
 filenames = {
     'spe+': 'data/segment_features.csv',
     'panphon': 'data/segment_features.csv',
-    'phoible': 'data/segment_features_phoible.csv',
 }
 
 
