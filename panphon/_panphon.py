@@ -257,45 +257,6 @@ class FeatureTable(object):
                 matching_segs.append(seg)
         return matching_segs
 
-    def fts_to_regex_fragment(self, fts):
-        """Return a regex fragment (enclosed in parentheses) corresponding to a
-        single segment.
-
-        fts - iterable of <name, value> tuples to serve as a feature mask.
-        """
-        segs = self.all_segs_matching_fts(fts)
-        options = u'|'.join(segs)
-        return u'({})'.format(options)
-
-    def compile_regex_fragments(self, fragments):
-        """Return a compiled regex consisting of the concatenation of the
-        sequence of fragments (pattern strings).
-
-        fragments -- List of regular expression pattern strings.
-        """
-        pattern = u''.join(fragments)
-        return re.compile(pattern)
-
-    def ft_str_to_sequence(self, ft_str):
-        """Given a string where features are divided with any standard delimiter
-        but are grouped into segments with square brackets, return a sequence of
-         feature masks.
-
-        ft_str -- A string encoding a sequence of (potentially underspecified)
-        segments in terms of features.
-        """
-        sequence = []
-        for m in re.finditer('[[]([^]]+)[]]', ft_str):
-            sequence.append(self.fts_to_regex_fragment(m.group(1)))
-        return sequence
-
-    def compile_regex(self, ft_str):
-        """Given a string where features are divided with any standard delimiter
-        (space, comma, etc.) but are grouped into segments with square brackets,
-        return a compiled regular expressions.
-        """
-        return self.compile_regex_fragments(self.ft_str_to_sequence(ft_str))
-
     def compile_regex_from_str(self, ft_str):
         """Given a string describing features masks for a sequence of segments,
         return a regex matching the corresponding strings.
