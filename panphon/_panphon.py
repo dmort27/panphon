@@ -61,9 +61,9 @@ class FeatureTable(object):
 
     def _read_table(self, filename):
         """Read the data from data/segment_features.csv into self.segments, a
-        list of 2-tuples of unicode strings and sets of feature tuples
-        and self.seg_dict, a dictionary mapping from unicode segments
-        and sets of feature tuples.
+        list of 2-tuples of unicode strings and sets of feature tuples and
+        self.seg_dict, a dictionary mapping from unicode segments and sets of
+        feature tuples. 
         """
         filename = pkg_resources.resource_filename(
             __name__, filename)
@@ -260,7 +260,11 @@ class FeatureTable(object):
     def compile_regex_from_str(self, ft_str):
         """Given a string describing features masks for a sequence of segments,
         return a regex matching the corresponding strings.
+
+        ft_str -- A string consisting of feature masks, each enclosed in square
+        brackets, in which the features are delimited by any standard delimiter.
         """
+
         sequence = []
         for m in re.finditer(ur'\[([^]]+)\]', ft_str):
             ft_mask = fts(m.group(1))
