@@ -295,3 +295,17 @@ class FeatureTable(object):
         return a compiled regular expressions.
         """
         return self.compile_regex_fragments(self.ft_str_to_sequence(ft_str))
+
+    def compile_regex_from_str(self, ft_str):
+        """Given a string describing features masks for a sequence of segments,
+        return a regex matching the corresponding strings.
+        """
+        sequence = []
+        for m in re.finditer(ur'\[([^]]+)\]', ft_str):
+            ft_mask = fts(m.group(1))
+            segs = self.all_segs_matching_fts(ft_mask)
+            sub_pat = u'({})'.format(u'|'.join(segs))
+            sequence.append(sub_pat)
+        pattern = u''.join(sequence)
+        regex = re.compile(pattern)
+        return regex
