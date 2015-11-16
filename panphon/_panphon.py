@@ -18,7 +18,8 @@ FT_REGEX = re.compile(ur'([-+0])([a-z][A-Za-z]*)', re.U | re.X)
 
 SEG_REGEX = re.compile(ur'[\p{InBasic_Latin}\p{InGreek_and_Coptic}' +
                     ur'\p{InIPA_Extensions}œ\u00C0-\u00FF]' +
-                    ur'[\u0300-\u0360\u0362-\u036F]*\p{InSpacing_Modifier_Letters}*', re.U | re.X)
+                    ur'[\u0300-\u0360\u0362-\u036F]*' +
+                    ur'\p{InSpacing_Modifier_Letters}*', re.U | re.X)
 
 
 def segment_text(text, seg_regex=SEG_REGEX):
@@ -63,7 +64,7 @@ class FeatureTable(object):
         """Read the data from data/segment_features.csv into self.segments, a
         list of 2-tuples of unicode strings and sets of feature tuples and
         self.seg_dict, a dictionary mapping from unicode segments and sets of
-        feature tuples. 
+        feature tuples.
         """
         filename = pkg_resources.resource_filename(
             __name__, filename)
@@ -247,7 +248,7 @@ class FeatureTable(object):
 
     def all_segs_matching_fts(self, fts):
         """Return a segments matching a feature mask, both as <name, value>
-        tuples.
+        tuples (sorted in reverse order by length).
 
          fts -- feature mask as <name, value> tuples.
         """
@@ -255,7 +256,7 @@ class FeatureTable(object):
         for seg, pairs in self.segments:
             if set(fts) <= set(pairs):
                 matching_segs.append(seg)
-        return matching_segs
+        return sorted(matching_segs, reverse=True)
 
     def compile_regex_from_str(self, ft_str):
         """Given a string describing features masks for a sequence of segments,
