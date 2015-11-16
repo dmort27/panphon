@@ -173,7 +173,9 @@ class FeatureTable(object):
 
         assert seg_to_dict([(1, 2), (3, 4)]) == {1: 2, 3: 4}
 
+    # Needs to be debugged or removed!
     def fts_to_str(self, seg):
+        """Returns a string representation of a set of <feature, value> pairs."""
         vals = {u'0': ' ', u'-': '0', u'+': '1'}
         seg_dict = {n: v for (v, n) in seg}
         vector = []
@@ -239,3 +241,31 @@ class FeatureTable(object):
         seg -- segment given as a Unicode IPA string
         """
         return self.sonority_from_fts(self.fts(seg))
+
+    def all_segs_matching_fts(self, fts):
+        """Return a segments matching a feature mask, both as <name, value> tuples.
+
+         fts -- feature mask as <name, value> tuples.
+        """
+        matching_segs = []
+        for seg, pairs in self.segments:
+            if set(fts) <= set(pairs):
+                matching_segs.append(seg)
+        return matching_segs
+
+    def fts_to_regex_fragment(self, fts):
+        """Return a regex fragment (enclosed in parentheses) corresponding to a single segment.
+
+        fts - iterator of <name, value> tuples to serve as a feature mask.
+        """
+        segs = self.all_segs_matching_fts(fts)
+        options = u'|'.join(segs)
+        return u'({})'.format(options)
+
+    def compile_regex_fragments(self, fragments):
+        """Return a compiled regex consisting of the concatenation of the sequence of fragments (pattern strings).
+
+        fragments -- List of regular expression pattern strings.
+        """
+        pattern = u''.join(fragments)
+        return re.compile(pattern)
