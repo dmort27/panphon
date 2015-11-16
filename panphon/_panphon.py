@@ -16,7 +16,8 @@ class SegmentError(Exception):
 FT_REGEX = re.compile(ur'([-+0])([a-z][A-Za-z]*)', re.U | re.X)
 
 
-SEG_REGEX = re.compile(ur'[\p{InBasic_Latin}\p{InGreek_and_Coptic}\p{InIPA_Extensions}œ\u00C0-\u00FF]' +
+SEG_REGEX = re.compile(ur'[\p{InBasic_Latin}\p{InGreek_and_Coptic}' +
+                    ur'\p{InIPA_Extensions}œ\u00C0-\u00FF]' +
                     ur'[\u0300-\u0360\u0362-\u036F]*\p{InSpacing_Modifier_Letters}*', re.U | re.X)
 
 
@@ -93,7 +94,8 @@ class FeatureTable(object):
             raise SegmentError
 
     def match(self, ft_mask, ft_seg):
-        """Evaluates whether a set of features (ft_mask) are a subset of another set of features (ft_seg).
+        """Evaluates whether a set of features (ft_mask) are a subset of another
+        set of features (ft_seg).
 
         ft_mask -- pattern defined as set of features (<val, name> tuples).
         ft_seg -- segment defined as a set of features (<val, name> tuples).
@@ -175,7 +177,8 @@ class FeatureTable(object):
 
     # Needs to be debugged or removed!
     def fts_to_str(self, seg):
-        """Returns a string representation of a set of <feature, value> pairs."""
+        """Returns a string representation of a set of <feature, value>
+        pairs."""
         vals = {u'0': ' ', u'-': '0', u'+': '1'}
         seg_dict = {n: v for (v, n) in seg}
         vector = []
@@ -243,7 +246,8 @@ class FeatureTable(object):
         return self.sonority_from_fts(self.fts(seg))
 
     def all_segs_matching_fts(self, fts):
-        """Return a segments matching a feature mask, both as <name, value> tuples.
+        """Return a segments matching a feature mask, both as <name, value>
+        tuples.
 
          fts -- feature mask as <name, value> tuples.
         """
@@ -254,18 +258,40 @@ class FeatureTable(object):
         return matching_segs
 
     def fts_to_regex_fragment(self, fts):
-        """Return a regex fragment (enclosed in parentheses) corresponding to a single segment.
+        """Return a regex fragment (enclosed in parentheses) corresponding to a
+        single segment.
 
-        fts - iterator of <name, value> tuples to serve as a feature mask.
+        fts - iterable of <name, value> tuples to serve as a feature mask.
         """
         segs = self.all_segs_matching_fts(fts)
         options = u'|'.join(segs)
         return u'({})'.format(options)
 
     def compile_regex_fragments(self, fragments):
-        """Return a compiled regex consisting of the concatenation of the sequence of fragments (pattern strings).
+        """Return a compiled regex consisting of the concatenation of the
+        sequence of fragments (pattern strings).
 
         fragments -- List of regular expression pattern strings.
         """
         pattern = u''.join(fragments)
         return re.compile(pattern)
+
+    def ft_str_to_sequence(self, ft_str):
+        """Given a string where features are divided with any standard delimiter
+        but are grouped into segments with square brackets, return a sequence of
+         feature masks.
+
+        ft_str -- A string encoding a sequence of (potentially underspecified)
+        segments in terms of features.
+        """
+        sequence = []
+        for m in re.finditer('[[]([^]]+)[]]', ft_str):
+            sequence.append(self.fts_to_regex_fragment(m.group(1)))
+        return sequence
+
+    def compile_regex(self, ft_str):
+        """Given a string where features are divided with any standard delimiter
+        (space, comma, etc.) but are grouped into segments with square brackets,
+        return a compiled regular expressions.
+        """
+        return self.compile_regex_fragments(self.ft_str_to_sequence(ft_str))
