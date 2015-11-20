@@ -17,9 +17,10 @@ FT_REGEX = re.compile(ur'([-+0])([a-z][A-Za-z]*)', re.U | re.X)
 
 
 SEG_REGEX = re.compile(ur'[\p{InBasic_Latin}\p{InGreek_and_Coptic}' +
-                    ur'\p{InIPA_Extensions}œ\u00C0-\u00FF]' +
-                    ur'[\u0300-\u0360\u0362-\u036F]*' +
-                    ur'\p{InSpacing_Modifier_Letters}*', re.U | re.X)
+                       ur'\p{InIPA_Extensions}œ\u00C0-\u00FF]' +
+                       ur'[\u0300-\u0360\u0362-\u036F]*' +
+                       ur'\p{InSpacing_Modifier_Letters}*',
+                       re.U | re.X)
 
 
 def segment_text(text, seg_regex=SEG_REGEX):
@@ -198,7 +199,7 @@ class FeatureTable(object):
         plus, minus = (u'+', ft_name), (u'-', ft_name)
         w_plus, w_minus = set(list(fs) + [plus]), set(list(fs) + [minus])
         return any([self.fts_match(w_plus, s) for s in inv]) and \
-               any([self.fts_match(w_minus, s) for s in inv])
+            any([self.fts_match(w_minus, s) for s in inv])
 
     def fts_count(self, fts, inv):
         """Returns the count of segments in an inventory matching a give
@@ -238,7 +239,6 @@ class FeatureTable(object):
                 else:
                     return 1
 
-
     def sonority(self, seg):
         """Returns the sonority of a segment.
 
@@ -262,9 +262,9 @@ class FeatureTable(object):
         """Given a string describing features masks for a sequence of segments,
         return a regex matching the corresponding strings.
 
-        ft_str -- A string consisting of feature masks, each enclosed in square
-        brackets, in which the features are delimited by any standard delimiter.
-        """
+        ft_str -- A string consisting of feature masks, each enclosed in
+        square brackets, in which the features are delimited by any
+        standard delimiter. """
 
         sequence = []
         for m in re.finditer(ur'\[([^]]+)\]', ft_str):
