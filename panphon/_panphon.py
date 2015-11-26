@@ -3,6 +3,10 @@ from __future__ import print_function
 import pkg_resources
 import regex as re
 import unicodecsv as csv
+import logging
+
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 class FeatureError(Exception):
@@ -49,6 +53,28 @@ filenames = {
     'spe+': 'data/segment_features.csv',
     'panphon': 'data/segment_features.csv',
 }
+
+
+class BoolTree(object):
+    def __init__(self, test=None, t_node=None, f_node=None):
+        self.test = test
+        self.t_node = t_node
+        self.f_node = f_node
+
+    def get_value(self):
+        logging.debug('t_node={} f_node={}'.format(self.t_node, self.f_node))
+        if self.test:
+            if isinstance(self.t_node, BoolTree):
+                return self.t_node.get_value()
+            else:
+                logging.debug('Returning {}'.format(self.t_node))
+                return self.t_node
+        else:
+            if isinstance(self.f_node, BoolTree):
+                return self.f_node.get_value()
+            else:
+                logging.debug('Returning {}'.format(self.f_node))
+                return self.f_node
 
 
 class FeatureTable(object):
@@ -215,35 +241,17 @@ class FeatureTable(object):
         return len(filter(lambda s: self.fts_match(fts, s), inv))
 
     def sonority_from_fts(self, seg):
-        """Returns the sonority of a segment, using 'spe+' feature system.
-
-        seg -- segment given as a set of <val, name> tuples
-        """
-        if self.match([(u'-', u'cons')], seg):
-            if self.match([(u'+', u'lo')], seg):
-                return 9
-            elif self.match([(u'-', u'hi')], seg):
-                return 8
-            elif self.match([(u'+', u'syl')], seg):
-                return 7
-            else:
-                return 6
-        else:
-            if self.match([(u'+', u'son')], seg):
-                if self.match([(u'-', u'nas')], seg):
-                    return 5
-                else:
-                    return 6
-            elif self.match([(u'+', u'cont')], seg):
-                if self.match([(u'+', u'voi')], seg):
-                    return 3
-                else:
-                    return 2
-            else:
-                if self.match([(u'+', u'voi')], seg):
-                    return 1
-                else:
-                    return 0
+        def match(m):
+            return self.match(fts(m), seg)
+        minusHi = BoolTree(match('-hi'), 8, 7)
+        plusLo = BoolTree(match('+lo'), 9, minusHi)
+        minusNas = BoolTree(match('-nas'), 6, 5)
+        plusVoi1 = BoolTree(match('+voi'), 4, 3)
+        plusVoi2 = BoolTree(match('+voi'), 2, 1)
+        plusCont = BoolTree(match('+cont'), plusVoi1, plusVoi2)
+        plusSon = BoolTree(match('+son'), minusNas, plusCont)
+        minusCons = BoolTree(match('-cons'), plusLo, plusSon)
+        return minusCons.get_value()
 
     def sonority(self, seg):
         """Returns the sonority of a segment.
