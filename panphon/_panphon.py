@@ -13,6 +13,10 @@ class SegmentError(Exception):
     pass
 
 
+class IpaRegexError(Exception):
+    pass
+
+
 FT_REGEX = re.compile(ur'([-+0])([a-z][A-Za-z]*)', re.U | re.X)
 
 
@@ -220,24 +224,26 @@ class FeatureTable(object):
                 return 9
             elif self.match([(u'-', u'hi')], seg):
                 return 8
-            else:
+            elif self.match([(u'+', u'syl')], seg):
                 return 7
+            else:
+                return 6
         else:
             if self.match([(u'+', u'son')], seg):
                 if self.match([(u'-', u'nas')], seg):
-                    return 6
-                else:
                     return 5
+                else:
+                    return 6
             elif self.match([(u'+', u'cont')], seg):
                 if self.match([(u'+', u'voi')], seg):
-                    return 4
-                else:
                     return 3
+                else:
+                    return 2
             else:
                 if self.match([(u'+', u'voi')], seg):
-                    return 2
-                else:
                     return 1
+                else:
+                    return 0
 
     def sonority(self, seg):
         """Returns the sonority of a segment.
