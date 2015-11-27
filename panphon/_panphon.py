@@ -6,7 +6,7 @@ import unicodecsv as csv
 import logging
 
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 
 class FeatureError(Exception):
@@ -253,12 +253,25 @@ class FeatureTable(object):
         minusCons = BoolTree(match('-cons'), plusLo, plusSon)
         return minusCons.get_value()
 
+    def sonority_from_fts2(self, seg):
+        def match(m):
+            return self.match(fts(m), seg)
+        minusHi = BoolTree(match('-hi'), 9, 8)
+        minusNas = BoolTree(match('-nas'), 6, 5)
+        plusVoi1 = BoolTree(match('+voi'), 4, 3)
+        plusVoi2 = BoolTree(match('+voi'), 2, 1)
+        plusCont = BoolTree(match('+cont'), plusVoi1, plusVoi2)
+        plusSon = BoolTree(match('+son'), minusNas, plusCont)
+        minusCons = BoolTree(match('-cons'), 7, plusSon)
+        plusSyl = BoolTree(match('+syl'), minusHi, minusCons)
+        return plusSyl.get_value()
+
     def sonority(self, seg):
         """Returns the sonority of a segment.
 
         seg -- segment given as a Unicode IPA string
         """
-        return self.sonority_from_fts(self.fts(seg))
+        return self.sonority_from_fts2(self.fts(seg))
 
     def all_segs_matching_fts(self, fts):
         """Return a segments matching a feature mask, both as <name, value>
