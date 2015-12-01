@@ -22,13 +22,16 @@ class IpaRegexError(Exception):
 
 
 FT_REGEX = re.compile(ur'([-+0])([a-z][A-Za-z]*)', re.U | re.X)
-
-
+MT_REGEX = re.compile(ur'\[[-+0a-zA-Z ,;]+\]')
 SEG_REGEX = re.compile(ur'[\p{InBasic_Latin}\p{InGreek_and_Coptic}' +
                        ur'\p{InIPA_Extensions}œ\u00C0-\u00FF]' +
                        ur'[\u0300-\u0360\u0362-\u036F]*' +
                        ur'\p{InSpacing_Modifier_Letters}*',
                        re.U | re.X)
+filenames = {
+    'spe+': 'data/segment_features.csv',
+    'panphon': 'data/segment_features.csv',
+}
 
 
 def segment_text(text, seg_regex=SEG_REGEX):
@@ -49,10 +52,17 @@ def fts(s):
     return [m.groups() for m in FT_REGEX.finditer(s)]
 
 
-filenames = {
-    'spe+': 'data/segment_features.csv',
-    'panphon': 'data/segment_features.csv',
-}
+def pat(p):
+    """Given a string with feature matrices (features grouped with square
+    brackets into segments, return a list of sets of <value, feature> tuples.
+
+    p - pattern as string
+    """
+    pattern = []
+    for matrix in [m.group(0) for m in MT_REGEX.finditer(p)]:
+        segment = set([m.groups() for m in FT_REGEX.finditer(matrix)])
+        pattern.append(segment)
+    return pattern
 
 
 class BoolTree(object):
@@ -85,11 +95,8 @@ class FeatureTable(object):
 
     def __init__(self, feature_set='spe+'):
         filename = filenames[feature_set]
-        self._read_table(filename)
-        # assert self.sonority(u'p') == 1
-        # assert self.sonority(u'a') == 5
-        # assert self.sonority(u'pʰ') == 1
-        # assert self.sonority(u'ã') == 5
+        self.segments, self.seg_dict, self.names = self._read_table(filename)
+        self.seg_regex = self._build_seg_regex()
 
     def _read_table(self, filename):
         """Read the data from data/segment_features.csv into self.segments, a
@@ -99,7 +106,7 @@ class FeatureTable(object):
         """
         filename = pkg_resources.resource_filename(
             __name__, filename)
-        self.segments = []
+        segments = []
         with open(filename, 'rb') as f:
             reader = csv.reader(f, encoding='utf-8')
             header = reader.next()
@@ -108,9 +115,14 @@ class FeatureTable(object):
                 seg = row[0]
                 vals = row[1:]
                 specs = set(zip(vals, names))
-                self.segments.append((seg, specs))
-        self.seg_dict = dict(self.segments)
-        self.names = names
+                segments.append((seg, specs))
+        seg_dict = dict(segments)
+        return segments, seg_dict, names
+
+    def _build_seg_regex(self):
+        # Build a regex that will match individual segments in a string.
+        segs = sorted(self.seg_dict.keys(), key=lambda x: len(x), reverse=True)
+        return re.compile(ur'({})'.format(u'|'.join(segs)))
 
     def delete_ties(self):
         """Deletes ties from all segments."""
@@ -118,8 +130,8 @@ class FeatureTable(object):
                          for (k, v) in self.seg_dict.items()}
 
     def fts(self, segment):
-        """Returns features corresponding to segment as list of <feature,
-        value> tuples."""
+        """Returns features corresponding to segment as list of <value,
+        feature> tuples."""
         if segment in self.seg_dict:
             return self.seg_dict[segment]
         else:
@@ -143,6 +155,37 @@ class FeatureTable(object):
             return features <= self.seg_dict[segment]
         else:
             return None
+
+    def segs(self, word):
+        """Returns a list of segments (as strings) from a word (as a
+        string).
+        """
+        return [m.group(1) for m in self.seg_regex.finditer(word)]
+
+    def word_fts(self, w):
+        """Returns a list of <value, feature> tuples, given a Unicode IPA
+        string.
+
+        w -- a Unicode IPA string consisting of one or more segments
+        """
+        return map(self.fts, self.segs(w))
+
+    def match_pattern(self, pat, word):
+        """Implements limited pattern matching. Matches just in case pattern
+        is the same length (in segments) as the word and each of the segments
+        in the pattern is a featural subset of the corresponding segment in the
+        word.
+
+        pat -- pattern consisting of a list of sets of <value, featured>
+        tuples.
+
+        word -- a Unicode IPA string consisting of zero or more segments.
+        """
+        segs = self.word_fts(word)
+        if len(pat) != len(segs):
+            return False
+        else:
+            return all([set(p) <= s for (p, s) in zip(pat, segs)])
 
     def seg_known(self, segment):
         """Returns True if segment is in segment <=> features database."""
@@ -232,7 +275,7 @@ class FeatureTable(object):
             any([self.fts_match(w_minus, s) for s in inv])
 
     def fts_count(self, fts, inv):
-        """Returns the count of segments in an inventory matching a give
+        """Returns the count of segments in an inventory matching a given
         feature mask.
 
         fts -- feature mask given as a set of <val, name> tuples
@@ -241,19 +284,7 @@ class FeatureTable(object):
         return len(filter(lambda s: self.fts_match(fts, s), inv))
 
     def sonority_from_fts(self, seg):
-        def match(m):
-            return self.match(fts(m), seg)
-        minusHi = BoolTree(match('-hi'), 8, 7)
-        plusLo = BoolTree(match('+lo'), 9, minusHi)
-        minusNas = BoolTree(match('-nas'), 6, 5)
-        plusVoi1 = BoolTree(match('+voi'), 4, 3)
-        plusVoi2 = BoolTree(match('+voi'), 2, 1)
-        plusCont = BoolTree(match('+cont'), plusVoi1, plusVoi2)
-        plusSon = BoolTree(match('+son'), minusNas, plusCont)
-        minusCons = BoolTree(match('-cons'), plusLo, plusSon)
-        return minusCons.get_value()
-
-    def sonority_from_fts2(self, seg):
+        """Given a segment, returns the sonority on a scale of 1 to 9."""
         def match(m):
             return self.match(fts(m), seg)
         minusHi = BoolTree(match('-hi'), 9, 8)
@@ -271,7 +302,7 @@ class FeatureTable(object):
 
         seg -- segment given as a Unicode IPA string
         """
-        return self.sonority_from_fts2(self.fts(seg))
+        return self.sonority_from_fts(self.fts(seg))
 
     def all_segs_matching_fts(self, fts):
         """Return a segments matching a feature mask, both as <name, value>
