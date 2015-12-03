@@ -1,7 +1,20 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 import unittest
 import _panphon
+
+
+class TestFeatureTable(unittest.TestCase):
+
+    def setUp(self):
+        self.ft = _panphon.FeatureTable()
+
+    def test_fts_contrast2(self):
+        inv = 'p t k b d g a e i o u'.split(' ')
+        self.assertTrue(self.ft.fts_contrast2([('-', 'syl')], 'voi', inv))
+        self.assertFalse(self.ft.fts_contrast2([('+', 'syl')], 'cor', inv))
+        self.assertTrue(self.ft.fts_contrast2(_panphon.fts('+ant -cor'), 'voi', inv))
 
 
 class TestIpaRe(unittest.TestCase):
@@ -11,13 +24,13 @@ class TestIpaRe(unittest.TestCase):
 
     def test_compile_regex_from_str1(self):
         r = self.ft.compile_regex_from_str('[-son -cont][+syl -hi -lo]')
-        self.assertIsNotNone(r.match(u'tʰe'))
-        self.assertIsNone(r.match(u'pi'))
+        self.assertIsNotNone(r.match('tʰe'))
+        self.assertIsNone(r.match('pi'))
 
     def test_compile_regex_from_str2(self):
-        r = self.ft.compile_regex_from_str(u'[-son -cont][+son +cont]')
-        self.assertIsNotNone(r.match(u'pj'))
-        self.assertIsNone(r.match(u'ts'))
+        r = self.ft.compile_regex_from_str('[-son -cont][+son +cont]')
+        self.assertIsNotNone(r.match('pj'))
+        self.assertIsNone(r.match('ts'))
 
 
 class TestSonority(unittest.TestCase):
@@ -26,47 +39,47 @@ class TestSonority(unittest.TestCase):
         self.ft = _panphon.FeatureTable()
 
     def test_sonority_nine(self):
-        segs = [u'a', u'ɑ', u'æ', u'ɒ', u'e', u'o']
+        segs = ['a', 'ɑ', 'æ', 'ɒ', 'e', 'o']
         scores = [9] * 6
         self.assertEqual(map(self.ft.sonority, segs), scores)
 
     def test_sonority_eight(self):
-        segs = [u'i', u'u', u'ɨ', u'ʉ', u'ɯ', u'u']
+        segs = ['i', '', 'ɨ', 'ʉ', 'ɯ', '']
         scores = [8] * 6
         self.assertEqual(map(self.ft.sonority, segs), scores)
 
     def test_sonority_seven(self):
-        segs = [u'j', u'w', u'ʋ', u'ɰ', u'ɹ']
+        segs = ['j', 'w', 'ʋ', 'ɰ', 'ɹ']
         scores = [7] * 5
         self.assertEqual(map(self.ft.sonority, segs), scores)
 
     def test_sonority_six(self):
-        segs = [u'l', u'ɭ', u'r', u'ɾ']
+        segs = ['l', 'ɭ', 'r', 'ɾ']
         scores = [6] * 4
         self.assertEqual(map(self.ft.sonority, segs), scores)
 
     def test_sonority_five(self):
-        segs = [u'n', u'm', u'ŋ', u'ɴ']
+        segs = ['n', 'm', 'ŋ', 'ɴ']
         scores = [5] * 4
         self.assertEqual(map(self.ft.sonority, segs), scores)
 
     def test_sonority_four(self):
-        segs = [u'v', u'z', u'ʒ', u'ɣ']
+        segs = ['v', 'z', 'ʒ', 'ɣ']
         scores = [4] * 4
         self.assertEqual(map(self.ft.sonority, segs), scores)
 
     def test_sonority_three(self):
-        segs = [u'f', u's', u'x', u'ħ', u'ʃ']
+        segs = ['f', 's', 'x', 'ħ', 'ʃ']
         scores = [3] * 5
         self.assertEqual(map(self.ft.sonority, segs), scores)
 
     def test_sonority_two(self):
-        segs = [u'b', u'g', u'd', u'ɢ']
+        segs = ['b', 'g', 'd', 'ɢ']
         scores = [2] * 4
         self.assertEqual(map(self.ft.sonority, segs), scores)
 
     def test_sonority_one(self):
-        segs = [u'p', u'k', u'c', u'q']
+        segs = ['p', 'k', 'c', 'q']
         scores = [1] * 4
         self.assertEqual(map(self.ft.sonority, segs), scores)
 

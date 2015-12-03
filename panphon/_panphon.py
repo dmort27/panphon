@@ -135,7 +135,10 @@ class FeatureTable(object):
         if segment in self.seg_dict:
             return self.seg_dict[segment]
         else:
-            raise SegmentError
+            msg = 'Segment {} ({}) is unknown.'.format(
+                segment.encode('utf-8'),
+                repr(segment),)
+            raise SegmentError(msg)
 
     def match(self, ft_mask, ft_seg):
         """Evaluates whether a set of features (ft_mask) are a subset of another
@@ -218,7 +221,7 @@ class FeatureTable(object):
         return fts
 
     def fts_match_any(self, fts, inv):
-        """Returns a boolean based on whether there is a segment in 'inv'
+        """ERROR! Returns a boolean based on whether there is a segment in 'inv'
         that matches all of the features in 'features'.
 
         features -- a collection of feature 2-tuples <val, name>
@@ -273,6 +276,24 @@ class FeatureTable(object):
         w_plus, w_minus = set(list(fs) + [plus]), set(list(fs) + [minus])
         return any([self.fts_match(w_plus, s) for s in inv]) and \
             any([self.fts_match(w_minus, s) for s in inv])
+
+    def fts_contrast2(self, fs, ft_name, inv):
+        """Return True if there is a segment in inv that contrasts in feature
+        ft_name.
+
+        fs --
+        ft_name -- name of the feature where contrast must be present.
+        inv -- collection of segments represented as Unicode segments.
+        """
+        inv_fts = [self.fts(x) for x in inv if set(fs) <= self.fts(x)]
+        for a in inv_fts:
+            for b in inv_fts:
+                if a != b:
+                    diff = a ^ b
+                    if len(diff) == 2:
+                        if all([nm == ft_name for (_, nm) in diff]):
+                            return True
+        return False
 
     def fts_count(self, fts, inv):
         """Returns the count of segments in an inventory matching a given
