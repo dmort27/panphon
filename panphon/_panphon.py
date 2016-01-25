@@ -3,8 +3,6 @@ from __future__ import print_function
 import pkg_resources
 import regex as re
 import unicodecsv as csv
-import logging
-
 
 # logging.basicConfig(level=logging.DEBUG)
 
@@ -72,18 +70,18 @@ class BoolTree(object):
         self.f_node = f_node
 
     def get_value(self):
-        logging.debug('t_node={} f_node={}'.format(self.t_node, self.f_node))
+        # logging.debug('t_node={} f_node={}'.format(self.t_node, self.f_node))
         if self.test:
             if isinstance(self.t_node, BoolTree):
                 return self.t_node.get_value()
             else:
-                logging.debug('Returning {}'.format(self.t_node))
+                # logging.debug('Returning {}'.format(self.t_node))
                 return self.t_node
         else:
             if isinstance(self.f_node, BoolTree):
                 return self.f_node.get_value()
             else:
-                logging.debug('Returning {}'.format(self.f_node))
+                # logging.debug('Returning {}'.format(self.f_node))
                 return self.f_node
 
 
@@ -185,6 +183,24 @@ class FeatureTable(object):
         word -- a Unicode IPA string consisting of zero or more segments.
         """
         segs = self.word_fts(word)
+        if len(pat) != len(segs):
+            return False
+        else:
+            return all([set(p) <= s for (p, s) in zip(pat, segs)])
+
+    def match_pattern_seq(self, pat, const):
+        """Implements limited pattern matching. Matches just in case pattern is
+        the same length (in segments) as the constituent and each of the
+        segments in the pattern is a featural subset of the corresponding
+        segment in the word.
+
+        pat -- pattern consisting of a list of sets of <value, featured>
+        tuples.
+
+        word -- a sequence of Unicode IPA strings consisting of zero or more
+        segments.
+        """
+        segs = [self.fts(s) for s in const]
         if len(pat) != len(segs):
             return False
         else:
