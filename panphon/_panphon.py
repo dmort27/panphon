@@ -184,9 +184,10 @@ class FeatureTable(object):
         """
         segs = self.word_fts(word)
         if len(pat) != len(segs):
-            return False
+            return None
         else:
-            return all([set(p) <= s for (p, s) in zip(pat, segs)])
+            if all([set(p) <= s for (p, s) in zip(pat, segs)]):
+                return segs
 
     def match_pattern_seq(self, pat, const):
         """Implements limited pattern matching. Matches just in case pattern is
