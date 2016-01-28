@@ -20,7 +20,7 @@ class IpaRegexError(Exception):
 
 
 FT_REGEX = re.compile(ur'([-+0])([a-z][A-Za-z]*)', re.U | re.X)
-MT_REGEX = re.compile(ur'\[[-+0a-zA-Z ,;]+\]')
+MT_REGEX = re.compile(ur'\[[-+0a-zA-Z ,;]*\]')
 SEG_REGEX = re.compile(ur'[\p{InBasic_Latin}\p{InGreek_and_Coptic}' +
                        ur'\p{InIPA_Extensions}œ\u00C0-\u00FF]' +
                        ur'[\u0300-\u0360\u0362-\u036F]*' +
