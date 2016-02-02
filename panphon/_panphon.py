@@ -133,9 +133,7 @@ class FeatureTable(object):
         if segment in self.seg_dict:
             return self.seg_dict[segment]
         else:
-            msg = 'Segment {} ({}) is unknown.'.format(
-                segment.encode('utf-8'),
-                repr(segment),)
+            msg = 'Segment {} is unknown.'.format(repr(segment))
             raise SegmentError(msg)
 
     def match(self, ft_mask, ft_seg):
@@ -162,6 +160,25 @@ class FeatureTable(object):
         string).
         """
         return [m.group(1) for m in self.seg_regex.finditer(word)]
+
+    def segs_safe(self, word):
+        """Return a list of segments (as strings) from a word. Characters that
+        are not valid segments are included in the list as individual
+        characters. """
+        segs = []
+        while word:
+            m = self.seg_regex.match(word)
+            if m:
+                segs.append(m.group(1))
+                word = word[len(m.group(1)):]
+            else:
+                segs.append(word[0])
+                word = word[1:]
+        return segs
+
+    def filter_segs(self, segs):
+        """Given list of strings, return only those which are valid segments."""
+        return [seg for seg in segs if seg in self.seg_dict]
 
     def word_fts(self, w):
         """Returns a list of <value, feature> tuples, given a Unicode IPA
