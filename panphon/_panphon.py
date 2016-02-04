@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Module for manipulating Unicode IPA strings with respect to articulatory
-features."""
-
 from __future__ import print_function
-from __future__ import unicode_literals
-
-import logging
 import pkg_resources
 import regex as re
 import unicodecsv as csv
+
+# logging.basicConfig(level=logging.DEBUG)
 
 
 class FeatureError(Exception):
@@ -24,7 +20,7 @@ class IpaRegexError(Exception):
 
 
 FT_REGEX = re.compile(ur'([-+0])([a-z][A-Za-z]*)', re.U | re.X)
-MT_REGEX = re.compile(ur'\[[-+0a-zA-Z ,;]+\]')
+MT_REGEX = re.compile(ur'\[[-+0a-zA-Z ,;]*\]')
 SEG_REGEX = re.compile(ur'[\p{InBasic_Latin}\p{InGreek_and_Coptic}' +
                        ur'\p{InIPA_Extensions}œ\u00C0-\u00FF]' +
                        ur'[\u0300-\u0360\u0362-\u036F]*' +
@@ -60,7 +56,6 @@ def pat(p):
 
     p - pattern as string
     """
-
     pattern = []
     for matrix in [m.group(0) for m in MT_REGEX.finditer(p)]:
         segment = set([m.groups() for m in FT_REGEX.finditer(matrix)])
@@ -75,18 +70,18 @@ class BoolTree(object):
         self.f_node = f_node
 
     def get_value(self):
-        logging.debug('t_node={} f_node={}'.format(self.t_node, self.f_node))
+        # logging.debug('t_node={} f_node={}'.format(self.t_node, self.f_node))
         if self.test:
             if isinstance(self.t_node, BoolTree):
                 return self.t_node.get_value()
             else:
-                logging.debug('Returning {}'.format(self.t_node))
+                # logging.debug('Returning {}'.format(self.t_node))
                 return self.t_node
         else:
             if isinstance(self.f_node, BoolTree):
                 return self.f_node.get_value()
             else:
-                logging.debug('Returning {}'.format(self.f_node))
+                # logging.debug('Returning {}'.format(self.f_node))
                 return self.f_node
 
 
@@ -107,7 +102,6 @@ class FeatureTable(object):
         self.seg_dict, a dictionary mapping from unicode segments and sets of
         feature tuples.
         """
-
         filename = pkg_resources.resource_filename(
             __name__, filename)
         segments = []
@@ -135,15 +129,11 @@ class FeatureTable(object):
 
     def fts(self, segment):
         """Returns features corresponding to segment as list of <value,
-        feature> tuples.
-        """
-
+        feature> tuples."""
         if segment in self.seg_dict:
             return self.seg_dict[segment]
         else:
-            msg = 'Segment {} ({}) is unknown.'.format(
-                segment.encode('utf-8'),
-                repr(segment),)
+            msg = 'Segment {} is unknown.'.format(repr(segment))
             raise SegmentError(msg)
 
     def match(self, ft_mask, ft_seg):
@@ -153,14 +143,12 @@ class FeatureTable(object):
         ft_mask -- pattern defined as set of features (<val, name> tuples).
         ft_seg -- segment defined as a set of features (<val, name> tuples).
         """
-
         return set(ft_mask) <= set(ft_seg)
 
     def fts_match(self, features, segment):
         """Evaluates whether a set of features 'match' a segment (are a subset
         of that segment's features); returns 'None' if segment is unknown.
         """
-
         features = set(features)
         if segment in self.seg_dict:
             return features <= self.seg_dict[segment]
@@ -171,8 +159,26 @@ class FeatureTable(object):
         """Returns a list of segments (as strings) from a word (as a
         string).
         """
-
         return [m.group(1) for m in self.seg_regex.finditer(word)]
+
+    def segs_safe(self, word):
+        """Return a list of segments (as strings) from a word. Characters that
+        are not valid segments are included in the list as individual
+        characters. """
+        segs = []
+        while word:
+            m = self.seg_regex.match(word)
+            if m:
+                segs.append(m.group(1))
+                word = word[len(m.group(1)):]
+            else:
+                segs.append(word[0])
+                word = word[1:]
+        return segs
+
+    def filter_segs(self, segs):
+        """Given list of strings, return only those which are valid segments."""
+        return [seg for seg in segs if seg in self.seg_dict]
 
     def word_fts(self, w):
         """Returns a list of <value, feature> tuples, given a Unicode IPA
@@ -193,8 +199,26 @@ class FeatureTable(object):
 
         word -- a Unicode IPA string consisting of zero or more segments.
         """
-
         segs = self.word_fts(word)
+        if len(pat) != len(segs):
+            return None
+        else:
+            if all([set(p) <= s for (p, s) in zip(pat, segs)]):
+                return segs
+
+    def match_pattern_seq(self, pat, const):
+        """Implements limited pattern matching. Matches just in case pattern is
+        the same length (in segments) as the constituent and each of the
+        segments in the pattern is a featural subset of the corresponding
+        segment in the word.
+
+        pat -- pattern consisting of a list of sets of <value, featured>
+        tuples.
+
+        word -- a sequence of Unicode IPA strings consisting of zero or more
+        segments.
+        """
+        segs = [self.fts(s) for s in const]
         if len(pat) != len(segs):
             return False
         else:
@@ -209,9 +233,7 @@ class FeatureTable(object):
         Unicode string; returns 'None' if segment is unknown.
 
         segment -- segment for which features are to be returned as
-        Unicode string
-        """
-
+        Unicode string """
         if segment in self.seg_dict:
             return self.seg_dict[segment]
         else:
@@ -237,11 +259,10 @@ class FeatureTable(object):
         that matches all of the features in 'features'.
 
         features -- a collection of feature 2-tuples <val, name>
-
         inv -- a collection of segments represented as Unicode
                strings
-        """
 
+        """
         return any([self.fts_match(fts, s) for s in inv])
 
     def fts_match_all(self, fts, inv):
@@ -269,9 +290,7 @@ class FeatureTable(object):
     # Needs to be debugged or removed!
     def fts_to_str(self, seg):
         """Returns a string representation of a set of <feature, value>
-        pairs.
-        """
-
+        pairs."""
         vals = {u'0': ' ', u'-': '0', u'+': '1'}
         seg_dict = {n: v for (v, n) in seg}
         vector = []
@@ -358,8 +377,7 @@ class FeatureTable(object):
 
         ft_str -- A string consisting of feature masks, each enclosed in
         square brackets, in which the features are delimited by any
-        standard delimiter.
-        """
+        standard delimiter. """
 
         sequence = []
         for m in re.finditer(ur'\[([^]]+)\]', ft_str):
