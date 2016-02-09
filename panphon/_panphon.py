@@ -388,3 +388,7 @@ class FeatureTable(object):
         pattern = u''.join(sequence)
         regex = re.compile(pattern)
         return regex
+
+    def segment_to_vector(self, seg):
+        ft_dict = dict(self.seg_dict[seg])
+        return [ft_dict[name] for name in self.names]
