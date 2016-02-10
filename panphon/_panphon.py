@@ -390,5 +390,24 @@ class FeatureTable(object):
         return regex
 
     def segment_to_vector(self, seg):
+        """Return a list of feature specificiations in cannonical order given a
+           Unicode IPA segment.
+        """
         ft_dict = dict(self.seg_dict[seg])
         return [ft_dict[name] for name in self.names]
+
+    def feature_difference(self, ft1, ft2):
+        """Given two feature specifications, return the difference."""
+        if ft1 != ft2:
+            if ft1 == '0' or ft2 == '0':
+                return 0.5
+            else:
+                return 1
+        else:
+            return 0
+
+    def unweighted_vector_difference(self, v1, v2):
+        """Given two feature vectors, return the difference."""
+        diffs = [self.feature_difference(ft1, ft2)
+                 for (ft1, ft2) in zip(v1, v2)]
+        return sum(diffs)
