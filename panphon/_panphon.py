@@ -414,7 +414,7 @@ class FeatureTable(object):
 
     def unweighted_insertion_cost(self, v1):
         """Return cost of inserting segment corresponding to feature vector."""
-        pass
+        return sum(map(lambda x: 0 if x == '0' else 1, v1))
 
     def min_edit_distance(self, del_cost, ins_cost, sub_cost, source, target):
         """Return minimum edit distance, parameterized.
