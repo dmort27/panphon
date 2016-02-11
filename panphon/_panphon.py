@@ -412,11 +412,19 @@ class FeatureTable(object):
                  for (ft1, ft2) in zip(v1, v2)]
         return sum(diffs)
 
-    def print_table(self, table):
-        for row in table:
-            print('\t'.join([repr(c) for c in row]))
+    def unweighted_insertion_cost(self, v1):
+        """Return cost of inserting segment corresponding to feature vector."""
+        pass
 
     def min_edit_distance(self, del_cost, ins_cost, sub_cost, source, target):
+        """Return minimum edit distance, parameterized.
+
+        del_cost -- cost function for deletion
+        ins_cost -- cost function for insertion
+        sub_cost -- cost function for substitution
+        source -- source string/sequence of feature vectors
+        target -- target string/sequence of feature vectors
+        """
         # Get lengths of source and target
         n, m = len(source), len(target)
         source, target = '#' + source, '#' + target
