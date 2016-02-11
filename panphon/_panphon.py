@@ -393,8 +393,11 @@ class FeatureTable(object):
         """Return a list of feature specificiations in cannonical order given a
            Unicode IPA segment.
         """
-        ft_dict = dict(self.seg_dict[seg])
+        ft_dict = {ft: val for (val, ft) in self.seg_dict[seg]}
         return [ft_dict[name] for name in self.names]
+
+    def word_to_vector_list(self, word):
+        return map(self.segment_to_vector, self.segs(word))
 
     def feature_difference(self, ft1, ft2):
         """Given two feature specifications, return the difference."""
@@ -414,24 +417,25 @@ class FeatureTable(object):
 
     def unweighted_insertion_cost(self, v1):
         """Return cost of inserting segment corresponding to feature vector."""
-        return sum(map(lambda x: 0 if x == '0' else 1, v1))
+        return sum(map(lambda x: 0.5 if x == '0' else 1, v1))
 
     def unweighted_deletion_cost(self, v1):
-        """Return cost of inserting segment corresponding to feature vector."""
-        return sum(map(lambda x: 0 if x == '0' else 1, v1))
+        """Return cost of deleting segment corresponding to feature vector."""
+        return sum(map(lambda x: 0.5 if x == '0' else 1, v1))
 
-    def min_edit_distance(self, del_cost, ins_cost, sub_cost, source, target):
+    def min_edit_distance(self, del_cost, ins_cost, sub_cost, start, source, target):
         """Return minimum edit distance, parameterized.
 
         del_cost -- cost function for deletion
         ins_cost -- cost function for insertion
         sub_cost -- cost function for substitution
+        start -- start symbol
         source -- source string/sequence of feature vectors
         target -- target string/sequence of feature vectors
         """
         # Get lengths of source and target
         n, m = len(source), len(target)
-        source, target = '#' + source, '#' + target
+        source, target = start + source, start + target
         # Create "matrix"
         d = []
         for i in range(n + 1):
@@ -451,3 +455,9 @@ class FeatureTable(object):
                     d[i][j - 1] + ins_cost(target[j]),
                 ])
         return d[n][m]
+
+    def feature_edit_distance(self, [], source, target):
+        return self.min_edit_distance(self.unweighted_deletion_cost,
+                                      self.unweighted_insertion_cost,
+                                      self.unweighted_substitution_cost,
+                                      source, target)
