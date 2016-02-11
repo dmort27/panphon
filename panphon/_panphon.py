@@ -411,3 +411,29 @@ class FeatureTable(object):
         diffs = [self.feature_difference(ft1, ft2)
                  for (ft1, ft2) in zip(v1, v2)]
         return sum(diffs)
+
+    def min_edit_distance(self, del_cost, ins_cost, sub_cost, source, target):
+        # Get lengths of source and target
+        source, target = '#' + source, '#' + target
+        n, m = len(source), len(target)
+        # Create "matrix"
+        d = []
+        for i in range(n + 1):
+            d.append((m + 1) * [None])
+        # Initialize "matrix"
+        d[0][0] = 0
+        for i in range(1, n + 1):
+            print("i={}".format(i))
+            d[i][0] = d[i - 1][0] + del_cost(source[i])
+        for j in range(1, m + 1):
+            print("j={}".format(j))
+            d[0][j] = d[0][j - 1] + ins_cost(target[j])
+        # Recurrence relation
+        for i in range(1, n + 1):
+            for j in range(1, m + 1):
+                d[i][j] = min([
+                    d[i - 1][j] + del_cost(source[i]),
+                    d[i - 1][j - 1] + sub_cost(source[i], target[j]),
+                    d[i][j - 1] + ins_cost(target[j]),
+                ])
+        return d[n][m]
