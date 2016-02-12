@@ -456,8 +456,8 @@ class FeatureTable(object):
                 ])
         return d[n][m]
 
-    def feature_edit_distance(self, [], source, target):
+    def feature_edit_distance(self, source, target):
         return self.min_edit_distance(self.unweighted_deletion_cost,
                                       self.unweighted_insertion_cost,
                                       self.unweighted_substitution_cost,
-                                      source, target)
+                                      [], source, target)
