@@ -409,27 +409,14 @@ class FeatureTable(object):
         else:
             return 0
 
-    def unweighted_substitution_cost(self, v1, v2):
-        """Given two feature vectors, return the difference."""
-        diffs = [self.feature_difference(ft1, ft2)
-                 for (ft1, ft2) in zip(v1, v2)]
-        return sum(diffs)
-
-    def unweighted_insertion_cost(self, v1):
-        """Return cost of inserting segment corresponding to feature vector."""
-        return sum(map(lambda x: 0.5 if x == '0' else 1, v1))
-
-    def unweighted_deletion_cost(self, v1):
-        """Return cost of deleting segment corresponding to feature vector."""
-        return sum(map(lambda x: 0.5 if x == '0' else 1, v1))
-
     def min_edit_distance(self, del_cost, ins_cost, sub_cost, start, source, target):
         """Return minimum edit distance, parameterized.
 
         del_cost -- cost function for deletion
         ins_cost -- cost function for insertion
         sub_cost -- cost function for substitution
-        start -- start symbol
+        start -- start symbol: string for strings, list for
+                 list, list of list for list of lists
         source -- source string/sequence of feature vectors
         target -- target string/sequence of feature vectors
         """
@@ -455,6 +442,20 @@ class FeatureTable(object):
                     d[i][j - 1] + ins_cost(target[j]),
                 ])
         return d[n][m]
+
+    def unweighted_substitution_cost(self, v1, v2):
+        """Given two feature vectors, return the difference."""
+        diffs = [self.feature_difference(ft1, ft2)
+                 for (ft1, ft2) in zip(v1, v2)]
+        return sum(diffs)
+
+    def unweighted_insertion_cost(self, v1):
+        """Return cost of inserting segment corresponding to feature vector."""
+        return sum(map(lambda x: 0.5 if x == '0' else 1, v1))
+
+    def unweighted_deletion_cost(self, v1):
+        """Return cost of deleting segment corresponding to feature vector."""
+        return sum(map(lambda x: 0.5 if x == '0' else 1, v1))
 
     def feature_edit_distance(self, source, target):
         return self.min_edit_distance(self.unweighted_deletion_cost,
