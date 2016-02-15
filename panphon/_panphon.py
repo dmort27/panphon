@@ -94,6 +94,7 @@ class FeatureTable(object):
     def __init__(self, feature_set='spe+'):
         filename = filenames[feature_set]
         self.segments, self.seg_dict, self.names = self._read_table(filename)
+        self.weights = self._read_weights()
         self.seg_regex = self._build_seg_regex()
 
     def _read_table(self, filename):
@@ -116,6 +117,15 @@ class FeatureTable(object):
                 segments.append((seg, specs))
         seg_dict = dict(segments)
         return segments, seg_dict, names
+
+    def _read_weights(self, filename='data/feature_weights.csv'):
+        filename = pkg_resources.resource_filename(
+            __name__, filename)
+        with open(filename, 'rb') as f:
+            reader = csv.reader(f, encoding='utf-8')
+            features = reader.next()
+            weights = reader.next()
+        return weights
 
     def _build_seg_regex(self):
         # Build a regex that will match individual segments in a string.
@@ -461,4 +471,34 @@ class FeatureTable(object):
         return self.min_edit_distance(self.unweighted_deletion_cost,
                                       self.unweighted_insertion_cost,
                                       self.unweighted_substitution_cost,
+                                      [[]], source, target)
+
+    def weighted_feature_difference(self, w, ft1, ft2):
+        """Return the weighted difference between two features."""
+        if ft1 != ft2:
+            if ft1 == '0' or ft2 == '0':
+                return 0.5 * w
+            else:
+                return w
+        else:
+            return 0
+
+    def weighted_substitution_cost(self, v1, v2, ws):
+        """Given two feature vectors, return the difference."""
+        diffs = [self.weighted_feature_difference(w, ft1, ft2)
+                 for (w, ft1, ft2) in zip(ws, v1, v2)]
+        return sum(diffs)
+
+    def weighted_insertion_cost(self, v1, ws):
+        """Return cost of inserting segment corresponding to feature vector."""
+        return sum(map(lambda w, x: 0.5 * w if x == '0' else w), zip(ws, v1))
+
+    def weighted_deletion_cost(self, v1, ws):
+        """Return cost of deleting segment corresponding to feature vector."""
+        return sum(map(lambda w, x: 0.5 * w if x == '0' else w), zip(ws, v1))
+
+    def weighted_feature_edit_distance(self, source, target, ws):
+        return self.min_edit_distance(self.weighted_deletion_cost,
+                                      self.weighted_insertion_cost,
+                                      self.weighted_substitution_cost,
                                       [[]], source, target)
