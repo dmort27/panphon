@@ -124,7 +124,7 @@ class FeatureTable(object):
         with open(filename, 'rb') as f:
             reader = csv.reader(f, encoding='utf-8')
             features = reader.next()
-            weights = reader.next()
+            weights = [float(x) for x in reader.next()]
         return weights
 
     def _build_seg_regex(self):
@@ -483,19 +483,21 @@ class FeatureTable(object):
         else:
             return 0
 
-    def weighted_substitution_cost(self, v1, v2, ws):
+    def weighted_substitution_cost(self, v1, v2):
         """Given two feature vectors, return the difference."""
         diffs = [self.weighted_feature_difference(w, ft1, ft2)
-                 for (w, ft1, ft2) in zip(ws, v1, v2)]
+                 for (w, ft1, ft2) in zip(self.weights, v1, v2)]
         return sum(diffs)
 
-    def weighted_insertion_cost(self, v1, ws):
+    def weighted_insertion_cost(self, v1):
         """Return cost of inserting segment corresponding to feature vector."""
-        return sum(map(lambda w, x: 0.5 * w if x == '0' else w), zip(ws, v1))
+        return sum(map(lambda (w, x): 0.5 * w if x == '0' else w,
+                       zip(self.weights, v1)))
 
-    def weighted_deletion_cost(self, v1, ws):
+    def weighted_deletion_cost(self, v1):
         """Return cost of deleting segment corresponding to feature vector."""
-        return sum(map(lambda w, x: 0.5 * w if x == '0' else w), zip(ws, v1))
+        return sum(map(lambda (w, x): 0.5 * w if x == '0' else w,
+                       zip(self.weights, v1)))
 
     def weighted_feature_edit_distance(self, source, target, ws):
         return self.min_edit_distance(self.weighted_deletion_cost,
