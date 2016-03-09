@@ -1,40 +1,71 @@
 # panphon
 
-These files constitute a preliminary database of segments in the International Phonetic Alphabet (IPA) and their equivalents in terms of (articulatory) phonological features. They include both data files and the tool `apply_diacritics.py`, which allows the application of rules for diacritics and modifiers to collections of IPA characters, data files, and configuration/rule files.
+These files constitute a preliminary database of segments in the International Phonetic Alphabet (IPA) and their equivalents in terms of (articulatory) phonological features. They include both data files and the tool `apply_diacritics.py`, which allows the application of rules for diacritics and modifiers to collections of IPA characters, data files, and configuration/rule files and well as the tool `validate_ipa.py`, which checks Unicode IPA text from STDIN for well-formedness.
+
+# Installation
+
+`panphon` has a few library dependencies aside from the Python standard library:
+
+1. [PyYAML](http://pyyaml.org/wiki/PyYAML). If `pip` is installed, you can easily install PyYAML:
+
+
+     $ pip install PyYAML
+
+
+2. [unicodecsv](https://pypi.python.org/pypi/unicodecsv/0.9.4). It is likewise trivial to install `unicodecsv` if `pip` is installed:
+
+
+    $ pip install unicodecsv
+
+
+3. [regex](https://pypi.python.org/pypi/regex). The installation procedure for installing `regex` is the same as that for `PyYAML` and `unicodecsv` if `pip` is installed:
+
+
+    $ pip install regex
+
+To install `panphon`, uncompress the source distribution, change directories to the root directory of the source distribution, and run `python setup.py install`:
+
+    $ tar xzf panphon.tar.gz
+    $ cd panphon
+    $ python setup.py install
+
+Of, if appropriate for your system:
+
+    $ sudo python setup.py install
 
 ## Python API for Accessing Phonological Features of IPA Segments
 
-The `panphon` module provides a simple, lightweight API allows users and developers to access the segment-feature relationships encoded in the fiel `panphon/data/segment_features.csv`.
+The `panphon` module provides a straightforward API that allows users and developers to access the segment-feature relationships encoded in the IPA database `panphon/data/segment_features.csv`.
 
     >>> import panphon.panphon as panphon
     >>> ft = panphon.FeatureTable()
     >>> ft.ftr_match(set([(u'+', u'syl')]), u'a')
 	True
 
-This interface consists of a single class with a couple of methods. The only exposed method is `self.feature_match(features, segment)`. It returns a boolean value depending on whether the features in *features* match the segment (a unicode string) in *segment*.
+The interface of `FeatureTable` has grown to be quite complicated. Not all of the methods will be illustrated or documented here. However, all significant methods of `FeatureTable` have detailed docstrings.
 
-While the interface is extraordinarily simple, it should be easy to subclass `FeatureTable` in order to develop more sophisticated interfaces.
+### Operations on feature sets and segments
+
+The `FeatureTable` class includes a broad range of operations on features and segments.
+
+### Fixed-width pattern matching
+
+The `FeaturTable` class allows matching of Fixed-width, feature-based patterns.
+
+### Sonority calculations
+
+The `FeatureTable` class has methods for computing sonority scores for segments.
+
+### Feature edit distance
+
+The `FeatureTable` class includes methods for calculating edit distance, both in which the cost of substitutions is based upon Hamming distance between the feature vectors and in which the cost of substitutions are based upon edit weights for individual features.
 
 ## Diacritic Application Tool: apply_diacritics.py
 
 This small, self-documenting Python program allows the user to apply sets of rules, defined in YAML, for adding diacritics and modifiers to IPA segments based upon their phonological features. For a detailed help message, execute `python apply_diacritics.py -h` in the directory containing `apply_diacritics.py`.
 
-`apply_diacritics.py` has a few library dependencies aside from the Python standard library:
-
-1. [PyYAML](http://pyyaml.org/wiki/PyYAML). If `pip` is installed, you can easily install PyYAML:
-
-	```pip install PyYAML``` 
-
-2. [unicodecsv](https://pypi.python.org/pypi/unicodecsv/0.9.4). It is likewise trivial to install `unicodecsv` if `pip` is installed:
-
-    ```pip install unicodecsv```
-
-3. [regex](https://pypi.python.org/pypi/regex). The installation procedure for installing `regex` is the same as that for `PyYAML` and `unicodecsv` if `pip` is installed:
-
-   ```pip install regex```
-
 ### Output Files
-	
+
 The tool `apply_diacritics.py` produces three kinds of output, depending on the command line options that are specified:
 
 1. *Segments file.* This is a CSV file containing a header row with the names of features and a succession of non-header rows, each of which includes an IPA segment in the first field and feature specifications in each of the subsequent fields. When diacritics are applied to bases to produce new segments, these are added to this list. The sorting of this list is controlled by the **sort order specification**. By default, this file is called ```segment_features.csv```. The name can be explicitly specified with the `-o` or `--output` options.
