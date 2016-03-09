@@ -309,18 +309,6 @@ class FeatureTable(object):
                 vector.append(vals[seg_dict[name]])
         return ''.join(vector)
 
-    def fts_contrast(self, fs, ft_name, inv):
-        """Return True if there is a segment in inv that contrasts in feature
-        ft_name.
-
-        ft_name -- name of the feature where contrast must be present.
-        inv -- collection of segments represented as Unicode segments.
-        """
-        plus, minus = (u'+', ft_name), (u'-', ft_name)
-        w_plus, w_minus = set(list(fs) + [plus]), set(list(fs) + [minus])
-        return any([self.fts_match(w_plus, s) for s in inv]) and \
-            any([self.fts_match(w_minus, s) for s in inv])
-
     def fts_contrast2(self, fs, ft_name, inv):
         """Return True if there is a segment in inv that contrasts in feature
         ft_name.
