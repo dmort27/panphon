@@ -123,7 +123,7 @@ class FeatureTable(object):
             __name__, filename)
         with open(filename, 'rb') as f:
             reader = csv.reader(f, encoding='utf-8')
-            features = reader.next()
+            reader.next()
             weights = [float(x) for x in reader.next()]
         return weights
 
@@ -171,25 +171,6 @@ class FeatureTable(object):
         """
         return [m.group(1) for m in self.seg_regex.finditer(word)]
 
-    def segs_safe(self, word):
-        """Return a list of segments (as strings) from a word. Characters that
-        are not valid segments are included in the list as individual
-        characters. """
-        segs = []
-        while word:
-            m = self.seg_regex.match(word)
-            if m:
-                segs.append(m.group(1))
-                word = word[len(m.group(1)):]
-            else:
-                segs.append(word[0])
-                word = word[1:]
-        return segs
-
-    def filter_segs(self, segs):
-        """Given list of strings, return only those which are valid segments."""
-        return [seg for seg in segs if seg in self.seg_dict]
-
     def word_fts(self, w):
         """Returns a list of <value, feature> tuples, given a Unicode IPA
         string.
@@ -230,7 +211,7 @@ class FeatureTable(object):
         return fts
 
     def fts_match_any(self, fts, inv):
-        """ERROR! Returns a boolean based on whether there is a segment in 'inv'
+        """Returns a boolean based on whether there is a segment in 'inv'
         that matches all of the features in 'features'.
 
         features -- a collection of feature 2-tuples <val, name>
@@ -279,13 +260,14 @@ class FeatureTable(object):
         return len(filter(lambda s: self.fts_match(fts, s), inv))
 
     def match_pattern(self, pat, word):
-        """Implements Fixed-width pattern matching. Matches just in case pattern
+        """Implements fixed-width pattern matching. Matches just in case pattern
         is the same length (in segments) as the word and each of the segments
         in the pattern is a featural subset of the corresponding segment in the
-        word.
+        word. Matches return the corresponding list of feature sets; failed
+        matches return None.
 
-        pat -- pattern consisting of a list of sets of <value, featured>
-        tuples.
+        pat -- pattern consisting of a sequence (list) of sets of <value,
+        featured> tuples.
 
         word -- a Unicode IPA string consisting of zero or more segments.
         """
@@ -367,17 +349,22 @@ class FeatureTable(object):
         return regex
 
     def segment_to_vector(self, seg):
-        """Return a list of feature specificiations in cannonical order given a
-           Unicode IPA segment.
+        """Given a Unicode IPA segment, return a list of feature specificiations
+        in cannonical order.
         """
         ft_dict = {ft: val for (val, ft) in self.seg_dict[seg]}
         return [ft_dict[name] for name in self.names]
 
     def word_to_vector_list(self, word):
+        """Return a list of feature vectors, given a Unicode IPA word.
+        """
         return map(self.segment_to_vector, self.segs(word))
 
     def feature_difference(self, ft1, ft2):
-        """Given two feature specifications, return the difference."""
+        """Given two feature values, return the difference.
+
+        ft1, ft2 -- two feature values ('+', '-', or '0')
+        """
         if ft1 != ft2:
             if ft1 == '0' or ft2 == '0':
                 return 0.5
