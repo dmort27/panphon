@@ -198,49 +198,14 @@ class FeatureTable(object):
         """
         return map(self.fts, self.segs(w))
 
-    def match_pattern(self, pat, word):
-        """Implements limited pattern matching. Matches just in case pattern
-        is the same length (in segments) as the word and each of the segments
-        in the pattern is a featural subset of the corresponding segment in the
-        word.
-
-        pat -- pattern consisting of a list of sets of <value, featured>
-        tuples.
-
-        word -- a Unicode IPA string consisting of zero or more segments.
-        """
-        segs = self.word_fts(word)
-        if len(pat) != len(segs):
-            return None
-        else:
-            if all([set(p) <= s for (p, s) in zip(pat, segs)]):
-                return segs
-
-    def match_pattern_seq(self, pat, const):
-        """Implements limited pattern matching. Matches just in case pattern is
-        the same length (in segments) as the constituent and each of the
-        segments in the pattern is a featural subset of the corresponding
-        segment in the word.
-
-        pat -- pattern consisting of a list of sets of <value, featured>
-        tuples.
-
-        word -- a sequence of Unicode IPA strings consisting of zero or more
-        segments.
-        """
-        segs = [self.fts(s) for s in const]
-        if len(pat) != len(segs):
-            return False
-        else:
-            return all([set(p) <= s for (p, s) in zip(pat, segs)])
-
     def seg_known(self, segment):
         """Returns True if segment is in segment <=> features database."""
         return segment in self.seg_dict
 
     def seg_fts(self, segment):
-        """Returns the features as a list of 2-tuples, given a segment as a
-        Unicode string; returns 'None' if segment is unknown.
+        """Returns the features of a segment as a list
+        of 2-tuples, given a segment as a Unicode string; returns 'None' if segment
+        is unknown.
 
         segment -- segment for which features are to be returned as
         Unicode string """
@@ -286,29 +251,6 @@ class FeatureTable(object):
         """
         return all([self.fts_match(fts, s) for s in inv])
 
-    def seg_diff(self, seg1, seg2):
-        """Return the features by which seg1 and seg2 differ.
-
-        seg1, seg2 -- segments (lists of <value, name> pairs)
-        """
-
-        def seg_to_dict(seg):
-            return {k: v for (v, k) in seg}
-
-        assert seg_to_dict([(1, 2), (3, 4)]) == {1: 2, 3: 4}
-
-    # Needs to be debugged or removed!
-    def fts_to_str(self, seg):
-        """Returns a string representation of a set of <feature, value>
-        pairs."""
-        vals = {u'0': ' ', u'-': '0', u'+': '1'}
-        seg_dict = {n: v for (v, n) in seg}
-        vector = []
-        for name in self.names:
-            if name in seg_dict:
-                vector.append(vals[seg_dict[name]])
-        return ''.join(vector)
-
     def fts_contrast2(self, fs, ft_name, inv):
         """Return True if there is a segment in inv that contrasts in feature
         ft_name.
@@ -335,6 +277,43 @@ class FeatureTable(object):
         inv -- inventory of segments (as Unicode IPA strings)
         """
         return len(filter(lambda s: self.fts_match(fts, s), inv))
+
+    def match_pattern(self, pat, word):
+        """Implements Fixed-width pattern matching. Matches just in case pattern
+        is the same length (in segments) as the word and each of the segments
+        in the pattern is a featural subset of the corresponding segment in the
+        word.
+
+        pat -- pattern consisting of a list of sets of <value, featured>
+        tuples.
+
+        word -- a Unicode IPA string consisting of zero or more segments.
+        """
+        segs = self.word_fts(word)
+        if len(pat) != len(segs):
+            return None
+        else:
+            if all([set(p) <= s for (p, s) in zip(pat, segs)]):
+                return segs
+
+    def match_pattern_seq(self, pat, const):
+        """Implements limited pattern matching. Matches just in case pattern is
+        the same length (in segments) as the constituent and each of the
+        segments in the pattern is a featural subset of the corresponding
+        segment in the word.
+
+        pat -- pattern consisting of a list of sets of <value, featured>
+        tuples.
+
+        const -- a sequence of Unicode IPA strings consisting of zero or more
+        segments.
+        """
+        segs = [self.fts(s) for s in const]
+        if len(pat) != len(segs):
+            return False
+        else:
+            return all([set(p) <= s for (p, s) in zip(pat, segs)])
+
 
     def sonority_from_fts(self, seg):
         """Given a segment, returns the sonority on a scale of 1 to 9."""
