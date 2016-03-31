@@ -38,8 +38,8 @@ directories to the root directory of the source distribution, and run
 
 ::
 
-    $ tar xzf panphon.tar.gz
-    $ cd panphon
+    $ tar xzf panphon-0.1.tar.gz
+    $ cd panphon-0.1
     $ python setup.py install
 
 Of, if appropriate for your system:
