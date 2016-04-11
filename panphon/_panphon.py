@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+
 import pkg_resources
 import regex as re
 import unicodecsv as csv
@@ -407,6 +408,28 @@ class FeatureTable(object):
                 ])
         return d[n][m]
 
+    def simple_deletion_cost(self, c1):
+        """Return 1."""
+        return 1
+
+    def simple_substitution_cost(self, c1, c2):
+        """Given two characters, return 0 if they are identical, otherwise 1."""
+        return 0 if v1 == v2 else 1
+
+    def simple_insertion_cost(self, c1):
+        """Return 1."""
+        return 1
+
+    def levenshtein_distance(self, source, target):
+        return self.min_edit_distance(self.simple_deletion_cost,
+                                      self.simple_insertion_cost,
+                                      self.simple_substitution_cost,
+                                      "", source, target)
+
+    def unweighted_deletion_cost(self, v1):
+        """Return cost of deleting segment corresponding to feature vector."""
+        return sum(map(lambda x: 0.5 if x == '0' else 1, v1))
+
     def unweighted_substitution_cost(self, v1, v2):
         """Given two feature vectors, return the difference."""
         diffs = [self.feature_difference(ft1, ft2)
@@ -415,10 +438,6 @@ class FeatureTable(object):
 
     def unweighted_insertion_cost(self, v1):
         """Return cost of inserting segment corresponding to feature vector."""
-        return sum(map(lambda x: 0.5 if x == '0' else 1, v1))
-
-    def unweighted_deletion_cost(self, v1):
-        """Return cost of deleting segment corresponding to feature vector."""
         return sum(map(lambda x: 0.5 if x == '0' else 1, v1))
 
     def feature_edit_distance(self, source, target):
