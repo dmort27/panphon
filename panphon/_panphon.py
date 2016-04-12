@@ -408,23 +408,23 @@ class FeatureTable(object):
                 ])
         return d[n][m]
 
-    def simple_deletion_cost(self, c1):
-        """Return 1."""
-        return 1
-
-    def simple_substitution_cost(self, c1, c2):
-        """Given two characters, return 0 if they are identical, otherwise 1."""
-        return 0 if v1 == v2 else 1
-
-    def simple_insertion_cost(self, c1):
-        """Return 1."""
-        return 1
-
-    def levenshtein_distance(self, source, target):
-        return self.min_edit_distance(self.simple_deletion_cost,
-                                      self.simple_insertion_cost,
-                                      self.simple_substitution_cost,
-                                      "", source, target)
+    # def simple_deletion_cost(self, c1):
+    #     """Return 1."""
+    #     return 1
+    #
+    # def simple_substitution_cost(self, c1, c2):
+    #     """Given two characters, return 0 if they are identical, otherwise 1."""
+    #     return 0 if v1 == v2 else 1
+    #
+    # def simple_insertion_cost(self, c1):
+    #     """Return 1."""
+    #     return 1
+    #
+    # def levenshtein_distance(self, list(source), list(target):
+    #     return self.min_edit_distance(self.simple_deletion_cost,
+    #                                   self.simple_insertion_cost,
+    #                                   self.simple_substitution_cost,
+    #                                   [[]], source, target)
 
     def unweighted_deletion_cost(self, v1):
         """Return cost of deleting segment corresponding to feature vector."""
