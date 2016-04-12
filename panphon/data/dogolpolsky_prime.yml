@@ -1,0 +1,55 @@
+-
+    name: labial obstruents
+    def: "[-son +ant -cor + lab]"
+    label: P
+-
+    name: coronal fricatives
+    def: "[-son +cor +cont +strid -delrel]"
+    label: S
+-
+    name: velar/postvelar obstruents
+    def: "[-son -ant -cor +back]"
+    label: K
+-
+    name: coronal affricates
+    def: "[+cor +delrel]"
+    label: K
+-
+    name: other coronal obstruents
+    def: "[-son +cor]"
+    label: T
+-
+    name: labial nasal
+    def: "[-syl +son +nas +ant -cor +lab]"
+    label: M
+-
+    name: nasal
+    def: "[-syl +son -cont +nas]"
+    label: N
+-
+    name: labiovelar glide
+    def: "[-syl +son ]"
+-
+    name: lateral
+    def: "[+lat]"
+    label: R
+-
+    name: approximates and trills
+    def: "[-syl +son -nas]"
+    label: R
+-
+    name: palatal glide
+    def: "[-syl +son +cont +hi -lo -back]"
+    label: J
+-
+    name: laryngeals
+    def: "[-syl +son +cons +cont -cor -hi -back -lo]"
+    label: H
+-
+    name: consonants
+    def: "[-syl]"
+    label: C
+-
+    name: vowels
+    def: "[+syl]"
+    label: V
