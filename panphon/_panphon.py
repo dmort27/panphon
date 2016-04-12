@@ -2,7 +2,9 @@
 from __future__ import print_function
 
 import pkg_resources
+import yaml
 import regex as re
+import numpy as np
 import unicodecsv as csv
 
 # logging.basicConfig(level=logging.DEBUG)
@@ -97,6 +99,7 @@ class FeatureTable(object):
         self.segments, self.seg_dict, self.names = self._read_table(filename)
         self.weights = self._read_weights()
         self.seg_regex = self._build_seg_regex()
+        self.dogol_prime = self._dogolpolsky_prime()
 
     def _read_table(self, filename):
         """Read the data from data/segment_features.csv into self.segments, a
@@ -137,6 +140,14 @@ class FeatureTable(object):
         """Deletes ties from all segments."""
         self.seg_dict = {k.replace(u'\u0361', u''): v
                          for (k, v) in self.seg_dict.items()}
+
+    def _dogolpolsky_prime(self, filename='data/dogolpolsky_prime.yml'):
+        """Reads Dogolpolsky' classes and constructs function cascade."""
+        with open(filename, 'r') as f:
+            rules = []
+            for rule in yaml.load(f.read()):
+                rules.append((fts(rule['def']), rule['label']))
+        return rules
 
     def fts(self, segment):
         """Returns features corresponding to segment as list of <value,
@@ -183,6 +194,10 @@ class FeatureTable(object):
     def seg_known(self, segment):
         """Returns True if segment is in segment <=> features database."""
         return segment in self.seg_dict
+
+    def filter_string(self, s):
+        """Return a string containing only legal IPA segments."""
+        return ''.join(self.seg_regex.findall(s))
 
     def seg_fts(self, segment):
         """Returns the features of a segment as a list
@@ -297,7 +312,6 @@ class FeatureTable(object):
         else:
             return all([set(p) <= s for (p, s) in zip(pat, segs)])
 
-
     def sonority_from_fts(self, seg):
         """Given a segment, returns the sonority on a scale of 1 to 9."""
         def match(m):
@@ -374,6 +388,32 @@ class FeatureTable(object):
         else:
             return 0
 
+    def levenshtein_distance(self, source, target):
+        if len(source) < len(target):
+            return self.levenshtein(target, source)
+        # So now we have len(source) >= len(target).
+        if len(target) == 0:
+            return len(source)
+        # We call tuple() to force strings to be used as sequences
+        # ('c', 'a', 't', 's') - numpy uses them as values by default.
+        source = np.array(tuple(source))
+        target = np.array(tuple(target))
+        # We use a dynamic programming algorithm, but with the
+        # added optimization that we only need the last two rows
+        # of the matrix.
+        previous_row = np.arange(target.size + 1)
+        for s in source:
+            # Insertion (target grows longer than source):
+            current_row = previous_row + 1
+            # Substitution or matching:
+            # Target and source items are aligned, and either
+            # are different (cost of 1), or are the same (cost of 0).
+            current_row[1:] = np.minimum(current_row[1:], np.add(previous_row[:-1], target != s))
+            # Deletion (target grows shorter than source):
+            current_row[1:] = np.minimum(current_row[1:], current_row[0:-1] + 1)
+            previous_row = current_row
+        return previous_row[-1]
+
     def min_edit_distance(self, del_cost, ins_cost, sub_cost, start, source, target):
         """Return minimum edit distance, parameterized.
 
@@ -448,13 +488,7 @@ class FeatureTable(object):
 
     def weighted_feature_difference(self, w, ft1, ft2):
         """Return the weighted difference between two features."""
-        if ft1 != ft2:
-            if ft1 == '0' or ft2 == '0':
-                return 0.5 * w
-            else:
-                return w
-        else:
-            return 0
+        return w if ft1 != ft2 else 0
 
     def weighted_substitution_cost(self, v1, v2):
         """Given two feature vectors, return the difference."""
@@ -464,15 +498,13 @@ class FeatureTable(object):
 
     def weighted_insertion_cost(self, v1):
         """Return cost of inserting segment corresponding to feature vector."""
-        return sum(map(lambda (w, x): 0.5 * w if x == '0' else w,
-                       zip(self.weights, v1)))
+        return sum(self.weights)
 
     def weighted_deletion_cost(self, v1):
         """Return cost of deleting segment corresponding to feature vector."""
-        return sum(map(lambda (w, x): 0.5 * w if x == '0' else w,
-                       zip(self.weights, v1)))
+        return sum(self.weights)
 
-    def weighted_feature_edit_distance(self, source, target, ws):
+    def weighted_feature_edit_distance(self, source, target):
         return self.min_edit_distance(self.weighted_deletion_cost,
                                       self.weighted_insertion_cost,
                                       self.weighted_substitution_cost,
