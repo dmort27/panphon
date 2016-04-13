@@ -29,6 +29,7 @@
 -
     name: labiovelar glide
     def: "[-syl +son ]"
+    label: W
 -
     name: lateral
     def: "[+lat]"
