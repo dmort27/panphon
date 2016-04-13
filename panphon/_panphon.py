@@ -148,7 +148,6 @@ class FeatureTable(object):
         with open(filename, 'r') as f:
             rules = []
             dogol_prime = yaml.load(f.read())
-            print(dogol_prime)
             for rule in dogol_prime:
                 rules.append((fts(rule['def']), rule['label']))
         return rules
