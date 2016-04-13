@@ -143,9 +143,13 @@ class FeatureTable(object):
 
     def _dogolpolsky_prime(self, filename='data/dogolpolsky_prime.yml'):
         """Reads Dogolpolsky' classes and constructs function cascade."""
+        filename = pkg_resources.resource_filename(
+            __name__, filename)
         with open(filename, 'r') as f:
             rules = []
-            for rule in yaml.load(f.read()):
+            dogol_prime = yaml.load(f.read())
+            print(dogol_prime)
+            for rule in dogol_prime:
                 rules.append((fts(rule['def']), rule['label']))
         return rules
 
@@ -194,6 +198,16 @@ class FeatureTable(object):
     def seg_known(self, segment):
         """Returns True if segment is in segment <=> features database."""
         return segment in self.seg_dict
+
+    def map_to_dogol_prime(self, s):
+        segs = []
+        for seg in self.seg_regex.findall(s):
+            fts = self.seg_fts(seg)
+            for mask, label in self.dogol_prime:
+                if self.match(mask, fts):
+                    segs.append(label)
+                    break
+        return ''.join(segs)
 
     def filter_string(self, s):
         """Return a string containing only legal IPA segments."""
