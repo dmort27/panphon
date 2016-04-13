@@ -27,10 +27,6 @@
     def: "[-syl +son -cont +nas]"
     label: N
 -
-    name: labiovelar glide
-    def: "[-syl +son ]"
-    label: W
--
     name: lateral
     def: "[+lat]"
     label: R
@@ -42,6 +38,10 @@
     name: palatal glide
     def: "[-syl +son +cont +hi -lo -back]"
     label: J
+-
+    name: labiovelar glide
+    def: "[-syl +son]"
+    label: W
 -
     name: laryngeals
     def: "[-syl +son +cons +cont -cor -hi -back -lo]"
