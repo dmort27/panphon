@@ -13,6 +13,11 @@ def levenshtein_dist(_, a, b):
     return Levenshtein.distance(a, b)
 
 
+def dogol_leven_dist(_, a, b):
+    return Levenshtein.distance(ft.map_to_dogol_prime(a),
+                                ft.map_to_dogol_prime(b))
+
+
 def feature_hamming_dist(ft, a, b):
     return ft.feature_edit_distance(ft.word_to_vector_list(a),
                                     ft.word_to_vector_list(b))
@@ -60,6 +65,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--dist', default='hamming', help='Distance metric (e.g. Hamming).')
     args = parser.parse_args()
     dists = {'levenshtein': levenshtein_dist,
+             'dogol_leven': dogol_leven_dist,
              'hamming': feature_hamming_dist,
              'weighted': feature_weighted_dist}
     ft = panphon.FeatureTable()
