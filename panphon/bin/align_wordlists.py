@@ -65,7 +65,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--dist', default='hamming', help='Distance metric (e.g. Hamming).')
     args = parser.parse_args()
     dists = {'levenshtein': levenshtein_dist,
-             'dogol_leven': dogol_leven_dist,
+             'dogol-leven': dogol_leven_dist,
              'hamming': feature_hamming_dist,
              'weighted': feature_weighted_dist}
     ft = panphon.FeatureTable()
