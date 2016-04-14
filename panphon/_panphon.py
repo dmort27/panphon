@@ -97,6 +97,7 @@ class FeatureTable(object):
     def __init__(self, feature_set='spe+'):
         filename = filenames[feature_set]
         self.segments, self.seg_dict, self.names = self._read_table(filename)
+        self.seg_seq = {seg[0]: i for (i, seg) in enumerate(self.segments)}
         self.weights = self._read_weights()
         self.seg_regex = self._build_seg_regex()
         self.dogol_prime = self._dogolpolsky_prime()
