@@ -10,44 +10,6 @@ files, and configuration/rule files and well as the tool
 ``validate_ipa.py``, which checks Unicode IPA text from STDIN for
 well-formedness.
 
-Installation
-============
-
-``panphon`` has a few library dependencies aside from the Python
-standard library:
-
-1. `PyYAML <http://pyyaml.org/wiki/PyYAML>`__. If ``pip`` is installed,
-   you can easily install PyYAML:
-
-   $ pip install PyYAML
-
-2. `unicodecsv <https://pypi.python.org/pypi/unicodecsv/0.9.4>`__. It is
-   likewise trivial to install ``unicodecsv`` if ``pip`` is installed:
-
-   $ pip install unicodecsv
-
-3. `regex <https://pypi.python.org/pypi/regex>`__. The installation
-   procedure for installing ``regex`` is the same as that for ``PyYAML``
-   and ``unicodecsv`` if ``pip`` is installed:
-
-   $ pip install regex
-
-To install ``panphon``, uncompress the source distribution, change
-directories to the root directory of the source distribution, and run
-``python setup.py install``:
-
-::
-
-    $ tar xzf panphon-0.1.tar.gz
-    $ cd panphon-0.1
-    $ python setup.py install
-
-Of, if appropriate for your system:
-
-::
-
-    $ sudo python setup.py install
-
 Python API for Accessing Phonological Features of IPA Segments
 --------------------------------------------------------------
 
