@@ -2,37 +2,6 @@
 
 These files constitute a preliminary database of segments in the International Phonetic Alphabet (IPA) and their equivalents in terms of (articulatory) phonological features. They include both data files and the tool `apply_diacritics.py`, which allows the application of rules for diacritics and modifiers to collections of IPA characters, data files, and configuration/rule files and well as the tool `validate_ipa.py`, which checks Unicode IPA text from STDIN for well-formedness.
 
-# Installation
-
-`panphon` has a few library dependencies aside from the Python standard library:
-
-1. [PyYAML](http://pyyaml.org/wiki/PyYAML). If `pip` is installed, you can easily install PyYAML:
-
-
-     $ pip install PyYAML
-
-
-2. [unicodecsv](https://pypi.python.org/pypi/unicodecsv/0.9.4). It is likewise trivial to install `unicodecsv` if `pip` is installed:
-
-
-    $ pip install unicodecsv
-
-
-3. [regex](https://pypi.python.org/pypi/regex). The installation procedure for installing `regex` is the same as that for `PyYAML` and `unicodecsv` if `pip` is installed:
-
-
-    $ pip install regex
-
-To install `panphon`, uncompress the source distribution, change directories to the root directory of the source distribution, and run `python setup.py install`:
-
-    $ tar xzf panphon-0.1.tar.gz
-    $ cd panphon-0.1
-    $ python setup.py install
-
-Of, if appropriate for your system:
-
-    $ sudo python setup.py install
-
 ## Python API for Accessing Phonological Features of IPA Segments
 
 The `panphon` module provides a straightforward API that allows users and developers to access the segment-feature relationships encoded in the IPA database `panphon/data/segment_features.csv`.
