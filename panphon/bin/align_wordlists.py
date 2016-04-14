@@ -48,8 +48,9 @@ def main(wordlist1, wordlist2, dist):
         reader_a = csv.reader(file_a, encoding='utf-8')
         reader_b = csv.reader(file_b, encoding='utf-8')
         print('Reading word lists...')
-        words_a = [(w, g) for (g, w) in reader_a]
-        words_b = [(w, g) for (g, w) in reader_b]
+        words = zip([(w, g) for (g, w) in reader_a],
+                    [(w, g) for (g, w) in reader_b])
+        words_a, words_b = zip(*[(a, b) for (a, b) in words if a and b])
         print('Constructing cost matrix...')
         matrix = construct_cost_matrix(words_a, words_b, dist)
         m = munkres.Munkres()
