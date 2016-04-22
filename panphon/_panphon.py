@@ -100,6 +100,7 @@ class FeatureTable(object):
         self.seg_seq = {seg[0]: i for (i, seg) in enumerate(self.segments)}
         self.weights = self._read_weights()
         self.seg_regex = self._build_seg_regex()
+        self.longest_seg = max([len(x) for x in self.seg_dict.keys()])
         self.dogol_prime = self._dogolpolsky_prime()
 
     def _read_table(self, filename):
@@ -180,6 +181,13 @@ class FeatureTable(object):
             return features <= self.seg_dict[segment]
         else:
             return None
+
+    def longest_one_seg_prefix(self, word):
+        """Return longest Unicode prefix of a word."""
+        for i in range(self.longest_seg, 0, -1):
+            if word[:i] in self.seg_dict:
+                return word[:i]
+        return ''
 
     def segs(self, word):
         """Returns a list of segments (as strings) from a word (as a
