@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='panphon',
-      version='0.2',
+      version='0.3',
       description='Tools for using the International Phonetic Alphabet with phonological features',
       url='https://github.com/dmort27/panphon',
       download_url='https://github.com/dmort27/panphon/tarball/0.2',
