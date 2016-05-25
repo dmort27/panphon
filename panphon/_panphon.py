@@ -2,10 +2,10 @@
 from __future__ import print_function
 
 import pkg_resources
-import yaml
+
 import regex as re
-import numpy as np
 import unicodecsv as csv
+
 
 # logging.basicConfig(level=logging.DEBUG)
 
@@ -101,7 +101,6 @@ class FeatureTable(object):
         self.weights = self._read_weights()
         self.seg_regex = self._build_seg_regex()
         self.longest_seg = max([len(x) for x in self.seg_dict.keys()])
-        self.dogol_prime = self._dogolpolsky_prime()
 
     def _read_table(self, filename):
         """Read the data from data/segment_features.csv into self.segments, a
@@ -142,17 +141,6 @@ class FeatureTable(object):
         """Deletes ties from all segments."""
         self.seg_dict = {k.replace(u'\u0361', u''): v
                          for (k, v) in self.seg_dict.items()}
-
-    def _dogolpolsky_prime(self, filename='data/dogolpolsky_prime.yml'):
-        """Reads Dogolpolsky' classes and constructs function cascade."""
-        filename = pkg_resources.resource_filename(
-            __name__, filename)
-        with open(filename, 'r') as f:
-            rules = []
-            dogol_prime = yaml.load(f.read())
-            for rule in dogol_prime:
-                rules.append((fts(rule['def']), rule['label']))
-        return rules
 
     def fts(self, segment):
         """Returns features corresponding to segment as list of <value,
@@ -206,16 +194,6 @@ class FeatureTable(object):
     def seg_known(self, segment):
         """Returns True if segment is in segment <=> features database."""
         return segment in self.seg_dict
-
-    def map_to_dogol_prime(self, s):
-        segs = []
-        for seg in self.seg_regex.findall(s):
-            fts = self.seg_fts(seg)
-            for mask, label in self.dogol_prime:
-                if self.match(mask, fts):
-                    segs.append(label)
-                    break
-        return ''.join(segs)
 
     def filter_string(self, s):
         """Return a string containing only legal IPA segments."""
@@ -396,138 +374,3 @@ class FeatureTable(object):
         """Return a list of feature vectors, given a Unicode IPA word.
         """
         return map(self.segment_to_vector, self.segs(word))
-
-    def feature_difference(self, ft1, ft2):
-        """Given two feature values, return the difference.
-
-        ft1, ft2 -- two feature values ('+', '-', or '0')
-        """
-        if ft1 != ft2:
-            if ft1 == '0' or ft2 == '0':
-                return 0.5
-            else:
-                return 1
-        else:
-            return 0
-
-    def levenshtein_distance(self, source, target):
-        if len(source) < len(target):
-            return self.levenshtein(target, source)
-        # So now we have len(source) >= len(target).
-        if len(target) == 0:
-            return len(source)
-        # We call tuple() to force strings to be used as sequences
-        # ('c', 'a', 't', 's') - numpy uses them as values by default.
-        source = np.array(tuple(source))
-        target = np.array(tuple(target))
-        # We use a dynamic programming algorithm, but with the
-        # added optimization that we only need the last two rows
-        # of the matrix.
-        previous_row = np.arange(target.size + 1)
-        for s in source:
-            # Insertion (target grows longer than source):
-            current_row = previous_row + 1
-            # Substitution or matching:
-            # Target and source items are aligned, and either
-            # are different (cost of 1), or are the same (cost of 0).
-            current_row[1:] = np.minimum(current_row[1:], np.add(previous_row[:-1], target != s))
-            # Deletion (target grows shorter than source):
-            current_row[1:] = np.minimum(current_row[1:], current_row[0:-1] + 1)
-            previous_row = current_row
-        return previous_row[-1]
-
-    def min_edit_distance(self, del_cost, ins_cost, sub_cost, start, source, target):
-        """Return minimum edit distance, parameterized.
-
-        del_cost -- cost function for deletion
-        ins_cost -- cost function for insertion
-        sub_cost -- cost function for substitution
-        start -- start symbol: string for strings, list for
-                 list, list of list for list of lists
-        source -- source string/sequence of feature vectors
-        target -- target string/sequence of feature vectors
-        """
-        # Get lengths of source and target
-        n, m = len(source), len(target)
-        source, target = start + source, start + target
-        # Create "matrix"
-        d = []
-        for i in range(n + 1):
-            d.append((m + 1) * [None])
-        # Initialize "matrix"
-        d[0][0] = 0
-        for i in range(1, n + 1):
-            d[i][0] = d[i - 1][0] + del_cost(source[i])
-        for j in range(1, m + 1):
-            d[0][j] = d[0][j - 1] + ins_cost(target[j])
-        # Recurrence relation
-        for i in range(1, n + 1):
-            for j in range(1, m + 1):
-                d[i][j] = min([
-                    d[i - 1][j] + del_cost(source[i]),
-                    d[i - 1][j - 1] + sub_cost(source[i], target[j]),
-                    d[i][j - 1] + ins_cost(target[j]),
-                ])
-        return d[n][m]
-
-    # def simple_deletion_cost(self, c1):
-    #     """Return 1."""
-    #     return 1
-    #
-    # def simple_substitution_cost(self, c1, c2):
-    #     """Given two characters, return 0 if they are identical, otherwise 1."""
-    #     return 0 if v1 == v2 else 1
-    #
-    # def simple_insertion_cost(self, c1):
-    #     """Return 1."""
-    #     return 1
-    #
-    # def levenshtein_distance(self, list(source), list(target):
-    #     return self.min_edit_distance(self.simple_deletion_cost,
-    #                                   self.simple_insertion_cost,
-    #                                   self.simple_substitution_cost,
-    #                                   [[]], source, target)
-
-    def unweighted_deletion_cost(self, v1):
-        """Return cost of deleting segment corresponding to feature vector."""
-        return sum(map(lambda x: 0.5 if x == '0' else 1, v1))
-
-    def unweighted_substitution_cost(self, v1, v2):
-        """Given two feature vectors, return the difference."""
-        diffs = [self.feature_difference(ft1, ft2)
-                 for (ft1, ft2) in zip(v1, v2)]
-        return sum(diffs)
-
-    def unweighted_insertion_cost(self, v1):
-        """Return cost of inserting segment corresponding to feature vector."""
-        return sum(map(lambda x: 0.5 if x == '0' else 1, v1))
-
-    def feature_edit_distance(self, source, target):
-        return self.min_edit_distance(self.unweighted_deletion_cost,
-                                      self.unweighted_insertion_cost,
-                                      self.unweighted_substitution_cost,
-                                      [[]], source, target)
-
-    def weighted_feature_difference(self, w, ft1, ft2):
-        """Return the weighted difference between two features."""
-        return w if ft1 != ft2 else 0
-
-    def weighted_substitution_cost(self, v1, v2):
-        """Given two feature vectors, return the difference."""
-        diffs = [self.weighted_feature_difference(w, ft1, ft2)
-                 for (w, ft1, ft2) in zip(self.weights, v1, v2)]
-        return sum(diffs)
-
-    def weighted_insertion_cost(self, v1):
-        """Return cost of inserting segment corresponding to feature vector."""
-        return sum(self.weights)
-
-    def weighted_deletion_cost(self, v1):
-        """Return cost of deleting segment corresponding to feature vector."""
-        return sum(self.weights)
-
-    def weighted_feature_edit_distance(self, source, target):
-        return self.min_edit_distance(self.weighted_deletion_cost,
-                                      self.weighted_insertion_cost,
-                                      self.weighted_substitution_cost,
-                                      [[]], source, target)
