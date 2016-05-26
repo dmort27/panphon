@@ -21,7 +21,7 @@ class Distance(_panphon.FeatureTable):
         self.dogol_prime = self._dogolpolsky_prime()
 
     def _dogolpolsky_prime(self, filename='data/dogolpolsky_prime.yml'):
-        """Reads Dogolpolsky' classes and constructs function cascade."""
+        """Reads Dogolpolsky-prime classes and constructs function cascade."""
         filename = pkg_resources.resource_filename(
             __name__, filename)
         with open(filename, 'r') as f:
