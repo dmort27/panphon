@@ -146,6 +146,11 @@ class Distance(_panphon.FeatureTable):
                  for (ft1, ft2) in zip(v1, v2)]
         return sum(diffs)
 
+    def hamming_substitution_cost(self, v1, v2):
+        diffs = [self.feature_difference_hamming(ft1, ft2)
+                 for (ft1, ft2) in zip(v1, v2)]
+        return sum(diffs)
+
     def unweighted_insertion_cost(self, v1):
         """Return cost of inserting segment corresponding to feature vector."""
         assert isinstance(v1, types.ListType)
