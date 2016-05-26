@@ -44,6 +44,7 @@ class TestUnweightedFeatureEditDist(unittest.TestCase):
     def test_trivial2(self):
         self.assertEqual(self.dist.feature_edit_distance('ti', 'tʰi'), 1)
 
+
 class TestWeightedFeatureEditDist(unittest.TestCase):
     def setUp(self):
         self.dist = distance.Distance()
@@ -52,6 +53,6 @@ class TestWeightedFeatureEditDist(unittest.TestCase):
         self.assertGreater(self.dist.weighted_feature_edit_distance('ti', 'tʰu'),
                            self.dist.weighted_feature_edit_distance('ti', 'tʰi'))
 
-    def test_trivial1(self):
+    def test_trivial2(self):
         self.assertGreater(self.dist.weighted_feature_edit_distance('ti', 'te'),
                            self.dist.weighted_feature_edit_distance('ti', 'tḭ'))
