@@ -170,7 +170,6 @@ class Distance(_panphon.FeatureTable):
                  for (ft1, ft2) in zip(v1, v2)]
         return sum(diffs)
 
-
     def hamming_feature_edit_distance(self, source, target):
         """String edit distance with equally-weighed features.
 
