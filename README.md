@@ -29,6 +29,42 @@ The `FeatureTable` class has methods for computing sonority scores for segments.
 
 The `FeatureTable` class includes methods for calculating edit distance, both in which the cost of substitutions is based upon Hamming distance between the feature vectors and in which the cost of substitutions are based upon edit weights for individual features.
 
+## The ```panphon.distance``` Module
+
+This module includes the ```Distance``` class, which includes various methods for computing the distance between Unicode IPA strings, including convenience methods (really "inconvenience methods") for computing Levenshtein distance, but--more importantly--methods for computing similarity metrics related to articulatory features. The methods include the following:
+
+```panphon.distance.Distance``` .**levenshtein_distance**
+
+A Python implementation of Levenshtein's string edit distance.
+
+```panphon.distance.Distance``` .**fast_levenshtein_distance**
+
+A C implementation of Levenshtein's string edit distance. Unsurprisingly, must faster than the former.
+
+```panphon.distance.Distance``` .**dogol_prime_distance**
+
+Fast Levenshtein distance after collapsing segments into an enhanced version of Dogolpolsky's equivalence classes.
+
+```panphon.distance.Distance``` .**feature_edit_distance**
+
+Edit distance where each feature-edit has cost 1. Edits from unspecified to specified cost 0.5.
+
+```panphon.distance.Distance``` .**hamming_feature_edit_distance**
+
+Edit distance where each feature-edit has cost 1. Edits from unspecified to specified also cost 1.
+
+```panphon.distance.Distance``` .**weighted_feature_edit_distance**
+
+Edit distance where costs of feature edits are differently weighted depending on their class and subjective variability. All of these methods have the same interface and patterns of usage, demonstrated below:
+
+
+    >>> import panphon.distance
+    >>> dst = panphon.distance.Distance()
+    >>> dst.dogol_prime_distance(u'pops', u'bobz')
+    0
+    >>> dst.dogol_prime_distance(u'pops', u'bobo')
+    1
+
 ## Diacritic Application Tool: apply_diacritics.py
 
 This small, self-documenting Python program allows the user to apply sets of rules, defined in YAML, for adding diacritics and modifiers to IPA segments based upon their phonological features. For a detailed help message, execute `python apply_diacritics.py -h` in the directory containing `apply_diacritics.py`.
@@ -133,3 +169,4 @@ The key **combinations** likewise points to a list of rules for combining the ru
   **diacritics** that are to be combined.
 
 The file `diacritic_definitions_schema.yml` is a [Kwalify](http://www.kuwata-lab.com/kwalify/) schema that defines a syntactically valid diacritics definition file.
+
