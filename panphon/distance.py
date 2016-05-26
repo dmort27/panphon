@@ -5,9 +5,9 @@ import types
 import numpy as np
 import pkg_resources
 import yaml
-import Levenshtein
 
 import _panphon
+import Levenshtein
 
 
 class Distance(_panphon.FeatureTable):
