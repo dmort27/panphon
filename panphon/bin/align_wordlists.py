@@ -6,6 +6,7 @@ import argparse
 import panphon
 import Levenshtein
 import munkres
+import panphon.distance
 from functools import partial
 
 
@@ -14,18 +15,16 @@ def levenshtein_dist(_, a, b):
 
 
 def dogol_leven_dist(_, a, b):
-    return Levenshtein.distance(ft.map_to_dogol_prime(a),
-                                ft.map_to_dogol_prime(b))
+    return Levenshtein.distance(dist.map_to_dogol_prime(a),
+                                dist.map_to_dogol_prime(b))
 
 
-def feature_hamming_dist(ft, a, b):
-    return ft.feature_edit_distance(ft.word_to_vector_list(a),
-                                    ft.word_to_vector_list(b))
+def feature_hamming_dist(dist, a, b):
+    return dist.feature_edit_distance(a, b)
 
 
-def feature_weighted_dist(ft, a, b):
-    return ft.weighted_feature_edit_distance(ft.word_to_vector_list(a),
-                                             ft.word_to_vector_list(b))
+def feature_weighted_dist(dist, a, b):
+    return dist.weighted_feature_edit_distance(a, b)
 
 
 def construct_cost_matrix(words_a, words_b, dist):
@@ -43,7 +42,7 @@ def score(indices):
     return pairs, errors
 
 
-def main(wordlist1, wordlist2, dist):
+def main(wordlist1, wordlist2, dist_funcs):
     with open(wordlist1, 'rb') as file_a, open(wordlist2, 'rb') as file_b:
         reader_a = csv.reader(file_a, encoding='utf-8')
         reader_b = csv.reader(file_b, encoding='utf-8')
@@ -52,7 +51,7 @@ def main(wordlist1, wordlist2, dist):
                     [(w, g) for (g, w) in reader_b])
         words_a, words_b = zip(*[(a, b) for (a, b) in words if a and b])
         print('Constructing cost matrix...')
-        matrix = construct_cost_matrix(words_a, words_b, dist)
+        matrix = construct_cost_matrix(words_a, words_b, dist_funcs)
         m = munkres.Munkres()
         print('Computing matrix using Hungarian Algorithm...')
         indices = m.compute(matrix)
@@ -69,6 +68,6 @@ if __name__ == '__main__':
              'dogol-leven': dogol_leven_dist,
              'hamming': feature_hamming_dist,
              'weighted': feature_weighted_dist}
-    ft = panphon.FeatureTable()
-    dist = partial(dists[args.dist], ft)
-    main(args.wordlists[0], args.wordlists[1], dist)
+    dist = panphon.distance.Distance()
+    dist_funcs = partial(dists[args.dist], dist)
+    main(args.wordlists[0], args.wordlists[1], dist_funcs)
