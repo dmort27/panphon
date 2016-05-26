@@ -170,6 +170,25 @@ class Distance(_panphon.FeatureTable):
                                       self.word_to_vector_list(source),
                                       self.word_to_vector_list(target))
 
+    def hamming_substitution_cost(self, v1, v2):
+        diffs = [self.feature_difference_hamming(ft1, ft2)
+                 for (ft1, ft2) in zip(v1, v2)]
+        return sum(diffs)
+
+
+    def hamming_feature_edit_distance(self, source, target):
+        """String edit distance with equally-weighed features.
+
+        All articulatory features are given equal weight. The distance between
+        an unspecified value and a specified value is smaller than the distance
+        between two features with oppoiste values."""
+        return self.min_edit_distance(self.unweighted_deletion_cost,
+                                      self.unweighted_insertion_cost,
+                                      self.hamming_substitution_cost,
+                                      [[]],
+                                      self.word_to_vector_list(source),
+                                      self.word_to_vector_list(target))
+
     def weighted_feature_difference(self, w, ft1, ft2):
         """Return the weighted difference between two features."""
         return w if ft1 != ft2 else 0
