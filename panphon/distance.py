@@ -7,8 +7,7 @@ import pkg_resources
 import yaml
 
 import _panphon
-import Levenshtein
-
+import editdistance
 
 class Distance(_panphon.FeatureTable):
     def __init__(self, feature_set='spe+'):
@@ -90,7 +89,7 @@ class Distance(_panphon.FeatureTable):
 
     def fast_levenshtein_distance(self, source, target):
         """Inconvenience wrapper for the distance function in the Levenshtein module."""
-        return Levenshtein.distance(source, target)
+        return int(editdistance.eval(source, target))
 
     def dogol_prime_distance(self, source, target):
         """Approximate Levenshtein distance using phonetic equivalence classes."""
