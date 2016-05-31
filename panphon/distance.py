@@ -9,6 +9,7 @@ import yaml
 import _panphon
 import editdistance
 
+
 class Distance(_panphon.FeatureTable):
     def __init__(self, feature_set='spe+'):
         filename = _panphon.filenames[feature_set]
