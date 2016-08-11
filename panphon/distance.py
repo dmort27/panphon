@@ -203,6 +203,9 @@ class Distance(_panphon.FeatureTable):
         two features with oppoiste values. The final value is the string edit
         distance calculated in this way and divided by the length of the longest
         sequence of feature vectors.
+
+        It should be remembered that the resulting function does not obey the
+        triangle inequality and is thus not a distance.
         """
 
         source, target = self.word_to_vector_list(source), self.word_to_vector_list(target)
