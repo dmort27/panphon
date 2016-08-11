@@ -1,4 +1,4 @@
-from __future__ import print_function, unicode_literals
+from __future__ import print_function, unicode_literals, division
 
 import types
 
@@ -98,6 +98,13 @@ class Distance(_panphon.FeatureTable):
         target = self.map_to_dogol_prime(target)
         return self.fast_levenshtein_distance(source, target)
 
+    def dogol_prime_distance_div_by_maxlen(self, source, target):
+        """Approximate Levenshtein distance using phonetic equivalence classes."""
+        source = self.map_to_dogol_prime(source)
+        target = self.map_to_dogol_prime(target)
+        maxlen = max(len(source), len(target))
+        return self.fast_levenshtein_distance(source, target) / maxlen
+
     def min_edit_distance(self, del_cost, ins_cost, sub_cost, start, source, target):
         """Return minimum edit distance, parameterized.
 
@@ -136,21 +143,22 @@ class Distance(_panphon.FeatureTable):
         """Return cost of deleting segment corresponding to feature vector."""
         assert isinstance(v1, types.ListType)
         assert isinstance(v1[0], types.StringTypes)
-        return sum(map(lambda x: 0.5 if x == '0' else 1, v1))
+        return sum(map(lambda x: 0.5 if x == '0' else 1, v1)) / len(v1)
 
     def unweighted_substitution_cost(self, v1, v2):
         """Given two feature vectors, return the difference."""
         assert isinstance(v1, types.ListType)
         assert isinstance(v1[0], types.StringTypes)
+        assert len(v1) == len(v2)
         diffs = [self.feature_difference(ft1, ft2)
                  for (ft1, ft2) in zip(v1, v2)]
-        return sum(diffs)
+        return sum(diffs) / len(v1)
 
     def unweighted_insertion_cost(self, v1):
         """Return cost of inserting segment corresponding to feature vector."""
         assert isinstance(v1, types.ListType)
         assert isinstance(v1[0], types.StringTypes)
-        return sum(map(lambda x: 0.5 if x == '0' else 1, v1))
+        return sum(map(lambda x: 0.5 if x == '0' else 1, v1)) / len(v1)
 
     def feature_edit_distance(self, source, target):
         """String edit distance with equally-weighed features.
@@ -165,10 +173,14 @@ class Distance(_panphon.FeatureTable):
                                       self.word_to_vector_list(source),
                                       self.word_to_vector_list(target))
 
+    def feature_edit_distance_div_by_maxlen(self, source, target):
+        maxlen = max(len(source), len(target))
+        return self.feature_edit_distance(self, source, target) / maxlen
+
     def hamming_substitution_cost(self, v1, v2):
         diffs = [self.feature_difference_hamming(ft1, ft2)
                  for (ft1, ft2) in zip(v1, v2)]
-        return sum(diffs)
+        return sum(diffs) / len(diffs)
 
     def hamming_feature_edit_distance(self, source, target):
         """String edit distance with equally-weighed features.
