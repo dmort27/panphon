@@ -11,6 +11,8 @@ import editdistance
 
 
 class Distance(_panphon.FeatureTable):
+    """Measures of phonological distance."""
+
     def __init__(self, feature_set='spe+'):
         filename = _panphon.filenames[feature_set]
         self.segments, self.seg_dict, self.names = self._read_table(filename)
@@ -42,25 +44,14 @@ class Distance(_panphon.FeatureTable):
         return ''.join(segs)
 
     def feature_difference(self, ft1, ft2):
-        """Given two feature values, return the difference.
+        """Given two feature values, return the difference (where the difference
+        between '+' and '-' is 1 and the difference between '0' and '+' or '-'
+        is 0.5.
 
         ft1, ft2 -- two feature values ('+', '-', or '0')
         """
-        if ft1 != ft2:
-            if ft1 == '0' or ft2 == '0':
-                return 0.5
-            else:
-                return 1
-        else:
-            return 0
-
-    def feature_difference_hamming(self, ft1, ft2):
-        """Gives the distance between feature values for computing Hamming
-        distance. OVERKILL.
-
-        ft1, ft2 -- two feature values ('+', '-', or '0')
-        """
-        return 0 if ft1 == ft2 else 1
+        tr = {'-': -1, '0': 0, '+': 1}
+        return abs(tr[ft1] - tr[ft2]) / 2.0
 
     def levenshtein_distance(self, source, target):
         if len(source) < len(target):
@@ -178,9 +169,14 @@ class Distance(_panphon.FeatureTable):
         return self.feature_edit_distance(self, source, target) / maxlen
 
     def hamming_substitution_cost(self, v1, v2):
-        diffs = [self.feature_difference_hamming(ft1, ft2)
-                 for (ft1, ft2) in zip(v1, v2)]
-        return sum(diffs) / len(diffs)
+        """Substitution cost for feature vectors computed as Hamming distance.
+
+        Substitution cost for feature vectors computed as Hamming distance and
+        normalized by dividing this result by the length of the vectors.
+        """
+        assert len(v1) == len(v2)
+        diffs = [ft1 != ft2 for (ft1, ft2) in zip(v1, v2)]
+        return sum(diffs) / len(diffs) #  Booleans are cohersed to integers.
 
     def hamming_feature_edit_distance(self, source, target):
         """String edit distance with equally-weighed features.
@@ -205,7 +201,7 @@ class Distance(_panphon.FeatureTable):
         sequence of feature vectors.
 
         It should be remembered that the resulting function does not obey the
-        triangle inequality and is thus not a distance.
+        triangle inequality and is thus not a proper metric.
         """
 
         source, target = self.word_to_vector_list(source), self.word_to_vector_list(target)
