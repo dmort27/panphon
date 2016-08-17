@@ -56,3 +56,22 @@ class TestWeightedFeatureEditDist(unittest.TestCase):
     def test_trivial2(self):
         self.assertGreater(self.dist.weighted_feature_edit_distance('ti', 'te'),
                            self.dist.weighted_feature_edit_distance('ti', 'tḭ'))
+
+class TestHammingFeatureEditDistanceDivMaxlen(unittest.TestCase):
+    def setUp(self):
+        self.dist = distance.Distance()
+
+    def test_hamming_substitution_cost(self):
+        self.assertEqual(self.dist.hamming_substitution_cost(['+', '-', '0'], ['0', '-', '0']) * 3, 1)
+
+    def test_trivial1(self):
+        self.assertEqual(self.dist.hamming_feature_edit_distance_div_maxlen('pa', 'ba') * 21 * 2, 1)
+
+    def test_trivial2(self):
+        self.assertEqual(self.dist.hamming_feature_edit_distance_div_maxlen('i', 'pi') * 2, 1)
+
+    def test_trivial3(self):
+        self.assertEqual(self.dist.hamming_feature_edit_distance_div_maxlen('sɛks', 'ɛɡz'), (1 + (1 / 21) + (1 / 21)) / 4)
+
+    def test_trivial4(self):
+        self.assertEqual(self.dist.hamming_feature_edit_distance_div_maxlen('k', 'ɡ'), 1 / 21)
