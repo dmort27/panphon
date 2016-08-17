@@ -19,7 +19,7 @@ The `FeatureTable` class includes a broad range of operations on features and se
 
 ### Fixed-width pattern matching
 
-The `FeaturTable` class allows matching of Fixed-width, feature-based patterns.
+The `FeatureTable` class allows matching of Fixed-width, feature-based patterns.
 
 ### Sonority calculations
 
@@ -167,4 +167,3 @@ The key **combinations** likewise points to a list of rules for combining the ru
   **diacritics** that are to be combined.
 
 The file `diacritic_definitions_schema.yml` is a [Kwalify](http://www.kuwata-lab.com/kwalify/) schema that defines a syntactically valid diacritics definition file.
-
