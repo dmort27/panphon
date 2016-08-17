@@ -1,6 +1,6 @@
 #!//usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals
+from __future__ import print_function, unicode_literals, division
 
 import unittest
 import distance
@@ -33,16 +33,16 @@ class TestUnweightedFeatureEditDist(unittest.TestCase):
         self.dist = distance.Distance()
 
     def test_unweighted_substitution_cost(self):
-        self.assertEqual(self.dist.unweighted_substitution_cost(['0', '+', '-'], ['0', '+', '+']), 1)
+        self.assertEqual(self.dist.unweighted_substitution_cost(['0', '+', '-'], ['0', '+', '+']), 1/3.0)
 
     def test_unweighted_deletion_cost(self):
-        self.assertEqual(self.dist.unweighted_deletion_cost(['+', '-', '+', '0']), 3.5)
+        self.assertEqual(self.dist.unweighted_deletion_cost(['+', '-', '+', '0']) * 4, 3.5)
 
     def test_trivial1(self):
-        self.assertEqual(self.dist.feature_edit_distance('bim', 'pym'), 3)
+        self.assertEqual(self.dist.feature_edit_distance('bim', 'pym') * 21, 3)
 
     def test_trivial2(self):
-        self.assertEqual(self.dist.feature_edit_distance('ti', 'tʰi'), 1)
+        self.assertEqual(self.dist.feature_edit_distance('ti', 'tʰi') * 21, 1)
 
 
 class TestWeightedFeatureEditDist(unittest.TestCase):
