@@ -181,11 +181,18 @@ class Distance(_panphon.FeatureTable):
     def hamming_feature_edit_distance(self, source, target):
         """String edit distance with equally-weighed features.
 
-        All articulatory features are given equal weight. The distance between
-        an unspecified value and a specified value is smaller than the distance
-        between two features with oppoiste values."""
-        return self.min_edit_distance(self.unweighted_deletion_cost,
-                                      self.unweighted_insertion_cost,
+        All articulatory features are given equal weight. The distance between an
+        unspecified value and a specified value is smaller than the distance between
+        two features with oppoiste values.
+
+        The insertion and deletion cost is always one, somewhat favoring
+        substitution.
+
+        This function has no normalization but should obey the triangle
+        inequality and thus provide a true distance metric.
+        """
+        return self.min_edit_distance(lambda v: 1,
+                                      lambda v: 1,
                                       self.hamming_substitution_cost,
                                       [[]],
                                       self.word_to_vector_list(source),
@@ -194,11 +201,13 @@ class Distance(_panphon.FeatureTable):
     def hamming_feature_edit_distance_div_maxlen(self, source, target):
         """String edit distance with equally-weighed features divided by maximum length.
 
-        All articulatory features are given equal weight. The distance between an
+        All articulatory features are given equal weight. For substitution, the distance between an
         unspecified value and a specified value is smaller than the distance between
-        two features with oppoiste values. The final value is the string edit
+        two features with opposite values. The final value is the string edit
         distance calculated in this way and divided by the length of the longest
         sequence of feature vectors.
+
+        The insertion and deletion cost is always one, somewhat favoring substitution.
 
         It should be remembered that the resulting function does not obey the
         triangle inequality and is thus not a proper metric.
@@ -206,8 +215,8 @@ class Distance(_panphon.FeatureTable):
 
         source, target = self.word_to_vector_list(source), self.word_to_vector_list(target)
         maxlen = max(len(source), len(target))
-        raw = self.min_edit_distance(self.unweighted_deletion_cost,
-                                     self.unweighted_insertion_cost,
+        raw = self.min_edit_distance(lambda v: 1,
+                                     lambda v: 1,
                                      self.hamming_substitution_cost,
                                      [[]], source, target)
         return  raw / maxlen
