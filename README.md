@@ -4,7 +4,7 @@ These files constitute a preliminary database of segments in the International P
 
 ## Python API for Accessing Phonological Features of IPA Segments
 
-The `panphon` module provides a straightforward API that allows users and developers to access the segment-feature relationships encoded in the IPA database `panphon/data/segment_features.csv`.
+The `panphon` module provides a straightforward API that allows users and developers to access the segment-feature relationships encoded in the IPA database `panphon/data/ipa_all.csv`.
 
     >>> import panphon.panphon as panphon
     >>> ft = panphon.FeatureTable()
@@ -73,23 +73,23 @@ This small, self-documenting Python program allows the user to apply sets of rul
 
 The tool `apply_diacritics.py` produces three kinds of output, depending on the command line options that are specified:
 
-1. *Segments file.* This is a CSV file containing a header row with the names of features and a succession of non-header rows, each of which includes an IPA segment in the first field and feature specifications in each of the subsequent fields. When diacritics are applied to bases to produce new segments, these are added to this list. The sorting of this list is controlled by the **sort order specification**. By default, this file is called ```segment_features.csv```. The name can be explicitly specified with the `-o` or `--output` options.
+1. *Segments file.* This is a CSV file containing a header row with the names of features and a succession of non-header rows, each of which includes an IPA segment in the first field and feature specifications in each of the subsequent fields. When diacritics are applied to bases to produce new segments, these are added to this list. The sorting of this list is controlled by the **sort order specification**. By default, this file is called ```ipa_all.csv```. The name can be explicitly specified with the `-o` or `--output` options.
 2. *Diacritics/modifier file.* This is a CSV file containing a header row with the names of each series. Each column contains a series of IPA segments to which a particular diacritic or modifier has been applied. These are likewise sorted according to the **sort order specification** as applied to the first column.
 3. *Segment comparison files.* These two files are produced when the `-c` or `--compare` options are specified. The first contains the segments predicted by the model but not attested in the specified standards of comparison (e.g. `phoible_phonemes.csv`); the second contains the segments attested in the standard of comparison but not predicted by the model associated with the database.
 
 ### Usage
 
-To generate a segment features file (```segment_features.csv```) and a segment series file (```segment_series.csv```), use the following:
+To generate a segment features file (```ipa_all.csv```) and a segment series file (```segment_series.csv```), use the following:
 
-```python apply_diacritics.py ipa_table.csv diacritic_definitions.yml
--a -f segment_features.csv -o segment_series.csv```
+```python apply_diacritics.py ipa_bases.csv diacritic_definitions.yml
+-a -f ipa_all.csv -o segment_series.csv```
 
 This is the most common use of the script. To sort the segments by feature specification, include a sort order file with the `-s` or `--sort` option:
 
-```python apply_diacritics.py ipa_table.csv diacritic_definitions.yml
--a -s sort_order.yml -f segment_features.csv -o segment_series.csv```
+```python apply_diacritics.py ipa_bases.csv diacritic_definitions.yml
+-a -s sort_order.yml -f ipa_all.csv -o segment_series.csv```
 
-The script can also be used to compare the results of applying all of the diacritics/modifiers in ```diacritic_definitions.yml``` to the segments in ```ipa_table.csv``` to other lists of phonemes (e.g. from the PHOIBLE database). This is done with the `-c` or `--compare` option, which takes three arguments:
+The script can also be used to compare the results of applying all of the diacritics/modifiers in ```diacritic_definitions.yml``` to the segments in ```ipa_bases.csv``` to other lists of phonemes (e.g. from the PHOIBLE database). This is done with the `-c` or `--compare` option, which takes three arguments:
 
 1. The file to which the comparison is to be made.
 2. The file to which the segments which are predicted by the model by not attested in the list are to be written.
@@ -97,9 +97,9 @@ The script can also be used to compare the results of applying all of the diacri
 
 ## Data Files
 
-This package also includes one data file. The most important of these is ipa_table.csv, a CSV table of IPA characters with definitions in terms of phonological features.
+This package also includes one data file. The most important of these is ipa_bases.csv, a CSV table of IPA characters with definitions in terms of phonological features.
 
-### IPA Character Database: ipa_table.csv
+### IPA Character Database: ipa_bases.csv
 
 The IPA Character Table is a CSV file in which the first column contains an IPA segment and each subsequent column contains a phonological feature, coded as +, -, or 0. The features are as follows:
 

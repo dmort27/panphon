@@ -30,8 +30,8 @@ SEG_REGEX = re.compile(ur'[\p{InBasic_Latin}\p{InGreek_and_Coptic}' +
                        ur'\p{InSpacing_Modifier_Letters}*',
                        re.U | re.X)
 filenames = {
-    'spe+': 'data/segment_features.csv',
-    'panphon': 'data/segment_features.csv',
+    'spe+': 'data/ipa_all.csv',
+    'panphon': 'data/ipa_all.csv',
 }
 
 

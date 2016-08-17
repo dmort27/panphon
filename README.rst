@@ -37,7 +37,7 @@ features and segments.
 Fixed-width pattern matching
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``FeaturTable`` class allows matching of Fixed-width, feature-based
+The ``FeatureTable`` class allows matching of Fixed-width, feature-based
 patterns.
 
 Sonority calculations
