@@ -124,7 +124,7 @@ The IPA Character Table is a CSV file in which the first column contains an IPA 
 * **round**: round
 * **tense**: tense
 
-The data in this table is drawn primarily from two sources: the data files for [HsSPE](https://github.com/dmort27/HsSPE) and Bruce Hayes's [feature spreadsheet](http://www.linguistics.ucla.edu/people/hayes/IP/#features).
+Inspiration for the data in this table is drawn primarily from two sources: the data files for [HsSPE](https://github.com/dmort27/HsSPE) and Bruce Hayes's [feature spreadsheet](http://www.linguistics.ucla.edu/people/hayes/IP/#features). It has since be re-rationalizeds based on evidence from a wide range of sources.
 
 The IPA Character Table is intended to contain all of the unmodified symbols in IPA, as well as all common affricates and dually-articulated segments. It is meant to be augmented by the rule-driven application of diacritics and modifiers.
 
@@ -141,9 +141,7 @@ The file `sort_order.yml` controls the ordering of segments in the output of the
 
 The order of the features determines the priority of sorting.
 
-The file `sort_order_schema_.yml` is a
-[Kwalify](http://www.kuwata-lab.com/kwalify/) schema that defines a
-syntactically valid sort order file.
+The file `sort_order_schema_.yml` is a [Kwalify](http://www.kuwata-lab.com/kwalify/) schema that defines a syntactically valid sort order file.
 
 ### Diacritic and Modifier Rules: diacritic_definitions.yml
 
