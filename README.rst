@@ -54,6 +54,56 @@ distance, both in which the cost of substitutions is based upon Hamming
 distance between the feature vectors and in which the cost of
 substitutions are based upon edit weights for individual features.
 
+The ``panphon.distance`` Module
+-------------------------------
+
+This module includes the ``Distance`` class, which includes various
+methods for computing the distance between Unicode IPA strings,
+including convenience methods (really "inconvenience methods") for
+computing Levenshtein distance, but--more importantly--methods for
+computing similarity metrics related to articulatory features. The
+methods include the following:
+
+``panphon.distance.Distance`` .\ **levenshtein\_distance**
+
+A Python implementation of Levenshtein's string edit distance.
+
+``panphon.distance.Distance`` .\ **fast\_levenshtein\_distance**
+
+A C implementation of Levenshtein's string edit distance.
+Unsurprisingly, must faster than the former.
+
+``panphon.distance.Distance`` .\ **dogol\_prime\_distance**
+
+Fast Levenshtein distance after collapsing segments into an enhanced
+version of Dogolpolsky's equivalence classes.
+
+``panphon.distance.Distance`` .\ **feature\_edit\_distance**
+
+Edit distance where each feature-edit has cost 1. Edits from unspecified
+to specified cost 0.5.
+
+``panphon.distance.Distance`` .\ **hamming\_feature\_edit\_distance**
+
+Edit distance where each feature-edit has cost 1. Edits from unspecified
+to specified also cost 1.
+
+``panphon.distance.Distance`` .\ **weighted\_feature\_edit\_distance**
+
+Edit distance where costs of feature edits are differently weighted
+depending on their class and subjective variability. All of these
+methods have the same interface and patterns of usage, demonstrated
+below:
+
+::
+
+    >>> import panphon.distance
+    >>> dst = panphon.distance.Distance()
+    >>> dst.dogol_prime_distance(u'pops', u'bobz')
+    0
+    >>> dst.dogol_prime_distance(u'pops', u'bobo')
+    1
+
 Diacritic Application Tool: apply\_diacritics.py
 ------------------------------------------------
 
@@ -151,10 +201,12 @@ feature, coded as +, -, or 0. The features are as follows:
 -  **round**: round
 -  **tense**: tense
 
-The data in this table is drawn primarily from two sources: the data
-files for `HsSPE <https://github.com/dmort27/HsSPE>`__ and Bruce Hayes's
-`feature
+Inspiration for the data in this table is drawn primarily from two
+sources: the data files for `HsSPE <https://github.com/dmort27/HsSPE>`__
+and Bruce Hayes's `feature
 spreadsheet <http://www.linguistics.ucla.edu/people/hayes/IP/#features>`__.
+It has since be re-rationalizeds based on evidence from a wide range of
+sources.
 
 The IPA Character Table is intended to contain all of the unmodified
 symbols in IPA, as well as all common affricates and dually-articulated
