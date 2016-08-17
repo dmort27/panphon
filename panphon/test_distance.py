@@ -33,7 +33,7 @@ class TestUnweightedFeatureEditDist(unittest.TestCase):
         self.dist = distance.Distance()
 
     def test_unweighted_substitution_cost(self):
-        self.assertEqual(self.dist.unweighted_substitution_cost(['0', '+', '-'], ['0', '+', '+']), 1/3.0)
+        self.assertEqual(self.dist.unweighted_substitution_cost(['0', '+', '-'], ['0', '+', '+']) * 3, 1)
 
     def test_unweighted_deletion_cost(self):
         self.assertEqual(self.dist.unweighted_deletion_cost(['+', '-', '+', '0']) * 4, 3.5)
