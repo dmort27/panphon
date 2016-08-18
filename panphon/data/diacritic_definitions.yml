@@ -37,16 +37,6 @@ diacritics:
     content:
       sg: "+"
 
-  - marker: ʰ # Uncommon and possibly never contrastive. Remove?
-    name: Preaspirated
-    position: pre
-    conditions:
-      - son: "-"
-        cg: "-"
-        voi: "-"
-    content:
-      sg: "+"
-
 # Backness modifications
 
   - marker: ̟
@@ -173,6 +163,10 @@ diacritics:
     position: post
     conditions:
       - syl:  "-"
+    exclude:
+      - w
+      - ʍ
+      - ɥ
     content:
       round: "+"
       back:  "+"
@@ -182,7 +176,10 @@ diacritics:
     name: Palatalized
     position: post
     conditions:
-     - syl: "-"
+      - syl: "-"
+    exclude:
+      - j
+      - ɥ
     content:
       hi:   "+"
       back: "-"
@@ -203,9 +200,11 @@ diacritics:
     position: post
     conditions:
       - syl: "-"
+      - high: "-"
+      - back: "-"
     exclude:
       - k
-      - g
+      - ɡ
       - ŋ
       - x
       - ɣ
@@ -253,7 +252,7 @@ diacritics:
     position: post
     conditions:
       - cont: "+"
-    content: {}    
+    content: {}
 
 # Tongue root state
 
@@ -432,7 +431,7 @@ combinations:
     - Syllabic
     - Labialized
 
-# Rhoticity 
+# Rhoticity
 
 # Voice quality
 
