@@ -29,6 +29,7 @@ class Sonority(FeatureTable):
 
             def match(m):
                 return self.match(fts(m), seg)
+
             minusHi = BoolTree(match('-hi'), 9, 8)
             minusNas = BoolTree(match('-nas'), 6, 5)
             plusVoi1 = BoolTree(match('+voi'), 4, 3)
