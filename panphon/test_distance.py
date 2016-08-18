@@ -57,6 +57,7 @@ class TestWeightedFeatureEditDist(unittest.TestCase):
         self.assertGreater(self.dist.weighted_feature_edit_distance('ti', 'te'),
                            self.dist.weighted_feature_edit_distance('ti', 'tḭ'))
 
+
 class TestHammingFeatureEditDistanceDivMaxlen(unittest.TestCase):
     def setUp(self):
         self.dist = distance.Distance()
