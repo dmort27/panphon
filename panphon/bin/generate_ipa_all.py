@@ -25,6 +25,7 @@ class Segment(object):
         assert set(feature_names) == set(self.features.keys())
         return [self.features[ft] for ft in feature_names]
 
+
 class Diacritic(object):
     def __init__(self, marker, position, conditions, exclude, content):
         self.marker = marker
