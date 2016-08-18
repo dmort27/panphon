@@ -176,7 +176,7 @@ class Distance(_panphon.FeatureTable):
         """
         assert len(v1) == len(v2)
         diffs = [ft1 != ft2 for (ft1, ft2) in zip(v1, v2)]
-        return sum(diffs) / len(diffs) #  Booleans are cohersed to integers.
+        return sum(diffs) / len(diffs)  # Booleans are cohersed to integers.
 
     def hamming_feature_edit_distance(self, source, target):
         """String edit distance with equally-weighed features.
@@ -219,7 +219,7 @@ class Distance(_panphon.FeatureTable):
                                      lambda v: 1,
                                      self.hamming_substitution_cost,
                                      [[]], source, target)
-        return  raw / maxlen
+        return raw / maxlen
 
     def weighted_feature_difference(self, w, ft1, ft2):
         """Return the weighted difference between two features."""
