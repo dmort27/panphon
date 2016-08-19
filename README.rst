@@ -1,14 +1,13 @@
-panphon
+PanPhon
 =======
 
-These files constitute a preliminary database of segments in the
-International Phonetic Alphabet (IPA) and their equivalents in terms of
-(articulatory) phonological features. They include both data files and
-the tool ``apply_diacritics.py``, which allows the application of rules
-for diacritics and modifiers to collections of IPA characters, data
-files, and configuration/rule files and well as the tool
-``validate_ipa.py``, which checks Unicode IPA text from STDIN for
-well-formedness.
+This package constitutes a database of segments in the International
+Phonetic Alphabet (IPA) and their equivalents in terms of (articulatory)
+phonological features. They include both data files and the tool
+``generate_ipa_all.py``, which allows the application of rules for
+diacritics and modifiers to collections of IPA characters, data files,
+and configuration/rule files and well as the tool ``validate_ipa.py``,
+which checks Unicode IPA text from STDIN for well-formedness.
 
 Python API for Accessing Phonological Features of IPA Segments
 --------------------------------------------------------------
@@ -23,6 +22,10 @@ the IPA database ``panphon/data/ipa_all.csv``.
     >>> ft = panphon.FeatureTable()
     >>> ft.ftr_match(set([(u'+', u'syl')]), u'a')
     True
+    >>> ft.segs(u'pʲãk')
+    [u'p\u02b2', u'a\u0303', u'k']\
+    >>> ft.word_fts(u'pʲãk')
+    [set([(u'-', u'syl'), (u'-', u'long'), (u'-', u'voi'), (u'+', u'ant'), (u'-', u'cg'), (u'+', u'hi'), (u'-', u'son'), (u'0', u'tense'), (u'-', u'lat'), (u'-', u'back'), (u'-', u'cont'), (u'-', u'nas'), (u'-', u'lo'), (u'0', u'distr'), (u'-', u'round'), (u'-', u'delrel'), (u'+', u'lab'), (u'-', u'sg'), (u'+', u'cons'), (u'0', u'strid'), (u'-', u'cor')]), set([(u'+', u'son'), (u'+', u'tense'), (u'+', u'cont'), (u'+', u'nas'), (u'+', u'lo'), (u'+', u'voi'), (u'-', u'cg'), (u'-', u'hi'), (u'-', u'lat'), (u'+', u'syl'), (u'0', u'strid'), (u'-', u'long'), (u'-', u'cor'), (u'0', u'distr'), (u'-', u'round'), (u'-', u'delrel'), (u'0', u'ant'), (u'-', u'sg'), (u'+', u'back'), (u'-', u'cons'), (u'-', u'lab')]), set([(u'-', u'syl'), (u'-', u'lab'), (u'-', u'voi'), (u'0', u'distr'), (u'+', u'back'), (u'-', u'cg'), (u'+', u'hi'), (u'-', u'son'), (u'0', u'tense'), (u'-', u'lat'), (u'-', u'cont'), (u'-', u'nas'), (u'-', u'lo'), (u'-', u'ant'), (u'-', u'round'), (u'-', u'delrel'), (u'-', u'sg'), (u'+', u'cons'), (u'0', u'strid'), (u'-', u'cor'), (u'-', u'long')])]
 
 Summary of Functionality
 ------------------------
@@ -31,12 +34,12 @@ Operations on feature sets and segments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``FeatureTable`` class includes a broad range of operations on
-features and segments.
+features and segments (consonants and vowels).
 
 Fixed-width pattern matching
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``FeatureTable`` class also allows matching of Fixed-width,
+The ``FeatureTable`` class also allows matching of fixed-width,
 feature-based patterns.
 
 Sonority calculations
@@ -79,13 +82,14 @@ version of Dogolpolsky's equivalence classes.
 
 ``panphon.distance.Distance`` .\ **feature\_edit\_distance**
 
-Edit distance where each feature-edit has cost 1. Edits from unspecified
-to specified cost 0.5.
+Edit distance where each feature-edit has cost 1/21. Edits from
+unspecified to specified cost 1/42.
 
 ``panphon.distance.Distance`` .\ **hamming\_feature\_edit\_distance**
 
-Edit distance where each feature-edit has cost 1. Edits from unspecified
-to specified also cost 1.
+Edit distance where each feature-edit has cost 1/21. Edits from
+unspecified to specified also cost 1/21. Insertions and substitutions
+each cost 1.
 
 ``panphon.distance.Distance`` .\ **weighted\_feature\_edit\_distance**
 
@@ -106,10 +110,13 @@ below:
 Scripts
 -------
 
-``generate_ipa_all.py``
-~~~~~~~~~~~~~~~~~~~~~~~
+The ``generate_ipa_all.py`` Script
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This small, Python program allows the user to apply sets of rules,
+Summary
+^^^^^^^
+
+This small Python program allows the user to apply sets of rules,
 defined in YAML, for adding diacritics and modifiers to IPA segments
 based upon their phonological features.
 
@@ -123,17 +130,30 @@ To generate a segment features file (``ipa_all.csv``), use the following
 
     $ generate_ipa_all.py ipa_bases.csv -d diacritic_definitions.yml -s sort_order.yml ipa_all.csv
 
-Note that this will overwrite your existing ``ipa_all.csv`` file.
+Note that this will overwrite your existing ``ipa_all.csv`` file, which
+is often what you want.
+
+The ``validate_ipa.py`` Script
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[To be added.]
+
+The ``align_wordlists.py`` Script
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[To be added.]
 
 Data Files
 ----------
 
 This package also includes multiple data files. The most important of
 these is ipa\_bases.csv, a CSV table of IPA characters with definitions
-in terms of phonological features.
+in terms of phonological features. From it, and the
+``diacritics_definitions.yml`` file, the comprehensive ``ipa_all.csv``
+is generated.
 
-IPA Character Database: ipa\_bases.csv
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+IPA Character Databases: ``ipa_bases.csv`` and ``ipa_all.csv``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The IPA Character Table is a CSV file in which the first column contains
 an IPA segment and each subsequent column contains a phonological
@@ -160,18 +180,18 @@ feature, coded as +, -, or 0. The features are as follows:
 -  **round**: round
 -  **tense**: tense
 
-Inspiration for the data in this table is drawn primarily from two
+Inspiration for the data in these tables is drawn primarily from two
 sources: the data files for `HsSPE <https://github.com/dmort27/HsSPE>`__
 and Bruce Hayes's `feature
 spreadsheet <http://www.linguistics.ucla.edu/people/hayes/IP/#features>`__.
 It has since be re-rationalizeds based on evidence from a wide range of
 sources. As such, any special relationship to these prior inspirations
-has been removed.
+has been eliminated.
 
-The IPA Character Table is intended to contain all of the unmodified
-segmental symbols in IPA, as well as all common affricates and
-dually-articulated segments. It is meant to be augmented by the
-rule-driven application of diacritics and modifiers.
+The IPA Character Table ``ipa_bases.csv`` is intended to contain all of
+the unmodified segmental symbols in IPA, as well as all common
+affricates and dually-articulated segments. It is meant to be augmented
+by the rule-driven application of diacritics and modifiers.
 
 Configuration and Rule Files
 ----------------------------
@@ -179,7 +199,8 @@ Configuration and Rule Files
 This package includes two files that control the behavior of
 ``generate_ipa_all.py``. These are intended to be edited by the end
 user. Both are written in `YAML <http://www.yaml.org/>`__, a
-human-readable and editable data serialization standard.
+standardized and human-readable and editable data serialization
+language.
 
 Sort Order Specification: sort\_order.yml
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
