@@ -12,7 +12,7 @@ class TestSonority(unittest.TestCase):
         self.son = sonority.Sonority()
 
     def test_sonority_nine(self):
-        segs = ['a', 'ɑ', 'æ', 'ɒ', 'e', 'o']
+        segs = ['a', 'ɑ', 'æ', 'ɒ', 'e', 'o̥']
         scores = [9] * 6
         self.assertEqual(map(self.son.sonority, segs), scores)
 
@@ -22,8 +22,8 @@ class TestSonority(unittest.TestCase):
         self.assertEqual(map(self.son.sonority, segs), scores)
 
     def test_sonority_seven(self):
-        segs = ['j', 'w', 'ʋ', 'ɰ', 'ɹ']
-        scores = [7] * 5
+        segs = ['j', 'w', 'ʋ', 'ɰ', 'ɹ', 'e̯']
+        scores = [7] * 6
         self.assertEqual(map(self.son.sonority, segs), scores)
 
     def test_sonority_six(self):
