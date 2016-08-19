@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import unicode_literals, print_function
 
 import unittest
 import _panphon
@@ -16,6 +16,29 @@ class TestFeatureTable(unittest.TestCase):
         self.assertFalse(self.ft.fts_contrast2([('+', 'syl')], 'cor', inv))
         self.assertTrue(self.ft.fts_contrast2(_panphon.fts('+ant -cor'), 'voi', inv))
 
+    def test_fts(self):
+        fts = self.ft.fts('ŋ')
+        self.assertIn(('+', 'voi'), fts)
+        self.assertIn(('-', 'syl'), fts)
+        self.assertIn(('+', 'hi'), fts)
+        self.assertIn(('-', 'lo'), fts)
+        self.assertIn(('+', 'nas'), fts)
+
+    def test_longest_one_seg_prefix(self):
+        prefix = self.ft.longest_one_seg_prefix('pʰʲaŋ')
+        self.assertEqual(prefix, 'pʰʲ')
+
+    def test_match_pattern(self):
+        self.assertTrue(self.ft.match_pattern([[('-', 'voi')], [('+', 'voi')],
+                                               [('-', 'voi')]], 'pat'))
+
+    def test_all_segs_matching_fts(self):
+        segs = self.ft.all_segs_matching_fts([('-', 'syl'), ('+', 'son')])
+        self.assertIn('m', segs)
+        self.assertIn('n', segs)
+        self.assertIn('ŋ', segs)
+        self.assertIn('m̥', segs)
+        self.assertIn('l', segs)
 
 class TestIpaRe(unittest.TestCase):
 
