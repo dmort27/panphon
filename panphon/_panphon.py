@@ -288,7 +288,7 @@ class FeatureTable(object):
         """Return a segments matching a feature mask, both as <name, value>
         tuples (sorted in reverse order by length).
 
-         fts -- feature mask as <name, value> tuples.
+         fts -- feature mask as <value, name> tuples.
         """
         matching_segs = []
         for seg, pairs in self.segments:
