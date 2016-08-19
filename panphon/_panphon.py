@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
+import os.path
+
 import pkg_resources
 
 import regex as re
@@ -10,15 +12,7 @@ import unicodecsv as csv
 # logging.basicConfig(level=logging.DEBUG)
 
 
-class FeatureError(Exception):
-    pass
-
-
 class SegmentError(Exception):
-    pass
-
-
-class IpaRegexError(Exception):
     pass
 
 
@@ -30,8 +24,8 @@ SEG_REGEX = re.compile(ur'[\p{InBasic_Latin}\p{InGreek_and_Coptic}' +
                        ur'\p{InSpacing_Modifier_Letters}*',
                        re.U | re.X)
 filenames = {
-    'spe+': 'data/ipa_all.csv',
-    'panphon': 'data/ipa_all.csv',
+    'spe+': os.path.join('data', 'ipa_all.csv'),
+    'panphon': os.path.join('data', 'ipa_all.csv'),
 }
 
 
@@ -81,7 +75,7 @@ class FeatureTable(object):
         self.longest_seg = max([len(x) for x in self.seg_dict.keys()])
 
     def _read_table(self, filename):
-        """Read the data from data/segment_features.csv into self.segments, a
+        """Read the data from data/ipa_all.csv into self.segments, a
         list of 2-tuples of unicode strings and sets of feature tuples and
         self.seg_dict, a dictionary mapping from unicode segments and sets of
         feature tuples.
@@ -101,7 +95,7 @@ class FeatureTable(object):
         seg_dict = dict(segments)
         return segments, seg_dict, names
 
-    def _read_weights(self, filename='data/feature_weights.csv'):
+    def _read_weights(self, filename=os.path.join('data', 'feature_weights.csv')):
         filename = pkg_resources.resource_filename(
             __name__, filename)
         with open(filename, 'rb') as f:
