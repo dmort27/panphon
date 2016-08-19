@@ -1,10 +1,10 @@
 from setuptools import setup
 
 setup(name='panphon',
-      version='0.3',
+      version='0.4',
       description='Tools for using the International Phonetic Alphabet with phonological features',
       url='https://github.com/dmort27/panphon',
-      download_url='https://github.com/dmort27/panphon/tarball/0.3',
+      download_url='https://github.com/dmort27/panphon/tarball/0.4',
       author='David R. Mortensen',
       author_email='dmortens@cs.cmu.edu',
       license='MIT',
@@ -17,7 +17,7 @@ setup(name='panphon',
                         'munkres'],
       scripts=['panphon/bin/apply_diacritics.py',
                'panphon/bin/validate_ipa.py',
-               'panphon/bin/align_wordlists.py'
+               'panphon/bin/align_wordlists.py',
                'panphon/bin/generate_ipa_all.py'],
       packages=['panphon'],
       package_dir={'panphon': 'panphon'},
