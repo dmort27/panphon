@@ -4,8 +4,10 @@ from __future__ import print_function, unicode_literals
 import argparse
 import codecs
 import copy
+import os.path
 from types import DictType, ListType, StringTypes
 
+import pkg_resources
 import yaml
 
 import unicodecsv as csv
@@ -152,7 +154,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('bases', help='File containing IPA bases (ipa_bases.csv)')
     parser.add_argument('all', help='File to which all IPA segments is to be written (ipa_all.csv)')
-    parser.add_argument('-d', '--dia', default='diacritic_definitions.yml', help='Diacritic definition file (default=diacritic_definitions.yml)')
-    parser.add_argument('-s', '--sort-order', help='File definiting sort order.')
+    parser.add_argument('-d', '--dia', required=True, help='Diacritic definition file (default=diacritic_definitions.yml)')
+    parser.add_argument('-s', '--sort-order', required=True, help='File definiting sort order.')
     args = parser.parse_args()
     main(args.bases, args.all, args.dia, args.sort_order)
