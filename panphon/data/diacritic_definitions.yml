@@ -33,7 +33,6 @@ diacritics:
       - cont: "+"
         son: "-"
         voi: "-"
-        lo: "-"
     content:
       sg: "+"
 
@@ -200,7 +199,7 @@ diacritics:
     position: post
     conditions:
       - syl: "-"
-      - high: "-"
+      - hi: "-"
       - back: "-"
     exclude:
       - k
@@ -349,6 +348,28 @@ diacritics:
 # COMBINATIONS OF DIACRITICS AND MODIFIERS
 combinations:
 
+# Quantity
+
+  - name: Long Labialized
+    combines:
+    - Long
+    - Labialized
+
+  - name: Long Palatalized
+    combines:
+    - Long
+    - Palatalized
+
+  - name: Long Velarized
+    combines:
+    - Long
+    - Velarized
+
+  - name: Long Pharyngealized
+    combines:
+    - Long
+    - Pharyngealized
+
 # Airstream mechanisms
 
 ## Ejective
@@ -413,6 +434,11 @@ combinations:
     combines:
     - Aspirated
     - Velarized
+
+  - name: Aspirated Labiopalatalized
+    combines:
+    - Aspirated
+    - Labiopalatalized
 
   - name: Aspirated Pharyngealized
     combines:
@@ -570,6 +596,17 @@ combinations:
     combines:
     - Palatalized
     - Long
+
+  - name: Palatalized Aspirated
+    combines:
+    - Palatalized
+    - Aspirated
+
+  - name: Palatalized Labialized Aspirated
+    combines:
+    - Palatalized
+    - Labialized
+    - Aspirated
 
 # Pharyngealized
 
