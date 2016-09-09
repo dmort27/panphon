@@ -11,21 +11,16 @@ import _panphon
 import regex as re
 import unicodecsv as csv
 
-def merge_two_dicts(x, y):
-    '''Given two dicts, merge them into a new dict as a shallow copy.'''
-    z = x.copy()
-    z.update(y)
-    return z
 
 def flip(s):
     return map(lambda (a, b): (b, a), s)
 
+
 def update_ft_set(seg, dia):
     seg = dict(flip(seg))
-    print(dia)
     seg.update(dia)
-    print(seg)
     return flip(set(seg.items()))
+
 
 class PermissiveFeatureTable(_panphon.FeatureTable):
     """Encapsulate the segment <=> feature vector mapping implied by the files
@@ -37,10 +32,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
                  ):
         self.bases, self.names = self._read_ipa_bases(ipa_bases)
         self.prefix_dias, self.postfix_dias = self._read_dias(dias)
-        self.pre_regex, self.post_regex, self.seg_regex = \
-            self._compile_seg_regexes(self.bases,
-                                    self.prefix_dias,
-                                    self.postfix_dias)
+        self.pre_regex, self.post_regex, self.seg_regex = self._compile_seg_regexes(self.bases, self.prefix_dias, self.postfix_dias)
 
     def _read_ipa_bases(self, fn):
         fn = pkg_resources.resource_filename(__name__, fn)
@@ -77,12 +69,10 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         match = self.seg_regex.match(segment)
         if match:
             pre, base, post = match.group('pre'), match.group('base'), match.group('post')
-            seg = copy.deepcopy(self.bases[match.group('base')])
+            seg = copy.deepcopy(self.bases[base])
             for m in reversed(pre):
-                print(self.prefix_dias[m])
                 seg = update_ft_set(seg, self.prefix_dias[m])
             for m in post:
-                print(self.postfix_dias[m])
                 seg = update_ft_set(seg, self.postfix_dias[m])
             return seg
         else:
