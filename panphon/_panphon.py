@@ -2,6 +2,7 @@
 from __future__ import print_function
 
 import os.path
+import sys
 
 import pkg_resources
 
@@ -143,11 +144,23 @@ class FeatureTable(object):
             return None
 
     def longest_one_seg_prefix(self, word):
-        """Return longest Unicode prefix of a word."""
+        """Return longest IPA Unicode prefix of a word."""
         for i in range(self.longest_seg, 0, -1):
             if word[:i] in self.seg_dict:
                 return word[:i]
         return ''
+
+    def validate_word(self, word):
+        """Returns True if word consists exhaustively of valid IPA segments."""
+        orig = word
+        while word:
+            match = self.seg_regex.match(word)
+            if match:
+                word = word[len(match.group(0)):]
+            else:
+                print(u'{}\t->{}'.format(orig, word).encode('utf-8'), file=sys.stderr)
+                return False
+        return True
 
     def segs(self, word):
         """Returns a list of segments (as strings) from a word (as a
@@ -182,6 +195,25 @@ class FeatureTable(object):
             return self.seg_dict[segment]
         else:
             return None
+
+    def segs_safe(self, word):
+        """Return a list of segments (as strings) from a word. Characters that
+        are not valid segments are included in the list as individual
+        characters. """
+        segs = []
+        while word:
+            m = self.seg_regex.match(word)
+            if m:
+                segs.append(m.group(1))
+                word = word[len(m.group(1)):]
+            else:
+                segs.append(word[0])
+                word = word[1:]
+        return segs
+
+    def filter_segs(self, segs):
+        """Given list of strings, return only those which are valid segments."""
+        return [seg for seg in segs if seg in self.seg_dict]
 
     def fts_intersection(self, segments):
         """Returns the features shared by all segments in the list/set of
