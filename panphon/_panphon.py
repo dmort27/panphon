@@ -63,7 +63,7 @@ def pat(p):
 
 class FeatureTable(object):
     """Encapsulate the segment <=> feature mapping in the file
-    data/segment_features.csv.
+    data/ipa_all.csv.
 
     """
 
