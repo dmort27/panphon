@@ -62,7 +62,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         bases_jnd = '|'.join(bases.keys())
         pre_re = '({})'.format(pre_jnd)
         post_re = '({})'.format(post_jnd)
-        seg_re = '(?P<pre>({})*)(?P<base>{})(?P<post>({})*)'.format(pre_jnd, bases_jnd, post_jnd)
+        seg_re = '(?P<all>(?P<pre>({})*)(?P<base>{})(?P<post>({})*))'.format(pre_jnd, bases_jnd, post_jnd)
         return re.compile(pre_re), re.compile(post_re), re.compile(seg_re)
 
     def fts(self, segment):
@@ -74,6 +74,21 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
                 seg = update_ft_set(seg, self.prefix_dias[m])
             for m in post:
                 seg = update_ft_set(seg, self.postfix_dias[m])
-            return seg
+            return set(seg)
         else:
-            raise _panphon.SegmentError
+            return None
+
+    def fts_match(self, features, segment):
+        features = set(features)
+        fts = self.fts(segment)
+        if fts:
+            return features <= fts
+        else:
+            return False
+
+    def longest_one_seg_prefix(self, word):
+        match = self.seg_regex(word)
+        if match:
+            return match.group(0)
+        else:
+            return ''
