@@ -108,7 +108,7 @@ class FeatureTable(object):
     def _build_seg_regex(self):
         # Build a regex that will match individual segments in a string.
         segs = sorted(self.seg_dict.keys(), key=lambda x: len(x), reverse=True)
-        return re.compile(ur'({})'.format(u'|'.join(segs)))
+        return re.compile(ur'(?P<all>{})'.format(u'|'.join(segs)))
 
     def delete_ties(self):
         """Deletes ties from all segments."""
@@ -148,7 +148,7 @@ class FeatureTable(object):
         for i in range(self.longest_seg, 0, -1):
             if word[:i] in self.seg_dict:
                 return word[:i]
-        return ''
+        return u''
 
     def validate_word(self, word):
         """Returns True if word consists exhaustively of valid IPA segments."""
@@ -158,7 +158,7 @@ class FeatureTable(object):
             if match:
                 word = word[len(match.group(0)):]
             else:
-                print(u'{}\t->{}'.format(orig, word).encode('utf-8'), file=sys.stderr)
+                print(u'{}\t->\t{}\t'.format(orig, word).encode('utf-8'), file=sys.stderr)
                 return False
         return True
 
@@ -166,7 +166,7 @@ class FeatureTable(object):
         """Returns a list of segments (as strings) from a word (as a
         string).
         """
-        return [m.group(1) for m in self.seg_regex.finditer(word)]
+        return [m.group('all') for m in self.seg_regex.finditer(word)]
 
     def word_fts(self, w):
         """Returns a list of <value, feature> tuples, given a Unicode IPA
