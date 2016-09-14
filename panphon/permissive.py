@@ -92,3 +92,25 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
             return match.group(0)
         else:
             return ''
+
+    def seg_known(self, segment):
+        if self.seg_regex.match(segment):
+            return True
+        else:
+            return False
+
+    def seg_fts(self, segment):
+        return self.fts(segment)
+
+    def filter_segs(self, segs):
+        def whole_seg(seg):
+            m = self.seg_regex.match(seg)
+            if m and m.group(0) == seg:
+                return True
+            else:
+                return False
+        return filter(whole_seg, segs)
+
+    def fts_intersection(self, segs):
+        fts_vecs = [self.fts(s) for s in self.filter_segs(segs)]
+        return reduce(lambda a, b: a & b, fts_vecs)
