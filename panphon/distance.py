@@ -36,7 +36,7 @@ class Distance(_panphon.FeatureTable):
     def map_to_dogol_prime(self, s):
         segs = []
         for seg in self.seg_regex.findall(s):
-            fts = self.seg_fts(seg)
+            fts = self.fts(seg)
             for mask, label in self.dogol_prime:
                 if self.match(mask, fts):
                     segs.append(label)
