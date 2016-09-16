@@ -14,10 +14,10 @@ class TestFeatureTableAPI(unittest.TestCase):
         self.assertEqual(len(self.ft.fts('u')), 21)
 
     def test_match(self):
-        self.assertTrue(self.match(self.ft.fst('u'), self.ft.fts('u')))
+        self.assertTrue(self.ft.match(self.ft.fts('u'), self.ft.fts('u')))
 
     def test_fts_match(self):
-        self.assertTrue(self.fts_match(self.ft.fst('u'), 'u'))
+        self.assertTrue(self.ft.fts_match(self.ft.fts('u'), 'u'))
 
     def test_longest_one_seg_prefix(self):
         self.assertEqual(self.ft.longest_one_seg_prefix('pap'), 'p')
@@ -62,7 +62,7 @@ class TestFeatureTableAPI(unittest.TestCase):
         self.assertEqual(self.ft.fts_count([('-', 'voi')], ['p', 't', 'k', 'r']), 3)
 
     def test_match_pattern(self):
-        self.assertEqual(self.ft.match_pattern([set([('-', 'voi')])], 'p'), 'p')
+        self.assertEqual(len(self.ft.match_pattern([set([('-', 'voi')])], 'p')), 1)
 
     def test_match_pattern_seq(self):
         self.assertTrue(self.ft.match_pattern_seq([set([('-', 'voi')])], 'p'))
@@ -77,4 +77,4 @@ class TestFeatureTableAPI(unittest.TestCase):
         self.assertEqual(len(self.ft.segment_to_vector('p')), 21)
 
     def test_word_to_vector_list(self):
-        self.assertEqual(len(self.ft.word_to_vector_list('pup')), 4)
+        self.assertEqual(len(self.ft.word_to_vector_list('pup')), 3)
