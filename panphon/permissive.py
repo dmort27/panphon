@@ -70,6 +70,13 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         return re.compile(pre_re), re.compile(post_re), re.compile(seg_re)
 
     def fts(self, segment):
+        """Returns features corresponding to segment as list of <value,
+        feature> tuples.
+
+        segment -- segment for which features are to be returned as
+        Unicode string.
+
+        Return None if the segment is unknown"""
         match = self.seg_regex.match(segment)
         if match:
             pre, base, post = match.group('pre'), match.group('base'), match.group('post')
@@ -83,6 +90,9 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
             return None
 
     def fts_match(self, features, segment):
+        """Evaluates whether a set of features 'match' a segment (are a subset
+        of that segment's features); returns 'None' if segment is unknown.
+        """
         features = set(features)
         fts = self.fts(segment)
         if fts:
@@ -91,6 +101,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
             return False
 
     def longest_one_seg_prefix(self, word):
+        """Return longest IPA Unicode prefix of a word."""
         match = self.seg_regex.match(word)
         if match:
             return match.group(0)
@@ -98,15 +109,18 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
             return ''
 
     def seg_known(self, segment):
+        """Return True if the segment is valid given the known set of bases and
+        diacritics.
+
+        segment -- a string which may or may not be a valid segment
+        """
         if self.seg_regex.match(segment):
             return True
         else:
             return False
 
-    def seg_fts(self, segment):
-        return self.fts(segment)
-
     def filter_segs(self, segs):
+        """Given list of strings, return only those which are valid segments."""
         def whole_seg(seg):
             m = self.seg_regex.match(seg)
             if m and m.group(0) == seg:
@@ -114,10 +128,6 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
             else:
                 return False
         return filter(whole_seg, segs)
-
-    def fts_intersection(self, segs):
-        fts_vecs = [self.fts(s) for s in self.filter_segs(segs)]
-        return reduce(lambda a, b: a & b, fts_vecs)
 
     @property
     def all_segs_matching_fts(self):
