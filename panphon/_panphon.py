@@ -110,11 +110,6 @@ class FeatureTable(object):
         segs = sorted(self.seg_dict.keys(), key=lambda x: len(x), reverse=True)
         return re.compile(ur'(?P<all>{})'.format(u'|'.join(segs)))
 
-    def delete_ties(self):
-        """Deletes ties from all segments."""
-        self.seg_dict = {k.replace(u'\u0361', u''): v
-                         for (k, v) in self.seg_dict.items()}
-
     def fts(self, segment):
         """Returns features corresponding to segment as list of <value,
         feature> tuples.
@@ -122,7 +117,7 @@ class FeatureTable(object):
         segment -- segment for which features are to be returned as
         Unicode string.
 
-        Raises a SegmentError if the segment is unknown."""
+        Raises a SegmentError if the segment is unknown"""
         if segment in self.seg_dict:
             return self.seg_dict[segment]
         else:
@@ -155,8 +150,8 @@ class FeatureTable(object):
         of that segment's features); returns 'None' if segment is unknown.
         """
         features = set(features)
-        if segment in self.seg_dict:
-            return features <= self.seg_dict[segment]
+        if self.seg_known(segment):
+            return features <= self.fts(segment)
         else:
             return None
 
@@ -197,10 +192,6 @@ class FeatureTable(object):
         """Returns True if segment is in segment <=> features database."""
         return segment in self.seg_dict
 
-    def filter_string(self, s):
-        """Return a string containing only legal IPA segments."""
-        return ''.join(self.seg_regex.findall(s))
-
     def segs_safe(self, word):
         """Return a list of segments (as strings) from a word. Characters that
         are not valid segments are included in the list as individual
@@ -218,22 +209,21 @@ class FeatureTable(object):
 
     def filter_segs(self, segs):
         """Given list of strings, return only those which are valid segments."""
-        return [seg for seg in segs if seg in self.seg_dict]
+        return filter(self.seg_known, segs)
 
-    def fts_intersection(self, segments):
+    def filter_string(self, s):
+        """Return a string containing only legal IPA segments."""
+        segs = [m.group(0) for m in self.seg_regex.finditer(s)]
+        return ''.join(segs)
+
+    def fts_intersection(self, segs):
         """Returns the features shared by all segments in the list/set of
         segments. Segments that are not known are ignored.
 
         segments -- set/list of features
         """
-        segments = set([seg for seg
-                        in segments
-                        if seg in self.seg_dict])
-        seg1 = segments.pop()
-        fts = self.seg_dict[seg1]
-        for seg in segments:
-            fts = fts & self.seg_dict[seg]
-        return fts
+        fts_vecs = [self.fts(s) for s in self.filter_segs(segs)]
+        return reduce(lambda a, b: a & b, fts_vecs)
 
     def fts_match_any(self, fts, inv):
         """Returns a boolean based on whether there is a segment in 'inv'
@@ -355,7 +345,7 @@ class FeatureTable(object):
         """Given a Unicode IPA segment, return a list of feature specificiations
         in cannonical order.
         """
-        ft_dict = {ft: val for (val, ft) in self.seg_dict[seg]}
+        ft_dict = {ft: val for (val, ft) in self.fts(seg)}
         return [ft_dict[name] for name in self.names]
 
     def word_to_vector_list(self, word):
