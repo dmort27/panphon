@@ -1,8 +1,8 @@
 from __future__ import division, print_function, unicode_literals
 
+import codecs
 import copy
 import os
-import codecs
 
 import pkg_resources
 import yaml
@@ -24,7 +24,11 @@ def update_ft_set(seg, dia):
 
 class PermissiveFeatureTable(_panphon.FeatureTable):
     """Encapsulate the segment <=> feature vector mapping implied by the files
-    data/ipa_all.csv and diacritic_definitions.yml"""
+    data/ipa_all.csv and diacritic_definitions.yml. Uses a more permissive
+    algorithm for identifying base+diacritic combinations. To avoid a
+    combinatorial explosion, it never generates all of the dia^a+base+base^b
+    combinations, meaning it cannot make statements about the whole set of
+    segments."""
 
     def __init__(self,
                  ipa_bases=os.path.join('data', 'ipa_bases.csv'),
@@ -114,3 +118,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
     def fts_intersection(self, segs):
         fts_vecs = [self.fts(s) for s in self.filter_segs(segs)]
         return reduce(lambda a, b: a & b, fts_vecs)
+
+    @property
+    def all_segs_matching_fts(self):
+        raise AttributeError( "'PermissiveFeatureTable' object has no attribute 'all_segs_matching_fts'" )
