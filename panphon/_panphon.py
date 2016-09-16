@@ -117,12 +117,29 @@ class FeatureTable(object):
 
     def fts(self, segment):
         """Returns features corresponding to segment as list of <value,
-        feature> tuples."""
+        feature> tuples.
+
+        segment -- segment for which features are to be returned as
+        Unicode string.
+
+        Raises a SegmentError if the segment is unknown."""
         if segment in self.seg_dict:
             return self.seg_dict[segment]
         else:
             msg = 'Segment {} is unknown.'.format(repr(segment))
             raise SegmentError(msg)
+
+    def seg_fts(self, segment):
+        """Returns the features of a segment as a list
+        of 2-tuples, given a segment as a Unicode string; returns 'None' if segment
+        is unknown.
+
+        segment -- segment for which features are to be returned as
+        Unicode string """
+        if segment in self.seg_dict:
+            return self.seg_dict[segment]
+        else:
+            return None
 
     def match(self, ft_mask, ft_seg):
         """Evaluates whether a set of features (ft_mask) are a subset of another
@@ -183,18 +200,6 @@ class FeatureTable(object):
     def filter_string(self, s):
         """Return a string containing only legal IPA segments."""
         return ''.join(self.seg_regex.findall(s))
-
-    def seg_fts(self, segment):
-        """Returns the features of a segment as a list
-        of 2-tuples, given a segment as a Unicode string; returns 'None' if segment
-        is unknown.
-
-        segment -- segment for which features are to be returned as
-        Unicode string """
-        if segment in self.seg_dict:
-            return self.seg_dict[segment]
-        else:
-            return None
 
     def segs_safe(self, word):
         """Return a list of segments (as strings) from a word. Characters that
