@@ -87,7 +87,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
             return False
 
     def longest_one_seg_prefix(self, word):
-        match = self.seg_regex(word)
+        match = self.seg_regex.match(word)
         if match:
             return match.group(0)
         else:
