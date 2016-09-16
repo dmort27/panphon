@@ -13,6 +13,9 @@ class TestFeatureTableAPI(unittest.TestCase):
     def test_fts(self):
         self.assertEqual(len(self.ft.fts('u')), 21)
 
+    def test_seg_fts(self):
+        self.assertEqual(len(self.ft.seg_fts('p')), 21)
+
     def test_match(self):
         self.assertTrue(self.ft.match(self.ft.fts('u'), self.ft.fts('u')))
 
@@ -36,9 +39,6 @@ class TestFeatureTableAPI(unittest.TestCase):
 
     def test_filter_string(self):
         self.assertEqual(len(self.ft.filter_string('pup$')), 3)
-
-    def test_seg_fts(self):
-        self.assertEqual(len(self.ft.seg_fts('p')), 21)
 
     def test_segs_safe(self):
         self.assertEqual(len(self.ft.segs_safe('pup$')), 4)
