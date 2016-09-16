@@ -50,7 +50,7 @@ def fts(s):
 
 def pat(p):
     """Given a string with feature matrices (features grouped with square
-    brackets into segments, return a list of sets of <value, feature> tuples.
+    brackets into segments, return a list of sets of <vadlue, feature> tuples.
 
     p - pattern as string
     """
@@ -117,20 +117,7 @@ class FeatureTable(object):
         segment -- segment for which features are to be returned as
         Unicode string.
 
-        Raises a SegmentError if the segment is unknown"""
-        if segment in self.seg_dict:
-            return self.seg_dict[segment]
-        else:
-            msg = 'Segment {} is unknown.'.format(repr(segment))
-            raise SegmentError(msg)
-
-    def seg_fts(self, segment):
-        """Returns the features of a segment as a list
-        of 2-tuples, given a segment as a Unicode string; returns 'None' if segment
-        is unknown.
-
-        segment -- segment for which features are to be returned as
-        Unicode string """
+        Return None if the segment is unknown"""
         if segment in self.seg_dict:
             return self.seg_dict[segment]
         else:
