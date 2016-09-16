@@ -256,7 +256,7 @@ class FeatureTable(object):
         """Return True if there is a segment in inv that contrasts in feature
         ft_name.
 
-        fs --
+        fs -- feature specifications used to filter inv.
         ft_name -- name of the feature where contrast must be present.
         inv -- collection of segments represented as Unicode segments.
         """
