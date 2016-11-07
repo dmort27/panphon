@@ -9,7 +9,7 @@ import sonority
 class TestSonority(unittest.TestCase):
 
     def setUp(self):
-        self.son = sonority.Sonority()
+        self.son = sonority.Sonority(feature_model='permissive')
 
     def test_sonority_nine(self):
         segs = ['a', 'ɑ', 'æ', 'ɒ', 'e', 'o̥']
