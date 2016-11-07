@@ -5,10 +5,11 @@ from __future__ import print_function, unicode_literals, division
 import unittest
 import distance
 
+feature_model = 'strict'
 
 class TestLevenshtein(unittest.TestCase):
     def setUp(self):
-        self.dist = distance.Distance()
+        self.dist = distance.Distance(feature_model=feature_model)
 
     def test_trivial1(self):
         self.assertEqual(self.dist.levenshtein_distance('pop', 'pʰop'), 1)
@@ -19,7 +20,7 @@ class TestLevenshtein(unittest.TestCase):
 
 class TestDogolPrime(unittest.TestCase):
     def setUp(self):
-        self.dist = distance.Distance()
+        self.dist = distance.Distance(feature_model=feature_model)
 
     def test_trivial1(self):
         self.assertEqual(self.dist.dogol_prime_distance('pop', 'bob'), 0)
@@ -30,7 +31,7 @@ class TestDogolPrime(unittest.TestCase):
 
 class TestUnweightedFeatureEditDist(unittest.TestCase):
     def setUp(self):
-        self.dist = distance.Distance()
+        self.dist = distance.Distance(feature_model=feature_model)
 
     def test_unweighted_substitution_cost(self):
         self.assertEqual(self.dist.unweighted_substitution_cost(['0', '+', '-'], ['0', '+', '+']) * 3, 1)
@@ -47,7 +48,7 @@ class TestUnweightedFeatureEditDist(unittest.TestCase):
 
 class TestWeightedFeatureEditDist(unittest.TestCase):
     def setUp(self):
-        self.dist = distance.Distance()
+        self.dist = distance.Distance(feature_model=feature_model)
 
     def test_trivial1(self):
         self.assertGreater(self.dist.weighted_feature_edit_distance('ti', 'tʰu'),
@@ -60,7 +61,7 @@ class TestWeightedFeatureEditDist(unittest.TestCase):
 
 class TestHammingFeatureEditDistanceDivMaxlen(unittest.TestCase):
     def setUp(self):
-        self.dist = distance.Distance()
+        self.dist = distance.Distance(feature_model=feature_model)
 
     def test_hamming_substitution_cost(self):
         self.assertEqual(self.dist.hamming_substitution_cost(['+', '-', '0'], ['0', '-', '0']) * 3, 1)
