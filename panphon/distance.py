@@ -1,29 +1,33 @@
-from __future__ import print_function, unicode_literals, division
+from __future__ import division, print_function, unicode_literals
 
 import types
 
+import editdistance
 import numpy as np
 import pkg_resources
 import yaml
 
 import _panphon
-import editdistance
+import permissive
 
 
-class Distance(_panphon.FeatureTable):
+class Distance(object):
     """Measures of phonological distance."""
 
-    def __init__(self, feature_set='spe+'):
+    def __init__(self, feature_set='spe+', feature_model='strict'):
         filename = _panphon.filenames[feature_set]
-        self.segments, self.seg_dict, self.names = self._read_table(filename)
-        self.seg_seq = {seg[0]: i for (i, seg) in enumerate(self.segments)}
-        self.weights = self._read_weights()
-        self.seg_regex = self._build_seg_regex()
-        self.longest_seg = max([len(x) for x in self.seg_dict.keys()])
+        fm = {'strict': _panphon.FeatureTable,
+              'permissive': permissive.PermissiveFeatureTable}
+        self.fm = fm[feature_model](feature_set='spe+')
+        self.segments, self.seg_dict, self.names = self.fm._read_table(filename)
+        # self.seg_seq = {seg[0]: i for (i, seg) in enumerate(self.fm.segments)}
+        self.weights = self.fm._read_weights()
+        self.seg_regex = self.fm._build_seg_regex()
+        self.longest_seg = max([len(x) for x in self.fm.seg_dict.keys()])
         self.dogol_prime = self._dogolpolsky_prime()
 
     def _dogolpolsky_prime(self, filename='data/dogolpolsky_prime.yml'):
-        """Reads Dogolpolsky-prime classes and constructs function cascade."""
+        """Reads Dogolpolsky' classes and constructs function cascade."""
         filename = pkg_resources.resource_filename(
             __name__, filename)
         with open(filename, 'r') as f:
@@ -35,10 +39,10 @@ class Distance(_panphon.FeatureTable):
 
     def map_to_dogol_prime(self, s):
         segs = []
-        for seg in self.seg_regex.findall(s):
-            fts = self.fts(seg)
+        for seg in self.fm.seg_regex.findall(s):
+            fts = self.fm.fts(seg)
             for mask, label in self.dogol_prime:
-                if self.match(mask, fts):
+                if self.fm.match(mask, fts):
                     segs.append(label)
                     break
         return ''.join(segs)
@@ -161,8 +165,8 @@ class Distance(_panphon.FeatureTable):
                                       self.unweighted_insertion_cost,
                                       self.unweighted_substitution_cost,
                                       [[]],
-                                      self.word_to_vector_list(source),
-                                      self.word_to_vector_list(target))
+                                      self.fm.word_to_vector_list(source),
+                                      self.fm.word_to_vector_list(target))
 
     def feature_edit_distance_div_by_maxlen(self, source, target):
         maxlen = max(len(source), len(target))
@@ -195,8 +199,8 @@ class Distance(_panphon.FeatureTable):
                                       lambda v: 1,
                                       self.hamming_substitution_cost,
                                       [[]],
-                                      self.word_to_vector_list(source),
-                                      self.word_to_vector_list(target))
+                                      self.fm.word_to_vector_list(source),
+                                      self.fm.word_to_vector_list(target))
 
     def hamming_feature_edit_distance_div_maxlen(self, source, target):
         """String edit distance with equally-weighed features divided by maximum length.
@@ -213,7 +217,7 @@ class Distance(_panphon.FeatureTable):
         triangle inequality and is thus not a proper metric.
         """
 
-        source, target = self.word_to_vector_list(source), self.word_to_vector_list(target)
+        source, target = self.fm.word_to_vector_list(source), self.fm.word_to_vector_list(target)
         maxlen = max(len(source), len(target))
         raw = self.min_edit_distance(lambda v: 1,
                                      lambda v: 1,
@@ -256,5 +260,5 @@ class Distance(_panphon.FeatureTable):
                                       self.weighted_insertion_cost,
                                       self.weighted_substitution_cost,
                                       [[]],
-                                      self.word_to_vector_list(source),
-                                      self.word_to_vector_list(target))
+                                      self.fm.word_to_vector_list(source),
+                                      self.fm.word_to_vector_list(target))
