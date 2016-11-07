@@ -31,6 +31,8 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
     segments."""
 
     def __init__(self,
+                 feature_set='spe+',
+                 feature_model='strict',
                  ipa_bases=os.path.join('data', 'ipa_bases.csv'),
                  dias=os.path.join('data', 'diacritic_definitions.yml'),
                  ):
