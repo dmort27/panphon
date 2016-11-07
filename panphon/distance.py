@@ -18,7 +18,7 @@ class Distance(object):
         filename = _panphon.filenames[feature_set]
         fm = {'strict': _panphon.FeatureTable,
               'permissive': permissive.PermissiveFeatureTable}
-        self.fm = fm[feature_model](feature_set='spe+')
+        self.fm = fm[feature_model](feature_set=feature_set)
         self.segments, self.seg_dict, self.names = self.fm._read_table(filename)
         # self.seg_seq = {seg[0]: i for (i, seg) in enumerate(self.fm.segments)}
         self.weights = self.fm._read_weights()
