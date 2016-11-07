@@ -1,3 +1,6 @@
+import _panphon
+import permissive
+
 from _panphon import FeatureTable, fts
 
 
@@ -23,12 +26,17 @@ class BoolTree(object):
                 return self.f_node
 
 
-class Sonority(FeatureTable):
+class Sonority(object):
+        def __init__(self, feature_set='spe+', feature_model='strict'):
+            fm = {'strict': _panphon.FeatureTable,
+                  'permissive': permissive.PermissiveFeatureTable}
+            self.fm = fm[feature_model](feature_set=feature_set)
+
         def sonority_from_fts(self, seg):
-            """Given a segment, returns the sonority on a scale of 1 to 9."""
+            """Given a segment as features, returns the sonority on a scale of 1 to 9."""
 
             def match(m):
-                return self.match(fts(m), seg)
+                return self.fm.match(fts(m), seg)
 
             minusHi = BoolTree(match('-hi'), 9, 8)
             minusNas = BoolTree(match('-nas'), 6, 5)
@@ -45,4 +53,4 @@ class Sonority(FeatureTable):
 
             seg -- segment given as a Unicode IPA string
             """
-            return self.sonority_from_fts(self.fts(seg))
+            return self.sonority_from_fts(self.fm.fts(seg))
