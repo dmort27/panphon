@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function
+from __future__ import print_function, unicode_literals, division, absolute_import
 
 import unittest
-import _panphon
+import panphon
 
 
 class TestFeatureTable(unittest.TestCase):
 
     def setUp(self):
-        self.ft = _panphon.FeatureTable()
+        self.ft = panphon.FeatureTable()
 
     def test_fts_contrast2(self):
         inv = 'p t k b d ɡ a e i o u'.split(' ')
         self.assertTrue(self.ft.fts_contrast2([('-', 'syl')], 'voi', inv))
         self.assertFalse(self.ft.fts_contrast2([('+', 'syl')], 'cor', inv))
-        self.assertTrue(self.ft.fts_contrast2(_panphon.fts('+ant -cor'), 'voi', inv))
+        self.assertTrue(self.ft.fts_contrast2(panphon.fts('+ant -cor'), 'voi', inv))
 
     def test_fts(self):
         fts = self.ft.fts('ŋ')
@@ -43,7 +43,7 @@ class TestFeatureTable(unittest.TestCase):
 class TestIpaRe(unittest.TestCase):
 
     def setUp(self):
-        self.ft = _panphon.FeatureTable()
+        self.ft = panphon.FeatureTable()
 
     def test_compile_regex_from_str1(self):
         r = self.ft.compile_regex_from_str('[-son -cont][+syl -hi -lo]')

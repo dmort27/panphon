@@ -1,9 +1,9 @@
 #!//usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals, division
+from __future__ import print_function, unicode_literals, division, absolute_import
 
 import unittest
-import sonority
+from panphon import sonority
 
 
 class TestSonority(unittest.TestCase):
