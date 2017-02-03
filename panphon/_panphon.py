@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
+from __future__ import print_function, absolute_import, unicode_literals
 
 import os.path
 import sys
@@ -17,12 +17,12 @@ class SegmentError(Exception):
     pass
 
 
-FT_REGEX = re.compile(ur'([-+0])([a-z][A-Za-z]*)', re.U | re.X)
-MT_REGEX = re.compile(ur'\[[-+0a-zA-Z ,;]*\]')
-SEG_REGEX = re.compile(ur'[\p{InBasic_Latin}\p{InGreek_and_Coptic}' +
-                       ur'\p{InIPA_Extensions}œ\u00C0-\u00FF]' +
-                       ur'[\u0300-\u0360\u0362-\u036F]*' +
-                       ur'\p{InSpacing_Modifier_Letters}*',
+FT_REGEX = re.compile(r'([-+0])([a-z][A-Za-z]*)', re.U | re.X)
+MT_REGEX = re.compile(r'\[[-+0a-zA-Z ,;]*\]')
+SEG_REGEX = re.compile(r'[\p{InBasic_Latin}\p{InGreek_and_Coptic}' +
+                       r'\p{InIPA_Extensions}œ\u00C0-\u00FF]' +
+                       r'[\u0300-\u0360\u0362-\u036F]*' +
+                       r'\p{InSpacing_Modifier_Letters}*',
                        re.U | re.X)
 filenames = {
     'spe+': os.path.join('data', 'ipa_all.csv'),
@@ -86,7 +86,7 @@ class FeatureTable(object):
         segments = []
         with open(filename, 'rb') as f:
             reader = csv.reader(f, encoding='utf-8')
-            header = reader.next()
+            header = next(reader)
             names = header[1:]
             for row in reader:
                 seg = row[0]
@@ -101,14 +101,14 @@ class FeatureTable(object):
             __name__, filename)
         with open(filename, 'rb') as f:
             reader = csv.reader(f, encoding='utf-8')
-            reader.next()
-            weights = [float(x) for x in reader.next()]
+            next(reader)
+            weights = [float(x) for x in next(reader)]
         return weights
 
     def _build_seg_regex(self):
         # Build a regex that will match individual segments in a string.
         segs = sorted(self.seg_dict.keys(), key=lambda x: len(x), reverse=True)
-        return re.compile(ur'(?P<all>{})'.format(u'|'.join(segs)))
+        return re.compile(r'(?P<all>{})'.format('|'.join(segs)))
 
     def fts(self, segment):
         """Returns features corresponding to segment as list of <value,
@@ -147,7 +147,7 @@ class FeatureTable(object):
         for i in range(self.longest_seg, 0, -1):
             if word[:i] in self.seg_dict:
                 return word[:i]
-        return u''
+        return ''
 
     def validate_word(self, word):
         """Returns True if word consists exhaustively of valid IPA segments."""
@@ -157,7 +157,7 @@ class FeatureTable(object):
             if match:
                 word = word[len(match.group(0)):]
             else:
-                print(u'{}\t->\t{}\t'.format(orig, word).encode('utf-8'), file=sys.stderr)
+                print('{}\t->\t{}\t'.format(orig, word).encode('utf-8'), file=sys.stderr)
                 return False
         return True
 
@@ -173,7 +173,7 @@ class FeatureTable(object):
 
         w -- a Unicode IPA string consisting of one or more segments
         """
-        return map(self.fts, self.segs(w))
+        return list(map(self.fts, self.segs(w)))
 
     def seg_known(self, segment):
         """Returns True if segment is in segment <=> features database."""
@@ -319,12 +319,12 @@ class FeatureTable(object):
         standard delimiter. """
 
         sequence = []
-        for m in re.finditer(ur'\[([^]]+)\]', ft_str):
+        for m in re.finditer(r'\[([^]]+)\]', ft_str):
             ft_mask = fts(m.group(1))
             segs = self.all_segs_matching_fts(ft_mask)
-            sub_pat = u'({})'.format(u'|'.join(segs))
+            sub_pat = '({})'.format('|'.join(segs))
             sequence.append(sub_pat)
-        pattern = u''.join(sequence)
+        pattern = ''.join(sequence)
         regex = re.compile(pattern)
         return regex
 
@@ -338,4 +338,4 @@ class FeatureTable(object):
     def word_to_vector_list(self, word):
         """Return a list of feature vectors, given a Unicode IPA word.
         """
-        return map(self.segment_to_vector, self.segs(word))
+        return list(map(self.segment_to_vector, self.segs(word)))

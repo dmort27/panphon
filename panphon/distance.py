@@ -1,5 +1,4 @@
-from __future__ import division, print_function, unicode_literals
-
+from __future__ import print_function, absolute_import, unicode_literals, division
 import types
 
 import editdistance
@@ -7,8 +6,8 @@ import numpy as np
 import pkg_resources
 import yaml
 
-import _panphon
-import permissive
+from . import _panphon
+from . import permissive
 
 
 class Distance(object):
