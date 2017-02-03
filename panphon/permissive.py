@@ -1,4 +1,4 @@
-from __future__ import division, print_function, unicode_literals
+from __future__ import print_function, absolute_import, unicode_literals
 
 import codecs
 import copy
@@ -7,13 +7,13 @@ import os
 import pkg_resources
 import yaml
 
-import _panphon
 import regex as re
 import unicodecsv as csv
+from . import _panphon
 
 
 def flip(s):
-    return map(lambda (a, b): (b, a), s)
+    return [(b, a) for (a, b) in s]
 
 
 def update_ft_set(seg, dia):
@@ -36,6 +36,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
                  ipa_bases=os.path.join('data', 'ipa_bases.csv'),
                  dias=os.path.join('data', 'diacritic_definitions.yml'),
                  ):
+        dias = pkg_resources.resource_filename(__name__, dias)
         self.bases, self.names = self._read_ipa_bases(ipa_bases)
         self.prefix_dias, self.postfix_dias = self._read_dias(dias)
         self.pre_regex, self.post_regex, self.seg_regex = self._compile_seg_regexes(self.bases, self.prefix_dias, self.postfix_dias)
@@ -133,4 +134,4 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
 
     @property
     def all_segs_matching_fts(self):
-        raise AttributeError( "'PermissiveFeatureTable' object has no attribute 'all_segs_matching_fts'" )
+        raise AttributeError("'PermissiveFeatureTable' object has no attribute 'all_segs_matching_fts'")
