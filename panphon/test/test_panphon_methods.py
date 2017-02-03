@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function
+from __future__ import print_function, unicode_literals, division, absolute_import
 
 import unittest
-import _panphon
+import panphon
 
 
 class TestFeatureTableAPI(unittest.TestCase):
 
     def setUp(self):
-        self.ft = _panphon.FeatureTable()
+        self.ft = panphon.FeatureTable()
 
     def test_fts(self):
-        self.assertEqual(len(self.ft.fts('u')), 21)
+        self.assertEqual(len(self.ft.fts('u')), 22)
 
     # def test_seg_fts(self):
-    #     self.assertEqual(len(self.ft.seg_fts('p')), 21)
+    #     self.assertEqual(len(self.ft.seg_fts('p')), 22)
 
     def test_match(self):
         self.assertTrue(self.ft.match(self.ft.fts('u'), self.ft.fts('u')))
@@ -74,7 +74,7 @@ class TestFeatureTableAPI(unittest.TestCase):
         pass
 
     def test_segment_to_vector(self):
-        self.assertEqual(len(self.ft.segment_to_vector('p')), 21)
+        self.assertEqual(len(self.ft.segment_to_vector('p')), 22)
 
     def test_word_to_vector_list(self):
         self.assertEqual(len(self.ft.word_to_vector_list('pup')), 3)
