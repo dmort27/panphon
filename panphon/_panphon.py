@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function, absolute_import, unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
 import os.path
 import sys
+from functools import reduce
 
 import pkg_resources
 
@@ -196,7 +197,7 @@ class FeatureTable(object):
 
     def filter_segs(self, segs):
         """Given list of strings, return only those which are valid segments."""
-        return filter(self.seg_known, segs)
+        return list(filter(self.seg_known, segs))
 
     def filter_string(self, s):
         """Return a string containing only legal IPA segments."""
@@ -259,7 +260,7 @@ class FeatureTable(object):
         fts -- feature mask given as a set of <val, name> tuples
         inv -- inventory of segments (as Unicode IPA strings)
         """
-        return len(filter(lambda s: self.fts_match(fts, s), inv))
+        return len(list(filter(lambda s: self.fts_match(fts, s), inv)))
 
     def match_pattern(self, pat, word):
         """Implements fixed-width pattern matching. Matches just in case pattern

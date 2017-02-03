@@ -1,5 +1,4 @@
 from __future__ import print_function, absolute_import, unicode_literals, division
-import types
 
 import editdistance
 import numpy as np
@@ -135,14 +134,12 @@ class Distance(object):
 
     def unweighted_deletion_cost(self, v1):
         """Return cost of deleting segment corresponding to feature vector."""
-        assert isinstance(v1, types.ListType)
-        assert isinstance(v1[0], types.StringTypes)
+        assert isinstance(v1, list)
         return sum(map(lambda x: 0.5 if x == '0' else 1, v1)) / len(v1)
 
     def unweighted_substitution_cost(self, v1, v2):
         """Given two feature vectors, return the difference."""
-        assert isinstance(v1, types.ListType)
-        assert isinstance(v1[0], types.StringTypes)
+        assert isinstance(v1, list)
         assert len(v1) == len(v2)
         diffs = [self.feature_difference(ft1, ft2)
                  for (ft1, ft2) in zip(v1, v2)]
@@ -150,8 +147,7 @@ class Distance(object):
 
     def unweighted_insertion_cost(self, v1):
         """Return cost of inserting segment corresponding to feature vector."""
-        assert isinstance(v1, types.ListType)
-        assert isinstance(v1[0], types.StringTypes)
+        assert isinstance(v1, list)
         return sum(map(lambda x: 0.5 if x == '0' else 1, v1)) / len(v1)
 
     def feature_edit_distance(self, source, target):
@@ -230,22 +226,19 @@ class Distance(object):
 
     def weighted_substitution_cost(self, v1, v2):
         """Given two feature vectors, return the difference."""
-        assert isinstance(v1, types.ListType)
-        assert isinstance(v1[0], types.StringTypes)
+        assert isinstance(v1, list)
         diffs = [self.weighted_feature_difference(w, ft1, ft2)
                  for (w, ft1, ft2) in zip(self.weights, v1, v2)]
         return sum(diffs)
 
     def weighted_insertion_cost(self, v1):
         """Return cost of inserting segment corresponding to feature vector."""
-        assert isinstance(v1, types.ListType)
-        assert isinstance(v1[0], types.StringTypes)
+        assert isinstance(v1, list)
         return sum(self.weights)
 
     def weighted_deletion_cost(self, v1):
         """Return cost of deleting segment corresponding to feature vector."""
-        assert isinstance(v1, types.ListType)
-        assert isinstance(v1[0], types.StringTypes)
+        assert isinstance(v1, list)
         return sum(self.weights)
 
     def weighted_feature_edit_distance(self, source, target):

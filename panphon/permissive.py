@@ -130,7 +130,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
                 return True
             else:
                 return False
-        return filter(whole_seg, segs)
+        return list(filter(whole_seg, segs))
 
     @property
     def all_segs_matching_fts(self):
