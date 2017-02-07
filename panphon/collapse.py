@@ -4,7 +4,9 @@ from __future__ import (absolute_import, division, print_function,
 import os.path
 
 import yaml
+import pkg_resources
 
+from . import permissive
 from . import _panphon
 
 
@@ -13,12 +15,12 @@ class Collapser(object):
         fm = {'strict': _panphon.FeatureTable,
               'permissive': permissive.PermissiveFeatureTable}
         self.fm = fm[feature_model](feature_set=feature_set)
-        self.rules = self._load_table(table)
+        self.rules = self._load_table(tablename)
 
     def _load_table(self, tablename):
         fn = os.path.join('data', tablename)
         fn = pkg_resources.resource_filename(__name__, fn)
-        with open(filename, 'r') as f:
+        with open(fn, 'r') as f:
             rules = []
             table = yaml.load(f.read())
             for rule in table:
