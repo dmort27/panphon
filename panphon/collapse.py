@@ -3,11 +3,10 @@ from __future__ import (absolute_import, division, print_function,
 
 import os.path
 
-import yaml
 import pkg_resources
+import yaml
 
-from . import permissive
-from . import _panphon
+from . import _panphon, permissive
 
 
 class Collapser(object):
