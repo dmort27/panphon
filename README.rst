@@ -82,13 +82,13 @@ version of Dogolpolsky's equivalence classes.
 
 ``panphon.distance.Distance`` .\ **feature\_edit\_distance**
 
-Edit distance where each feature-edit has cost 1/21. Edits from
+Edit distance where each feature-edit has cost 1/22. Edits from
 unspecified to specified cost 1/42.
 
 ``panphon.distance.Distance`` .\ **hamming\_feature\_edit\_distance**
 
-Edit distance where each feature-edit has cost 1/21. Edits from
-unspecified to specified also cost 1/21. Insertions and substitutions
+Edit distance where each feature-edit has cost 1/22. Edits from
+unspecified to specified also cost 1/22. Insertions and substitutions
 each cost 1.
 
 ``panphon.distance.Distance`` .\ **weighted\_feature\_edit\_distance**
