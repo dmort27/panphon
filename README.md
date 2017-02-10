@@ -51,7 +51,7 @@ Fast Levenshtein distance after collapsing segments into an enhanced version of 
 
 `panphon.distance.Distance` .**feature_edit_distance**
 
-Edit distance where each feature-edit has cost 1/22. Edits from unspecified to specified cost 1/42.
+Edit distance where each feature-edit has cost 1/22. Edits from unspecified to specified cost 1/44.
 
 `panphon.distance.Distance` .**hamming_feature_edit_distance**
 
