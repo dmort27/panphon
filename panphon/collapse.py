@@ -6,7 +6,8 @@ import os.path
 import pkg_resources
 import yaml
 
-from . import _panphon, permissive
+from panphon import _panphon
+from panphon import permissive
 
 
 class Collapser(object):
@@ -23,13 +24,13 @@ class Collapser(object):
             rules = []
             table = yaml.load(f.read())
             for rule in table:
-                rules.append(_panphon.fts(rule['def']), rule['label'])
+                rules.append((_panphon.fts(rule['def']), rule['label']))
         return rules
 
     def collapse(self, s):
         segs = []
         for seg in self.fm.seg_regex.findall(s):
-            fts = self.fs.fts(seg)
+            fts = self.fm.fts(seg)
             for mask, label in self.rules:
                 if self.fm.match(mask, fts):
                     segs.append(label)
