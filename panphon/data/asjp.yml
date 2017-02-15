@@ -1,0 +1,136 @@
+-
+    name: voiceless labiodental fricatives
+    def: "[-son +cont -voi +strid +ant -cor +lab]"
+    label: f
+-
+    name: voiceless labiodental fricatives
+    def: "[-son +cont +voi +strid +ant -cor +lab]"
+    label: v
+-
+    name: bilabial nasal
+    def: "[+son +nas +ant -cor +lab]"
+    label: m
+-
+    name: voiceless bilabial obstruents
+    def: "[-son -voi +ant -cor +lab]"
+    label: p
+-
+    name: voiced bilabial obstruents
+    def: "[-son +voi +ant -cor +lab]"
+    label: b
+-
+    name: dental fricatives
+    def: "[-son +cont +ant +cor +dist]"
+    label: 8
+-
+    name: dental nasal
+    def: "[+son +nas -cont +ant +cor +dist]"
+    label: 4
+-
+    name: voiceless alveolar stop
+    def: "[-son -cont -voi +ant +cor -dist]"
+    label: t
+-
+    name: voiceless alveolar stop
+    def: "[-son -cont +voi +ant +cor -dist]"
+    label: d
+-
+    name: voiceless alveolar fricative
+    def: "[-son -cont -voi +ant +cor -dist]"
+    label: s
+-
+    name: voiceless alveolar fricative
+    def: "[-son -cont +voi +ant +cor -dist]"
+    label: z
+-
+    name: alveolar affricates
+    def: "[-son +delrel +ant +cor -dist]"
+    label: c
+-
+    name: alveolar nasal
+    def: "[+son -cont +nas +ant +cor -dist]"
+    label: n
+-
+    name: voiceless postalveolar fricative
+    def: "[-son +cont -voi -ant +cor +dist]"
+    label: S
+-
+    name: voiceless postalveolar fricative
+    def: "[-son +cont +voi -ant +cor +dist]"
+    label: Z
+-
+    name: alveolar affricates
+    def: "[-son +delrel -voi -ant +cor +dist]"
+    label: C
+-
+    name: alveolar affricates
+    def: "[-son +delrel +voi -ant +cor +dist]"
+    label: j
+-
+    name: palatal stop
+    def: "[-son -cont -delrel -ant -cor +hi -lo -back]"
+    label: T
+-
+    name: palatal nasal
+    def: "[+son -cont +nas -ant -cor +hi -lo -back]"
+    label: 5
+-
+    name: voiceless velar stop
+    def: "[-son -cont -delrel -voi -ant -cor +hi -lo +back]"
+    label: k
+-
+    name: voiced velar stop
+    def: "[-son -cont -delrel +voi -ant -cor +hi -lo +back]"
+    label: g
+-
+    name: velar fricative
+    def: "[-son +cont -ant -cor +hi -lo +back]"
+    label: x
+-
+    name: velar nasal
+    def: "[+son -cont +nas -ant -cor +hi -lo +back]"
+    label: N
+-
+    name: voiceless uvular stop
+    def: "[-son -cont -delrel -voi -ant -cor -hi -lo +back]"
+    label: q
+-
+    name: voiced uvular stop
+    def: "[-son -cont -delrel +voi -ant -cor -hi -lo +back]"
+    label: G
+-
+    name: uvular and pharyngeal fricative
+    def: "[-son +cont -delrel -ant -cor -hi +back]"
+    label: X
+-
+    name: glottal stop
+    def: "[-syl +son -cont +cg -ant -cor -hi -lo -back]"
+    label: 7
+-
+    name: glottal fricative
+    def: "[-syl +son +cont -ant -cor -hi -lo -back]"
+    label: h
+-
+    name: coronal lateral
+    def: "[+son +cont +lat +ant +cor]"
+    label: l
+-
+    name: all non-coronal laterals
+    def: "[+son +cont +lat]"
+    label: L
+-
+    name: labiovelar approximant
+    def: "[-syl +son -cons +lab -ant -cor +hi -lo +back +round]"
+    label: w
+-
+    name: palatal approximant
+    def: "[-syl +son -cons -ant -cor +hi -lo -back]"
+    label: j
+-
+    name: coronal trill or tap
+    def: "[+son +cons +cont -lat +ant +cor]"
+    label: r
+-
+    name: coronal approximant
+    def: "[+son -cons +cont -lat +ant +cor]"
+    label: r
