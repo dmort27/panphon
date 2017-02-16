@@ -158,7 +158,7 @@ class FeatureTable(object):
             if match:
                 word = word[len(match.group(0)):]
             else:
-                print('{}\t->\t{}\t'.format(orig, word).encode('utf-8'), file=sys.stderr)
+                # print('{}\t->\t{}\t'.format(orig, word).encode('utf-8'), file=sys.stderr)
                 return False
         return True
 
