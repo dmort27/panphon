@@ -4,7 +4,9 @@ from __future__ import absolute_import, print_function, unicode_literals
 import os.path
 import sys
 from functools import reduce
+from operator import itemgetter
 
+import numpy
 import pkg_resources
 
 import regex as re
@@ -60,6 +62,18 @@ def pat(p):
         segment = set([m.groups() for m in FT_REGEX.finditer(matrix)])
         pattern.append(segment)
     return pattern
+
+def word2array(ft_names, word):
+    """Converts a word [[<value, feature>,...],...] to a NumPy array
+
+    ft_names -- list of feature names in order
+    word -- word as list of lists of feature tuples
+    """
+    vdict = {'+': 1, '-': -1, '0': 0}
+    def seg2col(seg):
+        seg = dict([(k, v) for (v, k) in seg])
+        return [vdict[seg[ft]] for ft in ft_names]
+    return numpy.array([seg2col(s) for s in word])
 
 
 class FeatureTable(object):
