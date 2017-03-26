@@ -2,9 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import os.path
-import sys
 from functools import reduce
-from operator import itemgetter
 
 import numpy
 import pkg_resources
@@ -73,7 +71,7 @@ def word2array(ft_names, word):
     def seg2col(seg):
         seg = dict([(k, v) for (v, k) in seg])
         return [vdict[seg[ft]] for ft in ft_names]
-    return numpy.array([seg2col(s) for s in word])
+    return numpy.array([seg2col(s) for s in word], order='F')
 
 
 class FeatureTable(object):
