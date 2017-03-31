@@ -67,7 +67,7 @@ def word2array(ft_names, word):
     """Converts a word [[<value, feature>,...],...] to a NumPy array
 
     ft_names -- list of feature names in order
-    word -- word as list of lists of feature tuples
+    word -- word as list of lists of feature tuples (output by FeatureTable)
     """
     vdict = {'+': 1, '-': -1, '0': 0}
     def seg2col(seg):
