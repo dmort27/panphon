@@ -29,9 +29,9 @@ The `panphon` class includes the function word2array which takes a list of featu
     >>> ft=panphon.FeatureTable()
     >>> panphon.word2array(['syl', 'son', 'cont'], ft.word_fts(u'snik'))
     array([[-1, -1,  1],
-        [-1,  1, -1],
-        [ 1,  1,  1],
-        [-1, -1, -1]])
+           [-1,  1, -1],
+           [ 1,  1,  1],
+           [-1, -1, -1]])
 
 ### Fixed-width pattern matching
 
