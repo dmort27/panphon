@@ -2,9 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import os.path
-import sys
 from functools import reduce
-from operator import itemgetter
 
 import numpy
 import pkg_resources
@@ -63,6 +61,7 @@ def pat(p):
         pattern.append(segment)
     return pattern
 
+
 def word2array(ft_names, word):
     """Converts a word [[<value, feature>,...],...] to a NumPy array
 
@@ -70,6 +69,7 @@ def word2array(ft_names, word):
     word -- word as list of lists of feature tuples (output by FeatureTable)
     """
     vdict = {'+': 1, '-': -1, '0': 0}
+
     def seg2col(seg):
         seg = dict([(k, v) for (v, k) in seg])
         return [vdict[seg[ft]] for ft in ft_names]
@@ -166,7 +166,6 @@ class FeatureTable(object):
 
     def validate_word(self, word):
         """Returns True if word consists exhaustively of valid IPA segments."""
-        orig = word
         while word:
             match = self.seg_regex.match(word)
             if match:
@@ -189,6 +188,15 @@ class FeatureTable(object):
         w -- a Unicode IPA string consisting of one or more segments
         """
         return list(map(self.fts, self.segs(w)))
+
+    def word_array(self, ft_names, w):
+        """Return word as [-1,0,1] features in a NumPy array
+
+        ft_names -- list of feature names in order
+        w -- word as a Unicode IPA string
+        """
+        word = self.word_fts(w)
+        return word2array(ft_names, word)
 
     def seg_known(self, segment):
         """Returns True if segment is in segment <=> features database."""
