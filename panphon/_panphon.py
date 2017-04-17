@@ -21,7 +21,7 @@ class SegmentError(Exception):
 FT_REGEX = re.compile(r'([-+0])([a-z][A-Za-z]*)', re.U | re.X)
 MT_REGEX = re.compile(r'\[[-+0a-zA-Z ,;]*\]')
 SEG_REGEX = re.compile(r'[\p{InBasic_Latin}\p{InGreek_and_Coptic}' +
-                       r'\p{InIPA_Extensions}œ\u00C0-\u00FF]' +
+                       r'\p{InIPA_Extensions}ŋœ\u00C0-\u00FF]' +
                        r'[\u0300-\u0360\u0362-\u036F]*' +
                        r'\p{InSpacing_Modifier_Letters}*',
                        re.U | re.X)
@@ -34,8 +34,13 @@ filenames = {
 def segment_text(text, seg_regex=SEG_REGEX):
     """Return an iterator of segments in the text.
 
-    text -- string of IPA Unicode text
-    seg_regex -- compiled regex defining a segment (base + modifiers)
+    Args:
+        text (unicode): string of IPA Unicode text
+        seg_regex (_regex.Pattern): compiled regex defining a segment (base +
+                                    modifiers)
+
+    Return:
+        generator: segments in the input text
     """
     for m in seg_regex.finditer(text):
         yield m.group(0)
@@ -44,16 +49,24 @@ def segment_text(text, seg_regex=SEG_REGEX):
 def fts(s):
     """Given string with +/-[alphabetical sequence]s, return list of features.
 
-    s -- string with +/-[alphabetical sequence]s
+    Args:
+        s (str): string with segments of the sort "+son -syl 0cor"
+
+    Return:
+        list: list of (value, feature) tuples
     """
     return [m.groups() for m in FT_REGEX.finditer(s)]
 
 
 def pat(p):
     """Given a string with feature matrices (features grouped with square
-    brackets into segments, return a list of sets of <vadlue, feature> tuples.
+    brackets into segments, return a list of sets of (value, feature) tuples.
 
-    p - pattern as string
+    Args:
+        p (str): list of feature matrices as strings
+
+    Return:
+        list: list of sets of (value, feature) tuples
     """
     pattern = []
     for matrix in [m.group(0) for m in MT_REGEX.finditer(p)]:
@@ -63,10 +76,23 @@ def pat(p):
 
 
 def word2array(ft_names, word):
-    """Converts a word [[<value, feature>,...],...] to a NumPy array
+    """Converts a word [[(value, feature),...],...] to a NumPy array
 
-    ft_names -- list of feature names in order
-    word -- word as list of lists of feature tuples (output by FeatureTable)
+    Given a word consisting of lists of lists/sets of (value, feature) tuples,
+    return a NumPy array where each row is a segment and each column is a
+    feature.
+
+    Args:
+        ft_names (list): list of feature names (as strings) in order; this
+                         argument controls what features are included in the
+                         array that is output and their order vis-a-vis the
+                         columns of the array
+        word (list): list of lists of feature tuples (output by
+                     FeatureTable.word_fts)
+
+    Returns:
+        (numpy.ndarray): array in which each row is a segment and each column
+                         is a feature
     """
     vdict = {'+': 1, '-': -1, '0': 0}
 
@@ -79,10 +105,16 @@ def word2array(ft_names, word):
 class FeatureTable(object):
     """Encapsulate the segment <=> feature mapping in the file
     data/ipa_all.csv.
-
     """
 
     def __init__(self, feature_set='spe+'):
+        """Construct a FeatureTable object
+
+        Args:
+            feature_set (str): the feature set that the FeatureTable will use;
+                               currently, there is only one of these ("spe+")
+
+        """
         filename = filenames[feature_set]
         self.segments, self.seg_dict, self.names = self._read_table(filename)
         self.seg_seq = {seg[0]: i for (i, seg) in enumerate(self.segments)}
@@ -126,30 +158,47 @@ class FeatureTable(object):
         return re.compile(r'(?P<all>{})'.format('|'.join(segs)))
 
     def fts(self, segment):
-        """Returns features corresponding to segment as list of <value,
-        feature> tuples.
+        """Returns features corresponding to segment as list of (value,
+        feature) tuples.
 
-        segment -- segment for which features are to be returned as
-        Unicode string.
+        Args:
+           segment (unicode): segment for which features are to be returned as
+                              Unicode IPA string.
 
-        Return None if the segment is unknown"""
+        Returns:
+            set: set of (value, feature) tuples, if segment is valid; otherwise,
+                 None
+        """
         if segment in self.seg_dict:
             return self.seg_dict[segment]
         else:
             return None
 
     def match(self, ft_mask, ft_seg):
-        """Evaluates whether a set of features (ft_mask) are a subset of another
-        set of features (ft_seg).
+        """Answer question "are ft_mask's features a subset of ft_seg?"
 
-        ft_mask -- pattern defined as set of features (<val, name> tuples).
-        ft_seg -- segment defined as a set of features (<val, name> tuples).
+        Args:
+            ft_mask (set): pattern defined as set of (value, feature) tuples
+            ft_seg (set): segment defined as a set of (value, feature) tuples
+
+        Returns:
+            bool: True iff all features in ft_mask are also in ft_seg
         """
         return set(ft_mask) <= set(ft_seg)
 
     def fts_match(self, features, segment):
-        """Evaluates whether a set of features 'match' a segment (are a subset
-        of that segment's features); returns 'None' if segment is unknown.
+        """Answer question "are ft_mask's features a subset of ft_seg?"
+
+        This is like FeatureTable.match except that it checks whether a
+        segment is valid and returns None if it is not.
+
+        Args:
+            ft_mask (set): pattern defined as set of (value, feature) tuples
+            ft_seg (set): segment defined as a set of (value, feature) tuples
+
+        Returns:
+            bool: True iff all features in ft_mask are also in ft_seg; None if
+                  segment is not valid
         """
         features = set(features)
         if self.seg_known(segment):
@@ -199,7 +248,7 @@ class FeatureTable(object):
         return word2array(ft_names, word)
 
     def seg_known(self, segment):
-        """Returns True if segment is in segment <=> features database."""
+        """Return True if segment is in segment <=> features database."""
         return segment in self.seg_dict
 
     def segs_safe(self, word):
