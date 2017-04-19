@@ -36,6 +36,26 @@ Operations on feature sets and segments
 The ``FeatureTable`` class includes a broad range of operations on
 features and segments (consonants and vowels).
 
+Converting words to feature arrays
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``panphon`` class includes the function word2array which takes a
+list of feature names (as a list of strings) and a panphon word (from
+FeatureTable().word\_fts()) and returns a NumPy array where each row
+corresponds to a segment in the word and each column corresponds to one
+of the specified features. Basic usage is illustrated in the following
+example:
+
+::
+
+    >>> import panphon
+    >>> ft=panphon.FeatureTable()
+    >>> panphon.word2array(['syl', 'son', 'cont'], ft.word_fts(u'snik'))
+    array([[-1, -1,  1],
+           [-1,  1, -1],
+           [ 1,  1,  1],
+           [-1, -1, -1]])
+
 Fixed-width pattern matching
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
