@@ -26,9 +26,9 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
     """Encapsulate the segment <=> feature vector mapping implied by the files
     data/ipa_all.csv and diacritic_definitions.yml. Uses a more permissive
     algorithm for identifying base+diacritic combinations. To avoid a
-    combinatorial explosion, it never generates all of the dia^a+base+base^b
-    combinations, meaning it cannot make statements about the whole set of
-    segments."""
+    combinatorial explosion, it never generates all of the base-diacritic-
+    modifier combinations, meaning it cannot easily make statements about the
+    whole set of segments."""
 
     def __init__(self,
                  feature_set='spe+',
@@ -36,6 +36,17 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
                  ipa_bases=os.path.join('data', 'ipa_bases.csv'),
                  dias=os.path.join('data', 'diacritic_definitions.yml'),
                  ):
+        """Construct a PermissiveFeatureTable object
+
+        Args:
+            feature_set (str): feature system (for API compatibility)
+            feature_model (str): feature parsing model (for API compatibility)
+            ipa_bases (str): path from panphon root to CSV file definining
+                             features of bases (unmodified consonants and
+                             vowels)
+            dias (str): path from panphon root to YAML file containing rules for
+                        diacritics and modifiers
+        """
         dias = pkg_resources.resource_filename(__name__, dias)
         self.bases, self.names = self._read_ipa_bases(ipa_bases)
         self.prefix_dias, self.postfix_dias = self._read_dias(dias)
@@ -73,13 +84,17 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         return re.compile(pre_re), re.compile(post_re), re.compile(seg_re)
 
     def fts(self, segment):
-        """Returns features corresponding to segment as list of <value,
-        feature> tuples.
+        """Return features corresponding to segment as list of (value,
+        feature) tuples
 
-        segment -- segment for which features are to be returned as
-        Unicode string.
+        Args:
+            segment (unicode): segment for which features are to be returned as
+                               Unicode string
 
-        Return None if the segment is unknown"""
+        Returns:
+            list: None if `segment` cannot be parsed; otherwise, a list of the
+                  features of `segment` as (value, feature) pairs
+        """
         match = self.seg_regex.match(segment)
         if match:
             pre, base, post = match.group('pre'), match.group('base'), match.group('post')
@@ -92,19 +107,34 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         else:
             return None
 
-    def fts_match(self, features, segment):
+    def fts_match(self, fts_mask, segment):
         """Evaluates whether a set of features 'match' a segment (are a subset
-        of that segment's features); returns 'None' if segment is unknown.
+        of that segment's features)
+
+        Args:
+            fts_mask (list): list of (value, feature) tuples
+            segment (unicode): IPA string corresponding to segment (consonant or
+                               vowel)
+        Returns:
+            bool: None if `segment` cannot be parsed; True if the feature values
+                  of `fts_mask` are a subset of those for `segment`
         """
-        features = set(features)
-        fts = self.fts(segment)
-        if fts:
-            return features <= fts
+        fts_mask = set(fts_mask)
+        fts_seg = self.fts(segment)
+        if fts_seg:
+            return fts_seg <= fts_mask
         else:
-            return False
+            return None
 
     def longest_one_seg_prefix(self, word):
-        """Return longest IPA Unicode prefix of a word."""
+        """Return longest IPA Unicode prefix of `word`
+
+        Args:
+            word (unicode): word as IPA string
+
+        Returns:
+            unicode: longest single-segment prefix of `word`
+        """
         match = self.seg_regex.match(word)
         if match:
             return match.group(0)
@@ -112,10 +142,14 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
             return ''
 
     def seg_known(self, segment):
-        """Return True if the segment is valid given the known set of bases and
-        diacritics.
+        """Return True if the segment is valid
 
-        segment -- a string which may or may not be a valid segment
+        Args:
+            segment (unicode): a string which may or may not be a valid segment
+
+        Returns:
+            bool: True if segment can be parsed given the database of bases and
+                  diacritics
         """
         if self.seg_regex.match(segment):
             return True
@@ -123,7 +157,16 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
             return False
 
     def filter_segs(self, segs):
-        """Given list of strings, return only those which are valid segments."""
+        """Given list of strings, return only those which are valid segments.
+
+        Args:
+            segs (list): list of unicode values
+
+        Returns:
+            list: values in `segs` that are valid segments (according to the
+                  definititions of bases and diacritics/modifiers known to the
+                  object
+        """
         def whole_seg(seg):
             m = self.seg_regex.match(seg)
             if m and m.group(0) == seg:
