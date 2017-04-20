@@ -5,7 +5,7 @@ from __future__ import print_function, unicode_literals, division, absolute_impo
 import unittest
 from panphon import distance
 
-feature_model = 'strict'
+feature_model = 'permissive'
 
 class TestLevenshtein(unittest.TestCase):
     def setUp(self):
