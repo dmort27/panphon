@@ -359,6 +359,14 @@ class Distance(object):
 
         Substitution cost for feature vectors computed as Hamming distance and
         normalized by dividing this result by the length of the vectors.
+
+        Args:
+            v1 (list): feature vector
+            v2 (list): feature vector
+
+        Returns:
+            float: Hamming distance between `v1` and `v2` divided by the length
+                   of `v1` and `v2`
         """
         assert len(v1) == len(v2)
         diffs = [ft1 != ft2 for (ft1, ft2) in zip(v1, v2)]
@@ -376,6 +384,14 @@ class Distance(object):
 
         This function has no normalization but should obey the triangle
         inequality and thus provide a true distance metric.
+
+        Args:
+            source (unicode): source string
+            target (unicode): target string
+
+        Returns:
+            float: Hamming feature edit distance between `source` and `target`
+                   with high insdel costs
         """
         return self.min_edit_distance(lambda v: 1,
                                       lambda v: 1,
@@ -384,22 +400,53 @@ class Distance(object):
                                       self.fm.word_to_vector_list(source),
                                       self.fm.word_to_vector_list(target))
 
-    def hamming_feature_edit_distance_div_maxlen(self, source, target):
-        """String edit distance with equally-weighed features divided by maximum length.
+    def jt_hamming_feature_edit_distance(self, source, target):
+        """String edit distance with equally-weighed features.
 
-        All articulatory features are given equal weight. For substitution, the distance between an
+        All articulatory features are given equal weight. The distance between an
         unspecified value and a specified value is smaller than the distance between
-        two features with opposite values. The final value is the string edit
-        distance calculated in this way and divided by the length of the longest
-        sequence of feature vectors.
+        two features with oppoiste values.
 
-        The insertion and deletion cost is always one, somewhat favoring substitution.
+        The insertion and deletion cost is always one, somewhat favoring
+        substitution.
 
-        It should be remembered that the resulting function does not obey the
-        triangle inequality and is thus not a proper metric.
+        This function has no normalization but should obey the triangle
+        inequality and thus provide a true distance metric.
+
+        Args:
+            source (unicode): source string
+            target (unicode): target string
+
+        Returns:
+            float: Hamming feature edit distance between `source` and `target`
+                   with low insdel costs (1/4 cost of total substitution)
         """
+        return self.min_edit_distance(lambda v: 0.25,
+                                      lambda v: 0.25,
+                                      self.hamming_substitution_cost,
+                                      [[]],
+                                      self.fm.word_to_vector_list(source),
+                                      self.fm.word_to_vector_list(target))
 
-        source, target = self.fm.word_to_vector_list(source), self.fm.word_to_vector_list(target)
+    def hamming_feature_edit_distance_div_maxlen(self, source, target):
+        """Hamming feature edit distance divded by maxlen
+
+        The same as `Distance.hamming_feature_edit_distance` except that the
+        resulting value is divided by the length of the longest argument. It
+        therefore does not obey the triangle inequality and is not a proper
+        metric.
+
+        Args:
+            source (unicode): source string
+            target (unicode): target string
+
+        Returns:
+            float: Hamming feature edit distance between `source` and `target`
+                   with high insdel costs, normalized by length of longest
+                   argument
+        """
+        source, target = self.fm.word_to_vector_list(source),\
+                         self.fm.word_to_vector_list(target)
         maxlen = max(len(source), len(target))
         raw = self.min_edit_distance(lambda v: 1,
                                      lambda v: 1,
@@ -407,33 +454,109 @@ class Distance(object):
                                      [[]], source, target)
         return raw / maxlen
 
-    def weighted_feature_difference(self, w, ft1, ft2):
-        """Return the weighted difference between two features."""
-        return w if ft1 != ft2 else 0
+    def jt_hamming_feature_edit_distance_div_maxlen(self, source, target):
+        """Hamming feature edit distance divded by maxlen
 
-    def weighted_substitution_cost(self, v1, v2):
-        """Given two feature vectors, return the difference."""
+        The same as `Distance.hamming_feature_edit_distance` except that the
+        resulting value is divided by the length of the longest argument. It
+        therefore does not obey the triangle inequality and is not a proper
+        metric.
+
+        Args:
+            source (unicode): source string
+            target (unicode): target string
+
+        Returns:
+            float: Hamming feature edit distance between `source` and `target`
+                   with low insdel costs, normalized by length of longest
+                   argument
+        """
+        source, target = self.fm.word_to_vector_list(source),\
+                         self.fm.word_to_vector_list(target)
+        maxlen = max(len(source), len(target))
+        raw = self.min_edit_distance(lambda v: 0.25,
+                                     lambda v: 0.25,
+                                     self.hamming_substitution_cost,
+                                     [[]], source, target)
+        return raw / maxlen
+
+    def weighted_feature_difference(self, w, ft1, ft2):
+        """Return the weighted difference between two features
+
+        Args:
+            w (Number): weight
+            ft1 (str): feature value
+            ft2 (str): feature value
+
+        Returns:
+            float: difference between two features multiplied by weight; raw
+                   differences are:
+                        '+' - '-' = 1.0
+                        '-' - '+' = 1.0
+                        '+' - '0' = 0.5
+                        '-' - '0' = 0.5
+                        '0' - '+' = 0.5
+                        '0' - '-' = 0.5
+                   Raw differences are multipled by weight `w`
+        """
+        return self.feature_difference(ft1, ft2) * w
+
+    def weighted_substitution_cost(self, v1, v2, gl_wt=1.0):
+        """Given two feature vectors, return the difference
+
+        Args:
+            v1 (list): feature vector
+            v2 (list): feature vector
+
+        Returns:
+            float: sum of weighted feature difference for each feature pair in
+                   zip(v1, v2)
+        """
         assert isinstance(v1, list)
         diffs = [self.weighted_feature_difference(w, ft1, ft2)
                  for (w, ft1, ft2) in zip(self.weights, v1, v2)]
-        return sum(diffs)
+        return sum(diffs) * gl_wt
 
-    def weighted_insertion_cost(self, v1):
-        """Return cost of inserting segment corresponding to feature vector."""
-        assert isinstance(v1, list)
-        return sum(self.weights)
+    def weighted_insertion_cost(self, v1, gl_wt=1.0):
+        """Return cost of inserting segment corresponding to feature vector
 
-    def weighted_deletion_cost(self, v1):
-        """Return cost of deleting segment corresponding to feature vector."""
+        Args:
+            v1 (list): feature vector
+            gl_wt (float): global weights
+
+        Returns:
+           float: sum of weights multiplied by global weight (`gl_wt`)
+        """
         assert isinstance(v1, list)
-        return sum(self.weights)
+        return sum(self.weights) * gl_wt
+
+    def weighted_deletion_cost(self, v1, gl_wt=1.0):
+        """Return cost of deleting segment corresponding to feature vector
+
+        Args:
+            v1 (list): feature vector
+            gl_wt (float): global weights
+
+        Returns:
+           float: sum of weights multiplied by global weight (`gl_wt`)"""
+        assert isinstance(v1, list)
+        return sum(self.weights) * gl_wt
 
     def weighted_feature_edit_distance(self, source, target):
-        """String edit distance with weighted features.
+        """String edit distance with weighted features
 
         The cost of changine an articulatory feature is weighted according to
         the the class of the feature and the subjective probability of the
         feature changing in phonological alternation and loanword contexts.
+        These weights are stored in `Distance.weights`.
+
+        Args:
+            source (unicode): source string
+            target (uniocde): target string
+
+        Returns:
+            float: feature weighted string edit distance between `source` and
+                   `target`
         """
         return self.min_edit_distance(self.weighted_deletion_cost,
                                       self.weighted_insertion_cost,
@@ -441,3 +564,60 @@ class Distance(object):
                                       [[]],
                                       self.fm.word_to_vector_list(source),
                                       self.fm.word_to_vector_list(target))
+
+    def weighted_feature_edit_distance_div_maxlen(self, source, target):
+        """String edit distance with weighted features, divided by maxlen
+
+        The cost of changine an articulatory feature is weighted according to
+        the the class of the feature and the subjective probability of the
+        feature changing in phonological alternation and loanword contexts.
+        These weights are stored in `Distance.weights`.
+
+        Args:
+            source (unicode): source string
+            target (uniocde): target string
+
+        Returns:
+            float: feature weighted string edit distance between `source` and
+                   `target` divided by the lenght of the longest of these
+                   arguments
+        """
+        source, target = self.fm.word_to_vector_list(source),\
+                         self.fm.word_to_vector_list(target)
+        maxlen = max(len(source), len(target))
+        return self.min_edit_distance(self.weighted_deletion_cost,
+                                      self.weighted_insertion_cost,
+                                      self.weighted_substitution_cost,
+                                      [[]],
+                                      source,
+                                      target) / maxlen
+
+    def jt_weighted_feature_edit_distance_div_maxlen(self, source, target):
+        """String edit distance with weighted features, cheap insdel, divided by maxlen
+
+        The cost of changine an articulatory feature is weighted according to
+        the the class of the feature and the subjective probability of the
+        feature changing in phonological alternation and loanword contexts.
+        These weights are stored in `Distance.weights`.
+
+        This is like `Distance.weighted_feature_edit_distance_div_maxlen` except
+        with low insdel costs (1/4 the cost of a complete substitution).
+
+        Args:
+            source (unicode): source string
+            target (uniocde): target string
+
+        Returns:
+            float: feature weighted string edit distance between `source` and
+                   `target` divided by the lenght of the longest of these
+                   arguments
+        """
+        source, target = self.fm.word_to_vector_list(source),\
+                         self.fm.word_to_vector_list(target)
+        maxlen = max(len(source), len(target))
+        return self.min_edit_distance(partial(self.weighted_deletion_cost, gl_wt=0.25),
+                                      partial(self.weighted_insertion_cost, gl_wt=0.25),
+                                      self.weighted_substitution_cost,
+                                      [[]],
+                                      source,
+                                      target) / maxlen
