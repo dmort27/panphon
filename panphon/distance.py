@@ -30,7 +30,6 @@ class Distance(object):
         self.segments, self.seg_dict, self.names = self.fm._read_table(filename)
         self.weights = self.fm._read_weights()
         self.seg_regex = self.fm._build_seg_regex()
-        self.longest_seg = max([len(x) for x in self.fm.seg_dict.keys()])
         self.dogol_prime = self._dogolpolsky_prime()
 
     def _dogolpolsky_prime(self, filename=os.path.join('data', 'dogolpolsky_prime.yml')):
@@ -59,8 +58,8 @@ class Distance(object):
             s (unicode): word with all segments collapsed to D' classes
         """
         segs = []
-        for seg in self.fm.seg_regex.findall(s):
-            fts = self.fm.fts(seg)
+        for seg in self.fm.seg_regex.finditer(s):
+            fts = self.fm.fts(seg.group(0))
             for mask, label in self.dogol_prime:
                 if self.fm.match(mask, fts):
                     segs.append(label)
@@ -319,7 +318,6 @@ class Distance(object):
                                       self.fm.word_to_vector_list(source),
                                       self.fm.word_to_vector_list(target))
 
-
     def feature_edit_distance_div_by_maxlen(self, source, target):
         """Like `Distance.feature_edit_distance` but normalized by maxlen
 
@@ -445,8 +443,7 @@ class Distance(object):
                    with high insdel costs, normalized by length of longest
                    argument
         """
-        source, target = self.fm.word_to_vector_list(source),\
-                         self.fm.word_to_vector_list(target)
+        source, target = self.fm.word_to_vector_list(source), self.fm.word_to_vector_list(target)
         maxlen = max(len(source), len(target))
         raw = self.min_edit_distance(lambda v: 1,
                                      lambda v: 1,
@@ -471,8 +468,7 @@ class Distance(object):
                    with low insdel costs, normalized by length of longest
                    argument
         """
-        source, target = self.fm.word_to_vector_list(source),\
-                         self.fm.word_to_vector_list(target)
+        source, target = self.fm.word_to_vector_list(source), self.fm.word_to_vector_list(target)
         maxlen = max(len(source), len(target))
         raw = self.min_edit_distance(lambda v: 0.25,
                                      lambda v: 0.25,
@@ -582,8 +578,7 @@ class Distance(object):
                    `target` divided by the lenght of the longest of these
                    arguments
         """
-        source, target = self.fm.word_to_vector_list(source),\
-                         self.fm.word_to_vector_list(target)
+        source, target = self.fm.word_to_vector_list(source), self.fm.word_to_vector_list(target)
         maxlen = max(len(source), len(target))
         return self.min_edit_distance(self.weighted_deletion_cost,
                                       self.weighted_insertion_cost,
@@ -612,8 +607,7 @@ class Distance(object):
                    `target` divided by the lenght of the longest of these
                    arguments
         """
-        source, target = self.fm.word_to_vector_list(source),\
-                         self.fm.word_to_vector_list(target)
+        source, target = self.fm.word_to_vector_list(source), self.fm.word_to_vector_list(target)
         maxlen = max(len(source), len(target))
         return self.min_edit_distance(partial(self.weighted_deletion_cost, gl_wt=0.25),
                                       partial(self.weighted_insertion_cost, gl_wt=0.25),
