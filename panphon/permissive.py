@@ -84,6 +84,9 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         seg_re = '(?P<all>(?P<pre>({})*)(?P<base>{})(?P<post>({})*))'.format(pre_jnd, bases_jnd, post_jnd)
         return re.compile(pre_re), re.compile(post_re), re.compile(seg_re)
 
+    def _build_seg_regex(self):
+        return self.seg_regex
+
     def fts(self, segment):
         """Return features corresponding to segment as list of (value,
         feature) tuples
