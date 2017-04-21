@@ -150,7 +150,7 @@ class Distance(object):
                  of these arguments
         """
         maxlen = max(len(source), len(target))
-        return int(editdistance.eval(source, target))/maxlen
+        return int(editdistance.eval(source, target)) / maxlen
 
     def dogol_prime_distance(self, source, target):
         """Levenshtein distance using D' phonetic equivalence classes
