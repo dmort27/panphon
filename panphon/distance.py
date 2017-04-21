@@ -125,7 +125,7 @@ class Distance(object):
         return previous_row[-1]
 
     def fast_levenshtein_distance(self, source, target):
-        """Wrapper for the distance function in the Levenshtein module.
+        """Wrapper for the distance function in the Levenshtein module
 
         Args:
             source (unicode): source word
@@ -136,6 +136,21 @@ class Distance(object):
                  `source` to `target`
         """
         return int(editdistance.eval(source, target))
+
+    def fast_levenshtein_distance_div_maxlen(self, source, target):
+        """Levenshtein distance divided by maxlen
+
+        Args:
+            source (unicode): source word
+            target (unicode): target word
+
+        Returns:
+            int: minimum number of Levenshtein edits required to get from
+                 `source` to `target` divided by the length of the longest
+                 of these arguments
+        """
+        maxlen = max(len(source), len(target))
+        return int(editdistance.eval(source, target))/maxlen
 
     def dogol_prime_distance(self, source, target):
         """Levenshtein distance using D' phonetic equivalence classes
