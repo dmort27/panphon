@@ -7,6 +7,7 @@ from panphon import distance
 
 feature_model = 'permissive'
 
+
 class TestLevenshtein(unittest.TestCase):
     def setUp(self):
         self.dist = distance.Distance(feature_model=feature_model)
@@ -77,3 +78,50 @@ class TestHammingFeatureEditDistanceDivMaxlen(unittest.TestCase):
 
     def test_trivial4(self):
         self.assertEqual(self.dist.hamming_feature_edit_distance_div_maxlen('k', 'ɡ'), 1 / 22)
+
+
+class TestMany(unittest.TestCase):
+    def setUp(self):
+        self.dist = distance.Distance(feature_model=feature_model)
+
+    def test_fast_levenshtein_distance(self):
+        self.assertEqual(self.dist.fast_levenshtein_distance('p', 'b'), 1)
+
+    def test_fast_levenshtein_distance_div_maxlen(self):
+        self.assertEqual(self.dist.fast_levenshtein_distance_div_maxlen('p', 'b'), 1)
+
+    def test_dogol_prime_distance(self):
+        self.assertEqual(self.dist.dogol_prime_distance('p', 'b'), 0)
+
+    def test_dogol_prime_div_maxlen(self):
+        self.assertEqual(self.dist.dogol_prime_distance_div_by_maxlen('p', 'b'), 0)
+
+    def test_feature_edit_distance(self):
+        self.assertEqual(self.dist.feature_edit_distance('p', 'b'), 1 / 22)
+
+    def test_jt_feature_edit_distance(self):
+        self.assertEqual(self.dist.jt_feature_edit_distance('p', 'b'), 1 / 22)
+
+    def test_feature_edit_distance_div_by_maxlen(self):
+        self.assertEqual(self.dist.feature_edit_distance_div_by_maxlen('p', 'b'), 1 / 22)
+
+    def test_jt_feature_edit_distance_div_by_maxlen(self):
+        self.assertEqual(self.dist.jt_feature_edit_distance_div_by_maxlen('p', 'b'), 1 / 22)
+
+    def test_hamming_feature_edit_distance(self):
+        self.assertEqual(self.dist.hamming_feature_edit_distance('p', 'b'), 1 / 22)
+
+    def test_jt_hamming_feature_edit_distance(self):
+        self.assertEqual(self.dist.jt_hamming_feature_edit_distance('p', 'b'), 1 / 22)
+
+    def test_hamming_feature_edit_distance_div_maxlen(self):
+        self.assertEqual(self.dist.hamming_feature_edit_distance_div_maxlen('p', 'b'), 1 / 22)
+
+    def test_jt_hamming_feature_edit_distance_div_maxlen(self):
+        self.assertEqual(self.dist.jt_hamming_feature_edit_distance_div_maxlen('p', 'b'), 1 / 22)
+
+    def test_weighted_feature_edit_distance(self):
+        self.assertEqual(self.weighted_feature_edit_distance('p', 'b'), 1 / 8)
+
+    def test_weighted_feature_edit_distance_div_maxlen(self):
+        self.assertEqual(self.weighted_feature_edit_distance_div_maxlen('p', 'b'), 1 / 8)
