@@ -348,7 +348,7 @@ class Distance(object):
                    Raw result is divided by the length of the longest argument
         """
         maxlen = max(len(source), len(target))
-        return self.feature_edit_distance(self, source, target) / maxlen
+        return self.feature_edit_distance(source, target) / maxlen
 
     def jt_feature_edit_distance_div_by_maxlen(self, source, target):
         """Like `Distance.feature_edit_distance` but normalized by maxlen
@@ -365,7 +365,7 @@ class Distance(object):
                    Raw result is divided by the length of the longest argument
         """
         maxlen = max(len(source), len(target))
-        return self.jt_feature_edit_distance(self, source, target) / maxlen
+        return self.jt_feature_edit_distance(source, target) / maxlen
 
     def hamming_substitution_cost(self, v1, v2):
         """Substitution cost for feature vectors computed as Hamming distance.
