@@ -576,6 +576,29 @@ class Distance(object):
                                       self.fm.word_to_vector_list(source),
                                       self.fm.word_to_vector_list(target))
 
+    def jt_weighted_feature_edit_distance(self, source, target):
+        """String edit distance with weighted features
+
+        The cost of changine an articulatory feature is weighted according to
+        the the class of the feature and the subjective probability of the
+        feature changing in phonological alternation and loanword contexts.
+        These weights are stored in `Distance.weights`.
+
+        Args:
+            source (unicode): source string
+            target (uniocde): target string
+
+        Returns:
+            float: feature weighted string edit distance between `source` and
+                   `target`
+        """
+        return self.min_edit_distance(partial(self.weighted_deletion_cost, gl_wt=0.25),
+                                      partial(self.weighted_insertion_cost, gl_wt=0.25),
+                                      self.weighted_substitution_cost,
+                                      [[]],
+                                      self.fm.word_to_vector_list(source),
+                                      self.fm.word_to_vector_list(target))
+
     def weighted_feature_edit_distance_div_maxlen(self, source, target):
         """String edit distance with weighted features, divided by maxlen
 
