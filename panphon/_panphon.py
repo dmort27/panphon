@@ -193,8 +193,8 @@ class FeatureTable(object):
         segment is valid and returns None if it is not.
 
         Args:
-            ft_mask (set): pattern defined as set of (value, feature) tuples
-            ft_seg (set): segment defined as a set of (value, feature) tuples
+            features (set): pattern defined as set of (value, feature) tuples
+            segment (set): segment defined as a set of (value, feature) tuples
 
         Returns:
             bool: True iff all features in `ft_mask` are also in `ft_seg`; None

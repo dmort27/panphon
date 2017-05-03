@@ -8,8 +8,6 @@ The `panphon` module provides a straightforward API that allows users and develo
 
     >>> import panphon.panphon as panphon
     >>> ft = panphon.FeatureTable()
-    >>> ft.ftr_match(set([(u'+', u'syl')]), u'a')
-	True
     >>> ft.segs(u'pʲãk')
     [u'p\u02b2', u'a\u0303', u'k']\
     >>> ft.word_fts(u'pʲãk')
