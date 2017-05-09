@@ -23,7 +23,7 @@ the IPA database ``panphon/data/ipa_all.csv``.
     >>> ft.ftr_match(set([(u'+', u'syl')]), u'a')
     True
     >>> ft.segs(u'pʲãk')
-    [u'p\u02b2', u'a\u0303', u'k']\
+    [u'p\u02b2', u'a\u0303', u'k']
     >>> ft.word_fts(u'pʲãk')
     [set([(u'-', u'syl'), (u'-', u'long'), (u'-', u'voi'), (u'+', u'ant'), (u'-', u'cg'), (u'+', u'hi'), (u'-', u'son'), (u'0', u'tense'), (u'-', u'lat'), (u'-', u'back'), (u'-', u'cont'), (u'-', u'nas'), (u'-', u'lo'), (u'0', u'distr'), (u'-', u'round'), (u'-', u'delrel'), (u'+', u'lab'), (u'-', u'sg'), (u'+', u'cons'), (u'0', u'strid'), (u'-', u'cor')]), set([(u'+', u'son'), (u'+', u'tense'), (u'+', u'cont'), (u'+', u'nas'), (u'+', u'lo'), (u'+', u'voi'), (u'-', u'cg'), (u'-', u'hi'), (u'-', u'lat'), (u'+', u'syl'), (u'0', u'strid'), (u'-', u'long'), (u'-', u'cor'), (u'0', u'distr'), (u'-', u'round'), (u'-', u'delrel'), (u'0', u'ant'), (u'-', u'sg'), (u'+', u'back'), (u'-', u'cons'), (u'-', u'lab')]), set([(u'-', u'syl'), (u'-', u'lab'), (u'-', u'voi'), (u'0', u'distr'), (u'+', u'back'), (u'-', u'cg'), (u'+', u'hi'), (u'-', u'son'), (u'0', u'tense'), (u'-', u'lat'), (u'-', u'cont'), (u'-', u'nas'), (u'-', u'lo'), (u'-', u'ant'), (u'-', u'round'), (u'-', u'delrel'), (u'-', u'sg'), (u'+', u'cons'), (u'0', u'strid'), (u'-', u'cor'), (u'-', u'long')])]
 
@@ -284,3 +284,14 @@ include only the following fields:
 The file ``diacritic_definitions_schema.yml`` is a
 `Kwalify <http://www.kuwata-lab.com/kwalify/>`__ schema that defines a
 syntactically valid diacritics definition file.
+
+Citing PanPhon
+==============
+
+If you use PanPhon in research, please cite the following paper:
+
+David R. Mortensen, Patrick Littell, Akash Bharadwaj, Kartik Goyal,
+Chris Dyer, Lori Levin (2016). "PanPhon: A Resource for Mapping IPA
+Segments to Articulatory Feature Vectors." *Proceedings of COLING 2016,
+the 26th International Conference on Computational Linguistics:
+Technical Papers*, pages 3475–3484, Osaka, Japan, December 11-17 2016.
