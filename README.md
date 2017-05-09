@@ -13,7 +13,7 @@ The `panphon` module provides a straightforward API that allows users and develo
 >>> ft.ftr_match(set([(u'+', u'syl')]), u'a')
 True
 >>> ft.segs(u'pʲãk')
-[u'p\u02b2', u'a\u0303', u'k']\
+[u'p\u02b2', u'a\u0303', u'k']
 >>> ft.word_fts(u'pʲãk')
 [set([(u'-', u'syl'), (u'-', u'long'), (u'-', u'voi'), (u'+', u'ant'), (u'-', u'cg'), (u'+', u'hi'), (u'-', u'son'), (u'0', u'tense'), (u'-', u'lat'), (u'-', u'back'), (u'-', u'cont'), (u'-', u'nas'), (u'-', u'lo'), (u'0', u'distr'), (u'-', u'round'), (u'-', u'delrel'), (u'+', u'lab'), (u'-', u'sg'), (u'+', u'cons'), (u'0', u'strid'), (u'-', u'cor')]), set([(u'+', u'son'), (u'+', u'tense'), (u'+', u'cont'), (u'+', u'nas'), (u'+', u'lo'), (u'+', u'voi'), (u'-', u'cg'), (u'-', u'hi'), (u'-', u'lat'), (u'+', u'syl'), (u'0', u'strid'), (u'-', u'long'), (u'-', u'cor'), (u'0', u'distr'), (u'-', u'round'), (u'-', u'delrel'), (u'0', u'ant'), (u'-', u'sg'), (u'+', u'back'), (u'-', u'cons'), (u'-', u'lab')]), set([(u'-', u'syl'), (u'-', u'lab'), (u'-', u'voi'), (u'0', u'distr'), (u'+', u'back'), (u'-', u'cg'), (u'+', u'hi'), (u'-', u'son'), (u'0', u'tense'), (u'-', u'lat'), (u'-', u'cont'), (u'-', u'nas'), (u'-', u'lo'), (u'-', u'ant'), (u'-', u'round'), (u'-', u'delrel'), (u'-', u'sg'), (u'+', u'cons'), (u'0', u'strid'), (u'-', u'cor'), (u'-', u'long')])]
 ```
