@@ -16,7 +16,7 @@ The ``panphon`` module provides a straightforward API that allows users
 and developers to access the segment-feature relationships encoded in
 the IPA database ``panphon/data/ipa_all.csv``.
 
-::
+.. code:: python
 
     >>> import panphon.panphon as panphon
     >>> ft = panphon.FeatureTable()
@@ -46,7 +46,7 @@ corresponds to a segment in the word and each column corresponds to one
 of the specified features. Basic usage is illustrated in the following
 example:
 
-::
+.. code:: python
 
     >>> import panphon
     >>> ft=panphon.FeatureTable()
@@ -118,7 +118,7 @@ depending on their class and subjective variability. All of these
 methods have the same interface and patterns of usage, demonstrated
 below:
 
-::
+.. code:: python
 
     >>> import panphon.distance
     >>> dst = panphon.distance.Distance()
@@ -146,7 +146,7 @@ Usage
 To generate a segment features file (``ipa_all.csv``), use the following
 **in the panphon data directory**:
 
-::
+.. code:: bash
 
     $ generate_ipa_all.py ipa_bases.csv -d diacritic_definitions.yml -s sort_order.yml ipa_all.csv
 

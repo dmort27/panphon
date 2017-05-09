@@ -6,12 +6,18 @@ This package constitutes a database of segments in the International Phonetic Al
 
 The `panphon` module provides a straightforward API that allows users and developers to access the segment-feature relationships encoded in the IPA database `panphon/data/ipa_all.csv`.
 
-    >>> import panphon.panphon as panphon
-    >>> ft = panphon.FeatureTable()
-    >>> ft.segs(u'pʲãk')
-    [u'p\u02b2', u'a\u0303', u'k']\
-    >>> ft.word_fts(u'pʲãk')
-    [set([(u'-', u'syl'), (u'-', u'long'), (u'-', u'voi'), (u'+', u'ant'), (u'-', u'cg'), (u'+', u'hi'), (u'-', u'son'), (u'0', u'tense'), (u'-', u'lat'), (u'-', u'back'), (u'-', u'cont'), (u'-', u'nas'), (u'-', u'lo'), (u'0', u'distr'), (u'-', u'round'), (u'-', u'delrel'), (u'+', u'lab'), (u'-', u'sg'), (u'+', u'cons'), (u'0', u'strid'), (u'-', u'cor')]), set([(u'+', u'son'), (u'+', u'tense'), (u'+', u'cont'), (u'+', u'nas'), (u'+', u'lo'), (u'+', u'voi'), (u'-', u'cg'), (u'-', u'hi'), (u'-', u'lat'), (u'+', u'syl'), (u'0', u'strid'), (u'-', u'long'), (u'-', u'cor'), (u'0', u'distr'), (u'-', u'round'), (u'-', u'delrel'), (u'0', u'ant'), (u'-', u'sg'), (u'+', u'back'), (u'-', u'cons'), (u'-', u'lab')]), set([(u'-', u'syl'), (u'-', u'lab'), (u'-', u'voi'), (u'0', u'distr'), (u'+', u'back'), (u'-', u'cg'), (u'+', u'hi'), (u'-', u'son'), (u'0', u'tense'), (u'-', u'lat'), (u'-', u'cont'), (u'-', u'nas'), (u'-', u'lo'), (u'-', u'ant'), (u'-', u'round'), (u'-', u'delrel'), (u'-', u'sg'), (u'+', u'cons'), (u'0', u'strid'), (u'-', u'cor'), (u'-', u'long')])]
+
+```python
+>>> import panphon.panphon as panphon
+>>> ft = panphon.FeatureTable()
+>>> ft.ftr_match(set([(u'+', u'syl')]), u'a')
+True
+>>> ft.segs(u'pʲãk')
+[u'p\u02b2', u'a\u0303', u'k']\
+>>> ft.word_fts(u'pʲãk')
+[set([(u'-', u'syl'), (u'-', u'long'), (u'-', u'voi'), (u'+', u'ant'), (u'-', u'cg'), (u'+', u'hi'), (u'-', u'son'), (u'0', u'tense'), (u'-', u'lat'), (u'-', u'back'), (u'-', u'cont'), (u'-', u'nas'), (u'-', u'lo'), (u'0', u'distr'), (u'-', u'round'), (u'-', u'delrel'), (u'+', u'lab'), (u'-', u'sg'), (u'+', u'cons'), (u'0', u'strid'), (u'-', u'cor')]), set([(u'+', u'son'), (u'+', u'tense'), (u'+', u'cont'), (u'+', u'nas'), (u'+', u'lo'), (u'+', u'voi'), (u'-', u'cg'), (u'-', u'hi'), (u'-', u'lat'), (u'+', u'syl'), (u'0', u'strid'), (u'-', u'long'), (u'-', u'cor'), (u'0', u'distr'), (u'-', u'round'), (u'-', u'delrel'), (u'0', u'ant'), (u'-', u'sg'), (u'+', u'back'), (u'-', u'cons'), (u'-', u'lab')]), set([(u'-', u'syl'), (u'-', u'lab'), (u'-', u'voi'), (u'0', u'distr'), (u'+', u'back'), (u'-', u'cg'), (u'+', u'hi'), (u'-', u'son'), (u'0', u'tense'), (u'-', u'lat'), (u'-', u'cont'), (u'-', u'nas'), (u'-', u'lo'), (u'-', u'ant'), (u'-', u'round'), (u'-', u'delrel'), (u'-', u'sg'), (u'+', u'cons'), (u'0', u'strid'), (u'-', u'cor'), (u'-', u'long')])]
+```
+
 
 ## Summary of Functionality
 
@@ -23,13 +29,17 @@ The `FeatureTable` class includes a broad range of operations on features and se
 
 The `panphon` class includes the function word2array which takes a list of feature names (as a list of strings) and a panphon word (from FeatureTable().word_fts()) and returns a NumPy array where each row corresponds to a segment in the word and each column corresponds to one of the specified features. Basic usage is illustrated in the following example:
 
-    >>> import panphon
-    >>> ft=panphon.FeatureTable()
-    >>> panphon.word2array(['syl', 'son', 'cont'], ft.word_fts(u'snik'))
-    array([[-1, -1,  1],
-           [-1,  1, -1],
-           [ 1,  1,  1],
-           [-1, -1, -1]])
+
+```python
+>>> import panphon
+>>> ft=panphon.FeatureTable()
+>>> panphon.word2array(['syl', 'son', 'cont'], ft.word_fts(u'snik'))
+array([[-1, -1,  1],
+       [-1,  1, -1],
+       [ 1,  1,  1],
+       [-1, -1, -1]])
+```
+
 
 ### Fixed-width pattern matching
 
@@ -72,12 +82,15 @@ Edit distance where each feature-edit has cost 1/22. Edits from unspecified to s
 Edit distance where costs of feature edits are differently weighted depending on their class and subjective variability. All of these methods have the same interface and patterns of usage, demonstrated below:
 
 
-    >>> import panphon.distance
-    >>> dst = panphon.distance.Distance()
-    >>> dst.dogol_prime_distance(u'pops', u'bobz')
-    0
-    >>> dst.dogol_prime_distance(u'pops', u'bobo')
-    1
+```python
+>>> import panphon.distance
+>>> dst = panphon.distance.Distance()
+>>> dst.dogol_prime_distance(u'pops', u'bobz')
+0
+>>> dst.dogol_prime_distance(u'pops', u'bobo')
+1
+```
+
 
 ## Scripts
 
@@ -91,7 +104,11 @@ This small Python program allows the user to apply sets of rules, defined in YAM
 
 To generate a segment features file (```ipa_all.csv```), use the following **in the panphon data directory**:
 
-    $ generate_ipa_all.py ipa_bases.csv -d diacritic_definitions.yml -s sort_order.yml ipa_all.csv
+
+```bash
+$ generate_ipa_all.py ipa_bases.csv -d diacritic_definitions.yml -s sort_order.yml ipa_all.csv
+```
+
 
 Note that this will overwrite your existing ```ipa_all.csv``` file, which is often what you want.
 
