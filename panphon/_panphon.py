@@ -10,6 +10,8 @@ import pkg_resources
 import regex as re
 import unicodecsv as csv
 
+from panphon import xsampa
+
 
 # logging.basicConfig(level=logging.DEBUG)
 
@@ -121,6 +123,7 @@ class FeatureTable(object):
         self.weights = self._read_weights()
         self.seg_regex = self._build_seg_regex()
         self.longest_seg = max([len(x) for x in self.seg_dict.keys()])
+        self.xsampa = xsampa.XSampa()
 
     def _read_table(self, filename):
         """Read the data from data/ipa_all.csv into self.segments, a
@@ -509,13 +512,41 @@ class FeatureTable(object):
         ft_dict = {ft: val for (val, ft) in self.fts(seg)}
         return [ft_dict[name] for name in self.names]
 
-    def word_to_vector_list(self, word):
+    def tensor_to_numeric(self, t):
+        return list(map(lambda a:
+                    map(lambda b: {'+': 1, '-': -1, '0': 0}[b], a), t))
+
+    def word_to_vector_list(self, word, numeric=False):
         """Return a list of feature vectors, given a Unicode IPA word.
 
         Args:
             word (unicode): string in IPA
+            numeric (bool): if True, return features as numeric values instead
+                            of strings
 
         Returns:
             list: a list of lists of '+'/'-'/'0'
         """
-        return list(map(self.segment_to_vector, self.segs(word)))
+        tensor = list(map(self.segment_to_vector, self.segs(word)))
+        if numeric:
+            return self.tensor_to_numeric(tensor)
+        else:
+            return tensor
+
+    def xsampa_to_vector_list(self, xsampa, numeric=False):
+        """Return a list of feature vectors, given an X-SAMPA word.
+
+        Args:
+            word (str): X-SAMPA word, space delimited
+            numeric (bool): if True, return features as numeric values instead
+                            of strings
+
+        Returns:
+            list: a list of lists of '+'/'-'/'0'
+        """
+        word = self.xsampa.convert(xsampa)
+        tensor = list(map(self.segment_to_vector, self.segs(word)))
+        if numeric:
+            return self.tensor_to_numeric(tensor)
+        else:
+            return tensor

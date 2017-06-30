@@ -179,6 +179,15 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
                 return False
         return list(filter(whole_seg, segs))
 
+    def segment_word_segments(self, word):
+        def n2s(s):
+            if s is None:
+                return ''
+            else:
+                return s
+        return ((n2s(m.group('pre')), n2s(m.group('base')), n2s(m.group('post')))
+                for m in self.seg_regex.finditer(word))
+
     @property
     def all_segs_matching_fts(self):
         raise AttributeError("'PermissiveFeatureTable' object has no attribute 'all_segs_matching_fts'")
