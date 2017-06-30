@@ -10,7 +10,7 @@ import pkg_resources
 import regex as re
 import unicodecsv as csv
 
-from panphon import xsampa
+from . import xsampa
 
 
 # logging.basicConfig(level=logging.DEBUG)

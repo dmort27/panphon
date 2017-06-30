@@ -10,7 +10,7 @@ import yaml
 import regex as re
 import unicodecsv as csv
 
-from . import _panphon
+from . import _panphon, xsampa
 
 
 def flip(s):
@@ -52,6 +52,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         self.bases, self.names = self._read_ipa_bases(ipa_bases)
         self.prefix_dias, self.postfix_dias = self._read_dias(dias)
         self.pre_regex, self.post_regex, self.seg_regex = self._compile_seg_regexes(self.bases, self.prefix_dias, self.postfix_dias)
+        self.xsampa = xsampa.XSampa()
 
     def _read_ipa_bases(self, fn):
         fn = pkg_resources.resource_filename(__name__, fn)

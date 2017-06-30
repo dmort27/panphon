@@ -155,7 +155,7 @@ The IPA Character Table `ipa_bases.csv` is intended to contain all of the unmodi
 
 ## Configuration and Rule Files
 
-This package includes two files that control the behavior of ```generate_ipa_all.py```. These are intended to be edited by the end user. Both are written in [YAML](http://www.yaml.org/), a standardized and human-readable and editable data serialization language.
+This package includes two files that control the behavior of ```generate_ipa_all.py```. These are intended to be edited by the end user. Both are written in [YAML](http://www.yaml.org/), a standardized, human-readable and human-editable data serialization language.
 
 ### Sort Order Specification: sort_order.yml
 
