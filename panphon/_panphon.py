@@ -516,7 +516,7 @@ class FeatureTable(object):
         return list(map(lambda a:
                     map(lambda b: {'+': 1, '-': -1, '0': 0}[b], a), t))
 
-    def word_to_vector_list(self, word, numeric=False):
+    def word_to_vector_list(self, word, numeric=False, xsampa=False):
         """Return a list of feature vectors, given a Unicode IPA word.
 
         Args:
@@ -527,24 +527,8 @@ class FeatureTable(object):
         Returns:
             list: a list of lists of '+'/'-'/'0'
         """
-        tensor = list(map(self.segment_to_vector, self.segs(word)))
-        if numeric:
-            return self.tensor_to_numeric(tensor)
-        else:
-            return tensor
-
-    def xsampa_to_vector_list(self, xsampa, numeric=False):
-        """Return a list of feature vectors, given an X-SAMPA word.
-
-        Args:
-            word (str): X-SAMPA word, space delimited
-            numeric (bool): if True, return features as numeric values instead
-                            of strings
-
-        Returns:
-            list: a list of lists of '+'/'-'/'0'
-        """
-        word = self.xsampa.convert(xsampa)
+        if xsampa:
+            word = self.xsampa.convert(word)
         tensor = list(map(self.segment_to_vector, self.segs(word)))
         if numeric:
             return self.tensor_to_numeric(tensor)

@@ -287,7 +287,7 @@ class Distance(object):
         assert isinstance(v1, list)
         return sum(map(lambda x: 0.5 if x == '0' else 1, v1)) / len(v1) * gl_wt
 
-    def feature_edit_distance(self, source, target):
+    def feature_edit_distance(self, source, target, xsampa=False):
         """String edit distance with equally-weighed features.
 
         All articulatory features are given equal weight. The distance between
@@ -307,10 +307,10 @@ class Distance(object):
                                       self.unweighted_insertion_cost,
                                       self.unweighted_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source),
-                                      self.fm.word_to_vector_list(target))
+                                      self.fm.word_to_vector_list(source, xsampa=xsampa),
+                                      self.fm.word_to_vector_list(target, xsampa=xsampa))
 
-    def jt_feature_edit_distance(self, source, target):
+    def jt_feature_edit_distance(self, source, target, xsampa=False):
         """String edit distance with equally-weighed features.
 
         All articulatory features are given equal weight. The distance between
@@ -320,6 +320,7 @@ class Distance(object):
         Args:
             source (unicode): source string
             target (unicode): target string
+            xsampa (bool): source and target are X-SAMPA
 
         Returns:
             float: feature edit distance with equally-weighed features and insdel
@@ -330,15 +331,16 @@ class Distance(object):
                                       partial(self.unweighted_insertion_cost, gl_wt=0.25),
                                       self.unweighted_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source),
-                                      self.fm.word_to_vector_list(target))
+                                      self.fm.word_to_vector_list(source, xsampa=xsampa),
+                                      self.fm.word_to_vector_list(target, xsampa=xsampa))
 
-    def feature_edit_distance_div_by_maxlen(self, source, target):
+    def feature_edit_distance_div_by_maxlen(self, source, target, xsampa=False):
         """Like `Distance.feature_edit_distance` but normalized by maxlen
 
         Args:
             source (unicode): source string
             target (unicode): target string
+            xsampa (bool): source and target are X-SAMPA
 
         Returns:
             float: feature edit distance with equally-weighed features and insdel
@@ -348,14 +350,15 @@ class Distance(object):
                    Raw result is divided by the length of the longest argument
         """
         maxlen = max(len(source), len(target))
-        return self.feature_edit_distance(source, target) / maxlen
+        return self.feature_edit_distance(source, target, xsampa=xsampa) / maxlen
 
-    def jt_feature_edit_distance_div_by_maxlen(self, source, target):
+    def jt_feature_edit_distance_div_by_maxlen(self, source, target, xsampa=False):
         """Like `Distance.feature_edit_distance` but normalized by maxlen
 
         Args:
             source (unicode): source string
             target (unicode): target string
+            xsampa (bool): source and target are X-SAMPA
 
         Returns:
             float: feature edit distance with equally-weighed features and insdel
@@ -365,7 +368,7 @@ class Distance(object):
                    Raw result is divided by the length of the longest argument
         """
         maxlen = max(len(source), len(target))
-        return self.jt_feature_edit_distance(source, target) / maxlen
+        return self.jt_feature_edit_distance(source, target, xsampa=xsampa) / maxlen
 
     def hamming_substitution_cost(self, v1, v2):
         """Substitution cost for feature vectors computed as Hamming distance.
@@ -385,7 +388,7 @@ class Distance(object):
         diffs = [ft1 != ft2 for (ft1, ft2) in zip(v1, v2)]
         return sum(diffs) / len(diffs)  # Booleans are cohersed to integers.
 
-    def hamming_feature_edit_distance(self, source, target):
+    def hamming_feature_edit_distance(self, source, target, xsampa=False):
         """String edit distance with equally-weighed features.
 
         All articulatory features are given equal weight. The distance between an
@@ -401,6 +404,7 @@ class Distance(object):
         Args:
             source (unicode): source string
             target (unicode): target string
+            xsampa (bool): source and target are X-SAMPA
 
         Returns:
             float: Hamming feature edit distance between `source` and `target`
@@ -410,10 +414,10 @@ class Distance(object):
                                       lambda v: 1,
                                       self.hamming_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source),
-                                      self.fm.word_to_vector_list(target))
+                                      self.fm.word_to_vector_list(source, xsampa=xsampa),
+                                      self.fm.word_to_vector_list(target, xsampa=xsampa))
 
-    def jt_hamming_feature_edit_distance(self, source, target):
+    def jt_hamming_feature_edit_distance(self, source, target, xsampa=False):
         """String edit distance with equally-weighed features.
 
         All articulatory features are given equal weight. The distance between an
@@ -429,6 +433,7 @@ class Distance(object):
         Args:
             source (unicode): source string
             target (unicode): target string
+            xsampa (bool): source and target are X-SAMPA
 
         Returns:
             float: Hamming feature edit distance between `source` and `target`
@@ -438,10 +443,10 @@ class Distance(object):
                                       lambda v: 0.25,
                                       self.hamming_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source),
-                                      self.fm.word_to_vector_list(target))
+                                      self.fm.word_to_vector_list(source, xsampa=xsampa),
+                                      self.fm.word_to_vector_list(target, xsampa=xsampa))
 
-    def hamming_feature_edit_distance_div_maxlen(self, source, target):
+    def hamming_feature_edit_distance_div_maxlen(self, source, target, xsampa=False):
         """Hamming feature edit distance divded by maxlen
 
         The same as `Distance.hamming_feature_edit_distance` except that the
@@ -452,21 +457,25 @@ class Distance(object):
         Args:
             source (unicode): source string
             target (unicode): target string
+            xsampa (bool): source and target are X-SAMPA
 
         Returns:
             float: Hamming feature edit distance between `source` and `target`
                    with high insdel costs, normalized by length of longest
                    argument
         """
-        source, target = self.fm.word_to_vector_list(source), self.fm.word_to_vector_list(target)
+        source = self.fm.word_to_vector_list(source, xsampa=xsampa)
+        target = self.fm.word_to_vector_list(target, xsampa=xsampa)
         maxlen = max(len(source), len(target))
         raw = self.min_edit_distance(lambda v: 1,
                                      lambda v: 1,
                                      self.hamming_substitution_cost,
-                                     [[]], source, target)
+                                     [[]],
+                                     source,
+                                     target)
         return raw / maxlen
 
-    def jt_hamming_feature_edit_distance_div_maxlen(self, source, target):
+    def jt_hamming_feature_edit_distance_div_maxlen(self, source, target, xsampa=False):
         """Hamming feature edit distance divded by maxlen
 
         The same as `Distance.hamming_feature_edit_distance` except that the
@@ -477,13 +486,15 @@ class Distance(object):
         Args:
             source (unicode): source string
             target (unicode): target string
+            xsampa (bool): source and target are X-SAMPA
 
         Returns:
             float: Hamming feature edit distance between `source` and `target`
                    with low insdel costs, normalized by length of longest
                    argument
         """
-        source, target = self.fm.word_to_vector_list(source), self.fm.word_to_vector_list(target)
+        source = self.fm.word_to_vector_list(source, xsampa=xsampa)
+        target = self.fm.word_to_vector_list(target, xsampa=xsampa)
         maxlen = max(len(source), len(target))
         raw = self.min_edit_distance(lambda v: 0.25,
                                      lambda v: 0.25,
@@ -553,7 +564,7 @@ class Distance(object):
         assert isinstance(v1, list)
         return sum(self.weights) * gl_wt
 
-    def weighted_feature_edit_distance(self, source, target):
+    def weighted_feature_edit_distance(self, source, target, xsampa=False):
         """String edit distance with weighted features
 
         The cost of changine an articulatory feature is weighted according to
@@ -564,6 +575,7 @@ class Distance(object):
         Args:
             source (unicode): source string
             target (uniocde): target string
+            xsampa (bool): source and target are X-SAMPA
 
         Returns:
             float: feature weighted string edit distance between `source` and
@@ -573,10 +585,10 @@ class Distance(object):
                                       self.weighted_insertion_cost,
                                       self.weighted_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source),
-                                      self.fm.word_to_vector_list(target))
+                                      self.fm.word_to_vector_list(source, xsampa=xsampa),
+                                      self.fm.word_to_vector_list(target, xsampa=xsampa))
 
-    def jt_weighted_feature_edit_distance(self, source, target):
+    def jt_weighted_feature_edit_distance(self, source, target, xsampa=False):
         """String edit distance with weighted features
 
         The cost of changine an articulatory feature is weighted according to
@@ -587,6 +599,7 @@ class Distance(object):
         Args:
             source (unicode): source string
             target (uniocde): target string
+            xsampa (bool): source and target are X-SAMPA
 
         Returns:
             float: feature weighted string edit distance between `source` and
@@ -596,10 +609,10 @@ class Distance(object):
                                       partial(self.weighted_insertion_cost, gl_wt=0.25),
                                       self.weighted_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source),
-                                      self.fm.word_to_vector_list(target))
+                                      self.fm.word_to_vector_list(source, xsampa=xsampa),
+                                      self.fm.word_to_vector_list(target, xsampa=xsampa))
 
-    def weighted_feature_edit_distance_div_maxlen(self, source, target):
+    def weighted_feature_edit_distance_div_maxlen(self, source, target, xsampa=False):
         """String edit distance with weighted features, divided by maxlen
 
         The cost of changine an articulatory feature is weighted according to
@@ -610,13 +623,15 @@ class Distance(object):
         Args:
             source (unicode): source string
             target (uniocde): target string
+            xsampa (bool): source and target are X-SAMPA
 
         Returns:
             float: feature weighted string edit distance between `source` and
                    `target` divided by the lenght of the longest of these
                    arguments
         """
-        source, target = self.fm.word_to_vector_list(source), self.fm.word_to_vector_list(target)
+        source = self.fm.word_to_vector_list(source, xsampa=xsampa)
+        target = self.fm.word_to_vector_list(target, xsampa=xsampa)
         maxlen = max(len(source), len(target))
         return self.min_edit_distance(self.weighted_deletion_cost,
                                       self.weighted_insertion_cost,
@@ -625,7 +640,7 @@ class Distance(object):
                                       source,
                                       target) / maxlen
 
-    def jt_weighted_feature_edit_distance_div_maxlen(self, source, target):
+    def jt_weighted_feature_edit_distance_div_maxlen(self, source, target, xsampa=False):
         """String edit distance with weighted features, cheap insdel, divided by maxlen
 
         The cost of changine an articulatory feature is weighted according to
@@ -639,13 +654,15 @@ class Distance(object):
         Args:
             source (unicode): source string
             target (uniocde): target string
+            xsampa (bool): source and target are X-SAMPA
 
         Returns:
             float: feature weighted string edit distance between `source` and
                    `target` divided by the lenght of the longest of these
                    arguments
         """
-        source, target = self.fm.word_to_vector_list(source), self.fm.word_to_vector_list(target)
+        source = self.fm.word_to_vector_list(source, xsampa=xsampa)
+        target = self.fm.word_to_vector_list(target, xsampa=xsampa)
         maxlen = max(len(source), len(target))
         return self.min_edit_distance(partial(self.weighted_deletion_cost, gl_wt=0.25),
                                       partial(self.weighted_insertion_cost, gl_wt=0.25),
