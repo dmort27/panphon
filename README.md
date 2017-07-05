@@ -4,13 +4,13 @@ This package constitutes a database of segments in the International Phonetic Al
 
 ## Python API for Accessing Phonological Features of IPA Segments
 
-The `panphon` module provides a straightforward API that allows users and developers to access the segment-feature relationships encoded in the IPA database `panphon/data/ipa_all.csv`.
+The `FeatureTable` class in the `panphon` module provides a straightforward API that allows users and developers to access the segment-feature relationships encoded in the IPA database consisting of the files `panphon/data/ipa_bases.csv` and `diacritic_definitions.yml`.
 
 
 ```python
->>> import panphon.panphon as panphon
+>>> import panphon
 >>> ft = panphon.FeatureTable()
->>> ft.ftr_match(set([(u'+', u'syl')]), u'a')
+>>> ft.fts_match(set([(u'+', u'syl')]), u'a')
 True
 >>> ft.segs(u'pʲãk')
 [u'p\u02b2', u'a\u0303', u'k']
@@ -111,14 +111,6 @@ $ generate_ipa_all.py ipa_bases.csv -d diacritic_definitions.yml -s sort_order.y
 
 
 Note that this will overwrite your existing ```ipa_all.csv``` file, which is often what you want.
-
-### The `validate_ipa.py` Script
-
-[To be added.]
-
-### The `align_wordlists.py` Script
-
-[To be added.]
 
 ## Data Files
 

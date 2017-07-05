@@ -40,6 +40,18 @@ class TestFeatureTable(unittest.TestCase):
         self.assertIn('m̥', segs)
         self.assertIn('l', segs)
 
+    def test_word_to_vector_list_aspiration(self):
+        self.assertNotEqual(self.ft.word_to_vector_list(u'pʰ'),
+                            self.ft.word_to_vector_list(u'p'))
+
+    def test_word_to_vector_list_aspiration_xsampa(self):
+        self.assertNotEqual(self.ft.word_to_vector_list(u'p_h', xsampa=True),
+                            self.ft.word_to_vector_list(u'p', xsampa=True))
+
+    def test_word_to_vector_list_aspiration_xsampa_len(self):
+        self.assertEqual(len(self.ft.word_to_vector_list(u'p_h', xsampa=True)), 1)
+
+
 class TestIpaRe(unittest.TestCase):
 
     def setUp(self):
