@@ -514,7 +514,7 @@ class FeatureTable(object):
 
     def tensor_to_numeric(self, t):
         return list(map(lambda a:
-                    map(lambda b: {'+': 1, '-': -1, '0': 0}[b], a), t))
+                    list(map(lambda b: {'+': 1, '-': -1, '0': 0}[b], a)), t))
 
     def word_to_vector_list(self, word, numeric=False, xsampa=False):
         """Return a list of feature vectors, given a Unicode IPA word.
