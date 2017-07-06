@@ -68,5 +68,14 @@ class TestIpaRe(unittest.TestCase):
         self.assertIsNone(r.match('ts'))
 
 
+class TestXSampa(unittest.TestCase):
+
+    def setUp(self):
+        self.ft = panphon.FeatureTable()
+
+    def test_affricates(self):
+        self.assertNotEqual(self.ft.word_to_vector_list(u'tS', xsampa=True),
+                            self.ft.word_to_vector_list(u't S', xsampa=True))
+
 if __name__ == '__main__':
     unittest.main()
