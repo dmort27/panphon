@@ -3,6 +3,7 @@
 from __future__ import print_function, unicode_literals, division, absolute_import
 
 import unittest
+import panphon
 from panphon import distance
 
 feature_model = 'permissive'
@@ -130,6 +131,11 @@ class TestMany(unittest.TestCase):
 class TestXSampa(unittest.TestCase):
     def setUp(self):
         self.dist = distance.Distance(feature_model=feature_model)
+        self.ft = panphon.FeatureTable()
 
     def test_feature_edit_distance(self):
         self.assertEqual(self.dist.feature_edit_distance("p_h", "p", xsampa=True), 1 / 22)
+
+    def test_affricate(self):
+        self.assertNotEqual(self.ft.word_to_vector_list('tS'),
+                            self.ft.word_to_vector_list('t S'))

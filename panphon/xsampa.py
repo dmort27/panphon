@@ -21,14 +21,15 @@ class XSampa(object):
         return xs_regex, xs2ipa
 
     def convert(self, xsampa):
-        ipa = []
-        xsampa = xsampa.replace(self.delimiter, '')
-        while xsampa:
-            match = self.xs_regex.match(xsampa)
-            if match:
-                ipa.append(self.xs2ipa[match.group(0)])
-                xsampa = xsampa[len(match.group(0)):]
-            else:
-                ipa.append(xsampa[0])
-                xsampa = xsampa[1:]
-        return ''.join(ipa)
+        def seg2ipa(seg):
+            ipa = []
+            while seg:
+                match = self.xs_regex.match(seg)
+                if match:
+                    ipa.append(self.xs2ipa[match.group(0)])
+                    seg = seg[len(match.group(0)):]
+                else:
+                    seg = seg[1:]
+            return ''.join(ipa)
+        ipasegs = map(seg2ipa, xsampa.split(self.delimiter))
+        return ''.join(ipasegs)
