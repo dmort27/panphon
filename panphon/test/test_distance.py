@@ -135,7 +135,3 @@ class TestXSampa(unittest.TestCase):
 
     def test_feature_edit_distance(self):
         self.assertEqual(self.dist.feature_edit_distance("p_h", "p", xsampa=True), 1 / 22)
-
-    def test_affricate(self):
-        self.assertNotEqual(self.ft.word_to_vector_list('tS'),
-                            self.ft.word_to_vector_list('t S'))
