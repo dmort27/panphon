@@ -125,3 +125,11 @@ class TestMany(unittest.TestCase):
 
     def test_weighted_feature_edit_distance_div_maxlen(self):
         self.assertEqual(self.dist.weighted_feature_edit_distance_div_maxlen('p', 'b'), 1 / 8)
+
+
+class TestXSampa(unittest.TestCase):
+    def setUp(self):
+        self.dist = distance.Distance(feature_model=feature_model)
+
+    def test_feature_edit_distance(self):
+        self.assertEqual(self.dist.feature_edit_distance("p_h", "p", xsampa=True), 1 / 22)
