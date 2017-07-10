@@ -74,7 +74,7 @@ class Distance(object):
 
         Args:
             ft1 (str): feature value ('+', '-', or '0')
-            ft2 (str): feature values ('+', '-', or '0')
+            ft2 (str): feature value ('+', '-', or '0')
 
         Returns:
             float: the difference between `ft1` and `ft2`:
@@ -84,6 +84,8 @@ class Distance(object):
                    '0' - '-' = 0.5
                    '+' - '0' = 0.5
                    '-' - '0' = 0.5
+                   '-' - '-' = 0.0
+                   '+' - '+' = 0.0
         """
         tr = {'-': -1, '0': 0, '+': 1}
         return abs(tr[ft1] - tr[ft2]) / 2.0
