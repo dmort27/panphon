@@ -49,8 +49,14 @@ class Segment(object):
     def __ge__(self, other):
         return self.match(other)
 
+    def intersection(self, other):
+        return dict(set(self.data.items()) & set(other.data.items()))
+
+    def __and__(self, other):
+        return self.intersection(other)
+
     def numeric(self):
         return [self.data[k] for k in self.names]
 
     def string(self):
-        return map(lambda x: self.tr[x], self.numeric())
+        return map(lambda x: self.n2s[x], self.numeric())
