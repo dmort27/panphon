@@ -12,12 +12,9 @@ import unicodecsv as csv
 
 from . import xsampa
 
+from panphon.errors import SegmentError
 
 # logging.basicConfig(level=logging.DEBUG)
-
-
-class SegmentError(Exception):
-    pass
 
 
 FT_REGEX = re.compile(r'([-+0])([a-z][A-Za-z]*)', re.U | re.X)
