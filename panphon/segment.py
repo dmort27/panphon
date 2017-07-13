@@ -8,7 +8,7 @@ import regex as re
 
 class Segment(object):
     """Models a phonological segment as a vector of features."""
-    def __init__(self, names, features={}, ftstr=''):
+    def __init__(self, names, features={}, ftstr='', weights=None):
         """Construct a `Segment` object
 
         Args:
@@ -27,9 +27,13 @@ class Segment(object):
                 self.data[name] = features[name]
             else:
                 self.data[name] = 0
-        for m in re.finditer('(+|0|-)(\w+)', ftstr):
+        for m in re.finditer(r'(\+|0|-)(\w+)', ftstr):
             v, k = m.groups()
             self.data[k] = self.s2n[v]
+        if weights:
+            self.weights = weights
+        else:
+            self.weights = [1 for _ in names]
 
     def __getitem__(self, key):
         """Get a feature specification"""
@@ -68,11 +72,11 @@ class Segment(object):
         """
         self.data.update(features)
 
-    def match(self, other):
-        """Determine whether `self`'s features are a superset of `other`'s
+    def match(self, features):
+        """Determine whether `self`'s features are a superset of `features`'s
 
         Args:
-            other (dict): (name, value) pairs
+            features (dict): (name, value) pairs
 
         Returns:
            (bool): True if superset relationship hold else False
