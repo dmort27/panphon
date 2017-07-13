@@ -55,7 +55,7 @@ class Distance(object):
             s (unicode): IPA word
 
         Returns:
-            s (unicode): word with all segments collapsed to D' classes
+            (unicode): word with all segments collapsed to D' classes
         """
         segs = []
         for seg in self.fm.seg_regex.finditer(s):
