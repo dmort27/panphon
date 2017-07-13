@@ -15,7 +15,8 @@ class Segment(object):
             names (list): ordered list of feature names
             features (dict): name-value pairs for specified features
             ftstr (unicode): a string, each /(+|0|-)\w+/ sequence of which is
-            Get     interpreted as a feature specification"""
+                             interpreted as a feature specification
+            """
         self.n2s = {-1: '-', 0: '0', 1: '+'}
         self.s2n = {k: v for (v, k) in self.n2s.items()}
         self.names = names
@@ -59,13 +60,13 @@ class Segment(object):
         """Return an iterator over the features as (name, value) pairs"""
         return ((k, self.data[k]) for k in self.names)
 
-    def update(self, segment):
-        """Update the objects features to match `segment`.
+    def update(self, features):
+        """Update the objects features to match `features`.
 
         Args:
-            segment (Segment): object containing the new feature values
+            features (dict): dictionary containing the new feature values
         """
-        self.data.update(segment)
+        self.data.update(features)
 
     def match(self, other):
         """Determine whether `self`'s features are a superset of `other`'s
@@ -131,10 +132,27 @@ class Segment(object):
         return self.distance(other) / len(self.names)
 
     def __sub__(self, other):
+        """Distance between segments, normalized by vector length"""
         return self.norm_distance(other)
 
     def hamming_distance(self, other):
+        """Compute Hamming distance between feature vectors
+
+        Args:
+            other (Segment): object to compare with `self`
+
+        Returns:
+            (int): the unnormalized Hamming distance between the two vectors.
+        """
         return sum(int(a != b) for (a, b) in zip(self.numeric(), other.numeric()))
 
     def norm_hamming_distance(self, other):
+        """Compute Hamming distance, normalized by vector length
+
+        Args:
+            other (Segment): object to compare with `self`
+
+        Returns:
+            (int): the normalized Hamming distance between the two vectors.
+        """
         return self.hamming_distance(other) / len(self.names)
