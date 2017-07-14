@@ -94,21 +94,25 @@ class Segment(object):
             other (Segment): object with feature specifications
 
         Returns:
-            (dict): (name, value) pairs for each shared feature
+            Segment: (name, value) pairs for each shared feature
         """
-        return dict(set(self.data.items()) & set(other.data.items()))
+        return Segment(self.names, dict(set(self.items()) & set(other.items())))
 
     def __and__(self, other):
         """Return dict of features shared by `self` and `other`"""
         return self.intersection(other)
 
-    def numeric(self):
+    def numeric(self, names=None):
+        if not names:
+            names = self.names
         """Return feature values as a list of integers"""
-        return [self.data[k] for k in self.names]
+        return [self.data[k] for k in names]
 
-    def string(self):
+    def string(self, names=None):
         """Return feature values as a list of strings"""
-        return map(lambda x: self.n2s[x], self.numeric())
+        if not names:
+            names = self.names
+        return map(lambda x: self.n2s[x], numeric())
 
     def distance(self, other):
         """Compute a distance between `self` and `other`
@@ -117,8 +121,8 @@ class Segment(object):
             other (Segment): object to compare with `self`
 
         Returns:
-            (int): the sum of the absolute value of the difference between each
-                   of the feature values in `self` and `other`.
+            int: the sum of the absolute value of the difference between each
+                 of the feature values in `self` and `other`.
         """
         return sum(abs(a - b) for (a, b) in zip(self.numeric(), other.numeric()))
 
@@ -129,9 +133,9 @@ class Segment(object):
             other (Segment): object to compare with `self`
 
         Returns:
-            (float): the sum of the absolute value of the difference between
-                     each of the feature values in `self` and `other`, divided
-                     by the number of features per vector.
+            float: the sum of the absolute value of the difference between
+                   each of the feature values in `self` and `other`, divided
+                   by the number of features per vector.
         """
         return self.distance(other) / len(self.names)
 
@@ -146,7 +150,7 @@ class Segment(object):
             other (Segment): object to compare with `self`
 
         Returns:
-            (int): the unnormalized Hamming distance between the two vectors.
+            int: the unnormalized Hamming distance between the two vectors.
         """
         return sum(int(a != b) for (a, b) in zip(self.numeric(), other.numeric()))
 
@@ -157,6 +161,38 @@ class Segment(object):
             other (Segment): object to compare with `self`
 
         Returns:
-            (int): the normalized Hamming distance between the two vectors.
+            int: the normalized Hamming distance between the two vectors.
         """
         return self.hamming_distance(other) / len(self.names)
+
+    def weighted_distance(self, other):
+        """Compute weighted distance
+
+        Args:
+            other (Segment): object to compare with `self`
+
+        Returns:
+            float: the weighted distance between the two vectors
+        """
+        return sum([abs(a - b) * c for (a, b, c)
+                   in zip(self.numeric(), other.numeric(), self.weights)])
+
+    def norm_weighted_distance(self, other):
+        """Compute weighted distance, normalized by vector length
+
+        Args:
+            other (Segment): object to compare with `self`
+
+        Returns:
+            float: the weighted distance between the two vectors, normalized by
+                   vector length.
+        """
+        return self.weighted_distance(other) / sum(self.weights)
+
+    def specified(self):
+        """Return dictionary of features that are specified '+' or '-' (1 or -1)
+
+        Returns:
+            dict: each feature in `self` for which the value is not 0
+        """
+        return {n: v for (n, v) in self.data.items() if v != 0}
