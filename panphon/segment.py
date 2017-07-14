@@ -79,7 +79,7 @@ class Segment(object):
             features (dict): (name, value) pairs
 
         Returns:
-           (bool): True if superset relationship hold else False
+           (bool): True if superset relationship holds else False
         """
         return all([self.data[k] == v for (k, v) in features.items()])
 
@@ -96,7 +96,9 @@ class Segment(object):
         Returns:
             Segment: (name, value) pairs for each shared feature
         """
-        return Segment(self.names, dict(set(self.items()) & set(other.items())))
+        data = dict(set(self.items()) & set(other.items()))
+        names = filter(lambda a: a in data, self.names)
+        return Segment(names, data)
 
     def __and__(self, other):
         """Return dict of features shared by `self` and `other`"""
