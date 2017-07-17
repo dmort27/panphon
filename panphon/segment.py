@@ -72,7 +72,7 @@ class Segment(object):
         """
         self.data.update(features)
 
-    def match(self, features):
+    def match(self, ft_mask):
         """Determine whether `self`'s features are a superset of `features`'s
 
         Args:
@@ -81,7 +81,7 @@ class Segment(object):
         Returns:
            (bool): True if superset relationship holds else False
         """
-        return all([self.data[k] == v for (k, v) in features.items()])
+        return all([self.data[k] == v for (k, v) in ft_mask.items()])
 
     def __ge__(self, other):
         """Determine whether `self`'s features are a superset of `other`'s"""
@@ -110,11 +110,11 @@ class Segment(object):
         """Return feature values as a list of integers"""
         return [self.data[k] for k in names]
 
-    def string(self, names=None):
+    def strings(self, names=None):
         """Return feature values as a list of strings"""
         if not names:
             names = self.names
-        return map(lambda x: self.n2s[x], numeric())
+        return map(lambda x: self.n2s[x], self.numeric())
 
     def distance(self, other):
         """Compute a distance between `self` and `other`
@@ -197,4 +197,15 @@ class Segment(object):
         Returns:
             dict: each feature in `self` for which the value is not 0
         """
-        return {n: v for (n, v) in self.data.items() if v != 0}
+        return {k: v for (k, v) in self.data.items() if v != 0}
+
+    def differing_specs(self, other):
+        """Return a list of feature names that differ in their specified values
+
+        Args:
+            other (Segment): object to compare with `self`
+
+        Returns:
+            list: the names of the features that differ in the two vectors
+        """
+        return [k for (k, v) in self.items() if other[k] != v]
