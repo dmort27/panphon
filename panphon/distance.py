@@ -249,7 +249,7 @@ class Distance(object):
             float: sum of the differences between the features in `v1` and `v2`,
                    divided by the number of features
         """
-        return sum([(ft1 - ft2) / 2 for (ft1, ft2) in zip(v1, v2)]) / len(v1)
+        return sum([abs(ft1 - ft2) / 2 for (ft1, ft2) in zip(v1, v2)]) / len(v1)
 
     def unweighted_insertion_cost(self, v1, gl_wt=1.0):
         """Return cost of inserting segment corresponding to feature vector
