@@ -522,7 +522,7 @@ class FeatureTable(object):
                             of strings
 
         Returns:
-            list: a list of lists of '+'/'-'/'0'
+            list: a list of lists of '+'/'-'/'0' or 1/-1/0
         """
         if xsampa:
             word = self.xsampa.convert(word)

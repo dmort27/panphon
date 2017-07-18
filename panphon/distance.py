@@ -9,13 +9,13 @@ import numpy as np
 import pkg_resources
 import yaml
 
-from . import _panphon, permissive
+from . import _panphon, permissive, featuretable
 
 
 class Distance(object):
     """Measures of phonological distance."""
 
-    def __init__(self, feature_set='spe+', feature_model='strict'):
+    def __init__(self, feature_set='spe+', feature_model='segment'):
         """Construct a `Distance` object
 
         Args:
@@ -23,13 +23,10 @@ class Distance(object):
             feature_model (str): feature parsing model to be used by the
                                  `Distance` object
         """
-        filename = _panphon.filenames[feature_set]
         fm = {'strict': _panphon.FeatureTable,
-              'permissive': permissive.PermissiveFeatureTable}
+              'permissive': permissive.PermissiveFeatureTable,
+              'segment': featuretable.FeatureTable}
         self.fm = fm[feature_model](feature_set=feature_set)
-        self.segments, self.seg_dict, self.names = self.fm._read_table(filename)
-        self.weights = self.fm._read_weights()
-        self.seg_regex = self.fm._build_seg_regex()
         self.dogol_prime = self._dogolpolsky_prime()
 
     def _dogolpolsky_prime(self, filename=os.path.join('data', 'dogolpolsky_prime.yml')):
@@ -65,30 +62,6 @@ class Distance(object):
                     segs.append(label)
                     break
         return ''.join(segs)
-
-    def feature_difference(self, ft1, ft2):
-        """Given two feature values, return the numerical difference
-
-        The difference between '+' and '-' is 1 and the difference between '0'
-        and '+' or '-' is 0.5.
-
-        Args:
-            ft1 (str): feature value ('+', '-', or '0')
-            ft2 (str): feature value ('+', '-', or '0')
-
-        Returns:
-            float: the difference between `ft1` and `ft2`:
-                   '+' - '-' = 1.0
-                   '-' - '+' = 1.0
-                   '0' - '+' = 0.5
-                   '0' - '-' = 0.5
-                   '+' - '0' = 0.5
-                   '-' - '0' = 0.5
-                   '-' - '-' = 0.0
-                   '+' - '+' = 0.0
-        """
-        tr = {'-': -1, '0': 0, '+': 1}
-        return abs(tr[ft1] - tr[ft2]) / 2.0
 
     def levenshtein_distance(self, source, target):
         """Slow implementation of Levenshtein distance using NumPy arrays
@@ -235,6 +208,18 @@ class Distance(object):
                 ])
         return d[n][m]
 
+    def feature_difference(self, ft1, ft2):
+        """Given two feature values, return the difference divided by 2 *deprecated*
+
+        Args:
+            ft1 (int): feature value in {1, 0, -1}
+            ft2 (int): feature value in {1, 0, -1}
+
+        Returns:
+            float: half the absolute value of the difference between ft1 and ft2
+        """
+        return abs(ft1 - ft2) / 2
+
     def unweighted_deletion_cost(self, v1, gl_wt=1.0):
         """Return cost of deleting segment corresponding to feature vector
 
@@ -251,7 +236,7 @@ class Distance(object):
                    multiplied by a global weighting factor
         """
         assert isinstance(v1, list)
-        return sum(map(lambda x: 0.5 if x == '0' else 1, v1)) / len(v1) * gl_wt
+        return sum(map(lambda x: 0.5 if x == 0 else 1, v1)) / len(v1) * gl_wt
 
     def unweighted_substitution_cost(self, v1, v2):
         """Given two feature vectors, return the difference
@@ -264,11 +249,7 @@ class Distance(object):
             float: sum of the differences between the features in `v1` and `v2`,
                    divided by the number of features
         """
-        assert isinstance(v1, list)
-        assert len(v1) == len(v2)
-        diffs = [self.feature_difference(ft1, ft2)
-                 for (ft1, ft2) in zip(v1, v2)]
-        return sum(diffs) / len(v1)
+        return sum([(ft1 - ft2) / 2 for (ft1, ft2) in zip(v1, v2)]) / len(v1)
 
     def unweighted_insertion_cost(self, v1, gl_wt=1.0):
         """Return cost of inserting segment corresponding to feature vector
@@ -286,8 +267,7 @@ class Distance(object):
                    divided by the number of features in the vector and
                    multiplied by a global weighting factor
         """
-        assert isinstance(v1, list)
-        return sum(map(lambda x: 0.5 if x == '0' else 1, v1)) / len(v1) * gl_wt
+        return sum(map(lambda x: 0.5 if x == 0 else 1, v1)) / len(v1) * gl_wt
 
     def feature_edit_distance(self, source, target, xsampa=False):
         """String edit distance with equally-weighed features.
@@ -309,8 +289,8 @@ class Distance(object):
                                       self.unweighted_insertion_cost,
                                       self.unweighted_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source, xsampa=xsampa),
-                                      self.fm.word_to_vector_list(target, xsampa=xsampa))
+                                      self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa),
+                                      self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa))
 
     def jt_feature_edit_distance(self, source, target, xsampa=False):
         """String edit distance with equally-weighed features.
@@ -333,8 +313,8 @@ class Distance(object):
                                       partial(self.unweighted_insertion_cost, gl_wt=0.25),
                                       self.unweighted_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source, xsampa=xsampa),
-                                      self.fm.word_to_vector_list(target, xsampa=xsampa))
+                                      self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa),
+                                      self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa))
 
     def feature_edit_distance_div_by_maxlen(self, source, target, xsampa=False):
         """Like `Distance.feature_edit_distance` but normalized by maxlen
@@ -386,7 +366,6 @@ class Distance(object):
             float: Hamming distance between `v1` and `v2` divided by the length
                    of `v1` and `v2`
         """
-        assert len(v1) == len(v2)
         diffs = [ft1 != ft2 for (ft1, ft2) in zip(v1, v2)]
         return sum(diffs) / len(diffs)  # Booleans are cohersed to integers.
 
@@ -416,8 +395,8 @@ class Distance(object):
                                       lambda v: 1,
                                       self.hamming_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source, xsampa=xsampa),
-                                      self.fm.word_to_vector_list(target, xsampa=xsampa))
+                                      self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa),
+                                      self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa))
 
     def jt_hamming_feature_edit_distance(self, source, target, xsampa=False):
         """String edit distance with equally-weighed features.
@@ -445,8 +424,8 @@ class Distance(object):
                                       lambda v: 0.25,
                                       self.hamming_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source, xsampa=xsampa),
-                                      self.fm.word_to_vector_list(target, xsampa=xsampa))
+                                      self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa),
+                                      self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa))
 
     def hamming_feature_edit_distance_div_maxlen(self, source, target, xsampa=False):
         """Hamming feature edit distance divded by maxlen
@@ -466,8 +445,8 @@ class Distance(object):
                    with high insdel costs, normalized by length of longest
                    argument
         """
-        source = self.fm.word_to_vector_list(source, xsampa=xsampa)
-        target = self.fm.word_to_vector_list(target, xsampa=xsampa)
+        source = self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa)
+        target = self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa)
         maxlen = max(len(source), len(target))
         raw = self.min_edit_distance(lambda v: 1,
                                      lambda v: 1,
@@ -495,8 +474,8 @@ class Distance(object):
                    with low insdel costs, normalized by length of longest
                    argument
         """
-        source = self.fm.word_to_vector_list(source, xsampa=xsampa)
-        target = self.fm.word_to_vector_list(target, xsampa=xsampa)
+        source = self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa)
+        target = self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa)
         maxlen = max(len(source), len(target))
         raw = self.min_edit_distance(lambda v: 0.25,
                                      lambda v: 0.25,
@@ -505,7 +484,7 @@ class Distance(object):
         return raw / maxlen
 
     def weighted_feature_difference(self, w, ft1, ft2):
-        """Return the weighted difference between two features
+        """Return the weighted difference between two features *deprecated*
 
         Args:
             w (Number): weight
@@ -536,10 +515,9 @@ class Distance(object):
             float: sum of weighted feature difference for each feature pair in
                    zip(v1, v2)
         """
-        assert isinstance(v1, list)
-        diffs = [self.weighted_feature_difference(w, ft1, ft2)
-                 for (w, ft1, ft2) in zip(self.weights, v1, v2)]
-        return sum(diffs) * gl_wt
+        return sum([abs(ft1 - ft2) / 2 * w
+                    for (w, ft1, ft2)
+                    in zip(self.fm.weights, v1, v2)]) * gl_wt
 
     def weighted_insertion_cost(self, v1, gl_wt=1.0):
         """Return cost of inserting segment corresponding to feature vector
@@ -552,7 +530,7 @@ class Distance(object):
            float: sum of weights multiplied by global weight (`gl_wt`)
         """
         assert isinstance(v1, list)
-        return sum(self.weights) * gl_wt
+        return sum(self.fm.weights) * gl_wt
 
     def weighted_deletion_cost(self, v1, gl_wt=1.0):
         """Return cost of deleting segment corresponding to feature vector
@@ -564,7 +542,7 @@ class Distance(object):
         Returns:
            float: sum of weights multiplied by global weight (`gl_wt`)"""
         assert isinstance(v1, list)
-        return sum(self.weights) * gl_wt
+        return sum(self.fm.weights) * gl_wt
 
     def weighted_feature_edit_distance(self, source, target, xsampa=False):
         """String edit distance with weighted features
@@ -587,8 +565,8 @@ class Distance(object):
                                       self.weighted_insertion_cost,
                                       self.weighted_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source, xsampa=xsampa),
-                                      self.fm.word_to_vector_list(target, xsampa=xsampa))
+                                      self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa),
+                                      self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa))
 
     def jt_weighted_feature_edit_distance(self, source, target, xsampa=False):
         """String edit distance with weighted features
@@ -611,8 +589,8 @@ class Distance(object):
                                       partial(self.weighted_insertion_cost, gl_wt=0.25),
                                       self.weighted_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source, xsampa=xsampa),
-                                      self.fm.word_to_vector_list(target, xsampa=xsampa))
+                                      self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa),
+                                      self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa))
 
     def weighted_feature_edit_distance_div_maxlen(self, source, target, xsampa=False):
         """String edit distance with weighted features, divided by maxlen
@@ -632,8 +610,8 @@ class Distance(object):
                    `target` divided by the lenght of the longest of these
                    arguments
         """
-        source = self.fm.word_to_vector_list(source, xsampa=xsampa)
-        target = self.fm.word_to_vector_list(target, xsampa=xsampa)
+        source = self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa)
+        target = self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa)
         maxlen = max(len(source), len(target))
         return self.min_edit_distance(self.weighted_deletion_cost,
                                       self.weighted_insertion_cost,
@@ -663,8 +641,8 @@ class Distance(object):
                    `target` divided by the lenght of the longest of these
                    arguments
         """
-        source = self.fm.word_to_vector_list(source, xsampa=xsampa)
-        target = self.fm.word_to_vector_list(target, xsampa=xsampa)
+        source = self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa)
+        target = self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa)
         maxlen = max(len(source), len(target))
         return self.min_edit_distance(partial(self.weighted_deletion_cost, gl_wt=0.25),
                                       partial(self.weighted_insertion_cost, gl_wt=0.25),

@@ -16,6 +16,7 @@ class Segment(object):
             features (dict): name-value pairs for specified features
             ftstr (unicode): a string, each /(+|0|-)\w+/ sequence of which is
                              interpreted as a feature specification
+            weights (float): order list of feature weights/saliencies
             """
         self.n2s = {-1: '-', 0: '0', 1: '+'}
         self.s2n = {k: v for (v, k) in self.n2s.items()}
