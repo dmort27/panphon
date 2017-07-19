@@ -6,16 +6,21 @@ This package constitutes a database of segments in the International Phonetic Al
 
 The `FeatureTable` class in the `panphon` module provides a straightforward API that allows users and developers to access the segment-feature relationships encoded in the IPA database consisting of the files `panphon/data/ipa_bases.csv` and `diacritic_definitions.yml`.
 
+Note that a new API using faster, more rational, data structures (see the `Segment` class in `panphon.segment`) has been introduced. The old API is still available in the module `_panphon`.
 
 ```python
 >>> import panphon
 >>> ft = panphon.FeatureTable()
->>> ft.fts_match(set([(u'+', u'syl')]), u'a')
+>>> ft.word_fts(u'swit')
+[<Segment [-syl, -son, +cons, +cont, -delrel, -lat, -nas, 0strid, -voi, -sg, -cg, +ant, +cor, -distr, -lab, -hi, -lo, -back, -round, -velaric, 0tense, -long]>, <Segment [-syl, +son, -cons, +cont, -delrel, -lat, -nas, 0strid, +voi, -sg, -cg, -ant, -cor, 0distr, +lab, +hi, -lo, +back, +round, -velaric, 0tense, -long]>, <Segment [+syl, +son, -cons, +cont, -delrel, -lat, -nas, 0strid, +voi, -sg, -cg, 0ant, -cor, 0distr, -lab, +hi, -lo, -back, -round, -velaric, +tense, -long]>, <Segment [-syl, -son, +cons, -cont, -delrel, -lat, -nas, 0strid, -voi, -sg, -cg, +ant, +cor, -distr, -lab, -hi, -lo, -back, -round, -velaric, 0tense, -long]>]
+>>> ft.word_fts(u'swit')[0].match({'cor': 1})
 True
->>> ft.segs(u'pʲãk')
-[u'p\u02b2', u'a\u0303', u'k']
->>> ft.word_fts(u'pʲãk')
-[set([(u'-', u'syl'), (u'-', u'long'), (u'-', u'voi'), (u'+', u'ant'), (u'-', u'cg'), (u'+', u'hi'), (u'-', u'son'), (u'0', u'tense'), (u'-', u'lat'), (u'-', u'back'), (u'-', u'cont'), (u'-', u'nas'), (u'-', u'lo'), (u'0', u'distr'), (u'-', u'round'), (u'-', u'delrel'), (u'+', u'lab'), (u'-', u'sg'), (u'+', u'cons'), (u'0', u'strid'), (u'-', u'cor')]), set([(u'+', u'son'), (u'+', u'tense'), (u'+', u'cont'), (u'+', u'nas'), (u'+', u'lo'), (u'+', u'voi'), (u'-', u'cg'), (u'-', u'hi'), (u'-', u'lat'), (u'+', u'syl'), (u'0', u'strid'), (u'-', u'long'), (u'-', u'cor'), (u'0', u'distr'), (u'-', u'round'), (u'-', u'delrel'), (u'0', u'ant'), (u'-', u'sg'), (u'+', u'back'), (u'-', u'cons'), (u'-', u'lab')]), set([(u'-', u'syl'), (u'-', u'lab'), (u'-', u'voi'), (u'0', u'distr'), (u'+', u'back'), (u'-', u'cg'), (u'+', u'hi'), (u'-', u'son'), (u'0', u'tense'), (u'-', u'lat'), (u'-', u'cont'), (u'-', u'nas'), (u'-', u'lo'), (u'-', u'ant'), (u'-', u'round'), (u'-', u'delrel'), (u'-', u'sg'), (u'+', u'cons'), (u'0', u'strid'), (u'-', u'cor'), (u'-', u'long')])]
+>>> ft.word_fts(u'swit')[0] >= {'cor': 1}
+True
+>>> ft.word_fts(u'swit')[1] >= {'cor': 1}
+False
+>>> ft.word_to_vector_list(u'sauɹ', numeric=False)
+[[u'-', u'-', u'+', u'+', u'-', u'-', u'-', u'0', u'-', u'-', u'-', u'+', u'+', u'-', u'-', u'-', u'-', u'-', u'-', u'-', u'0', u'-'], [u'+', u'+', u'-', u'+', u'-', u'-', u'-', u'0', u'+', u'-', u'-', u'0', u'-', u'0', u'-', u'-', u'+', u'+', u'-', u'-', u'+', u'-'], [u'+', u'+', u'-', u'+', u'-', u'-', u'-', u'0', u'+', u'-', u'-', u'0', u'-', u'0', u'+', u'+', u'-', u'+', u'+', u'-', u'+', u'-'], [u'-', u'+', u'-', u'+', u'-', u'-', u'-', u'0', u'+', u'-', u'-', u'+', u'+', u'-', u'-', u'+', u'-', u'+', u'+', u'-', u'0', u'-']]
 ```
 
 
@@ -33,17 +38,101 @@ The `panphon` class includes the function word2array which takes a list of featu
 ```python
 >>> import panphon
 >>> ft=panphon.FeatureTable()
->>> panphon.word2array(['syl', 'son', 'cont'], ft.word_fts(u'snik'))
+>>> ft.word_array(['syl', 'son', 'cont'], u'sɑlti')
 array([[-1, -1,  1],
-       [-1,  1, -1],
        [ 1,  1,  1],
-       [-1, -1, -1]])
+       [-1,  1,  1],
+       [-1, -1, -1],
+       [ 1,  1,  1]])
+```
+
+
+### Segment manipulations
+
+The `Segment` class, defined in the `panphon.segment` module, is used to represent analyzed segments in the new `panphon.FeatureTable` class (code found in `panphon.featuretable`). It provides performance advantages over the old list-of-tuples representation, is more Pythonic, and provides additional functionality.
+
+#### Construction
+
+There are two main ways to construct a `Segment` object:
+
+
+```python
+>>> from panphon.segment import Segment
+>>> Segment(['syl', 'son', 'cont'], {'syl': -1, 'son': -1, 'cont': 1})
+<Segment [-syl, -son, +cont]>
+>>> Segment(['syl', 'son', 'cont'], ftstr='[-syl, -son, +cont]')
+<Segment [-syl, -son, +cont]>
+```
+
+In both cases, the first argument passed to the constructor is a list of feature names. This specifies what features a segment has as well as their canonical ordering (used, for example, when a feature vector for a segment is returned as a list). The second argument is a dictionary of feature name-feature value pairs. The feature values are integers from the set {-1, 0 1} (equivalent to {-, 0, +}). This dictionary can be omitted if the keyword argument `ftstr` is included. This string is scanned for sequences of (-|0|+)(\w+), which are interpreted as name-value (really value-name) pairs.
+
+#### Basic querying and updating
+
+`Segment` objects implement a dictionary-like interface for manipulating key-value pairs:
+
+
+```python
+>>> a = Segment(['syl', 'son', 'cont'], {'syl': -1, 'son': -1, 'cont': 1})
+>>> a
+<Segment [-syl, -son, +cont]>
+>>> a['syl']
+-1
+>>> a['son'] = 1
+>>> a
+<Segment [-syl, +son, +cont]>
+>>> a.update({'son': -1, 'cont': -1})
+>>> a
+<Segment [-syl, -son, -cont]>
+```
+
+
+#### Set operations
+
+The `match` method asks whether the `Segment` object on which it is called has a superset of the features contained in the dictionary passed to it as an argument. The >= operator is an alias for the `match` method:
+
+
+```python
+>>> a = Segment(['syl', 'son', 'cont'], {'syl': -1, 'son': -1, 'cont': 1})
+>>> a.match({'son': -1, 'cont': 1})
+True
+>>> a.match({'son': -1, 'cont': -1})
+False
+>>> a >= {'son': -1, 'cont': 1}
+True
+>>> a >= {'son': 1, 'cont': 1}
+False
+```
+
+
+The `intersection` method asks which features the `Segment` object on which it is called and the dictionary or `Segment` object that is passed to it as an argument share. The & operator is an alias for the `intersection` method:
+
+
+```python
+>>> a = Segment(['syl', 'son', 'cont'], {'syl': -1, 'son': -1, 'cont': 1})
+>>> a.intersection({'syl': -1, 'son': 1, 'cont': -1})
+<Segment [-syl]>
+>>> a & {'syl': -1, 'son': 1, 'cont': -1}
+<Segment [-syl]>
+```
+
+
+#### Vector representations
+
+`Segment` objects can return their vector representations, either as a list of integers or as a list of strings, using the `numeric` and `string` methods:
+
+
+```python
+>>> a = Segment(['syl', 'son', 'cont'], {'syl': -1, 'son': -1, 'cont': 1})
+>>> a.numeric()
+[-1, -1, 1]
+>>> a.strings()
+[u'-', u'-', u'+']
 ```
 
 
 ### Fixed-width pattern matching
 
-The `FeatureTable` class also allows matching of fixed-width, feature-based patterns.
+The `FeatureTable` classes also allows matching of fixed-width, feature-based patterns.
 
 ### Sonority calculations
 

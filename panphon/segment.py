@@ -16,7 +16,7 @@ class Segment(object):
             features (dict): name-value pairs for specified features
             ftstr (unicode): a string, each /(+|0|-)\w+/ sequence of which is
                              interpreted as a feature specification
-            weights (float): order list of feature weights/saliencies
+            weights (float): order list of feature weights/saliences
             """
         self.n2s = {-1: '-', 0: '0', 1: '+'}
         self.s2n = {k: v for (v, k) in self.n2s.items()}
@@ -51,7 +51,7 @@ class Segment(object):
         """Return a string representation of a feature vector"""
         pairs = [(self.n2s[self.data[k]], k) for k in self.names]
         fts = ', '.join(['{}{}'.format(*pair) for pair in pairs])
-        return '[{}]'.format(fts)
+        return '<Segment [{}]>'.format(fts)
 
     def __iter__(self):
         """Return an iterator over the feature names"""
