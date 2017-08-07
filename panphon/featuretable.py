@@ -329,8 +329,8 @@ class FeatureTable(object):
         """
         s2n = {'-': -1, '0': 0, '+': 1}
         seg_res = []
-        for mat in re.findall(ur'\[[^]]+\]+', pat):
-            ft_mask = {k: s2n[v] for (v, k) in re.findall(ur'([+-])(\w+)', mat)}
+        for mat in re.findall(r'\[[^]]+\]+', pat):
+            ft_mask = {k: s2n[v] for (v, k) in re.findall(r'([+-])(\w+)', mat)}
             segs = self.all_segs_matching_fts(ft_mask)
             seg_res.append('({})'.format('|'.join(segs)))
         regexp = ''.join(seg_res)
@@ -347,7 +347,7 @@ class FeatureTable(object):
             list: feature specifications ('+'/'-'/'0') in the order from
             `FeatureTable.names`
         """
-        return self.fts(seg).strings
+        return self.fts(seg).strings()
 
     def word_to_vector_list(self, word, numeric=False, xsampa=False):
         """Return a list of feature vectors, given a Unicode IPA word.
