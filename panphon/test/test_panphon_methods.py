@@ -2,7 +2,7 @@
 from __future__ import print_function, unicode_literals, division, absolute_import
 
 import unittest
-import panphon
+import panphon._panphon as panphon
 
 
 class TestFeatureTableAPI(unittest.TestCase):

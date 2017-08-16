@@ -6,10 +6,19 @@ from functools import partial
 
 import editdistance
 import numpy as np
+import regex as re
 import pkg_resources
 import yaml
 
 from . import _panphon, permissive, featuretable
+
+
+def ftstr2dict(ftstr):
+    fts = {}
+    for m in re.finditer(r'([-0+])(\w+)', ftstr):
+        v, k = m.groups()
+        fts[k] = {'-': -1, '0': 0, '+': 1}[v]
+    return fts
 
 
 class Distance(object):
@@ -42,7 +51,7 @@ class Distance(object):
             rules = []
             dogol_prime = yaml.load(f.read())
             for rule in dogol_prime:
-                rules.append((_panphon.fts(rule['def']), rule['label']))
+                rules.append((ftstr2dict(rule['def']), rule['label']))
         return rules
 
     def map_to_dogol_prime(self, s):
@@ -58,7 +67,7 @@ class Distance(object):
         for seg in self.fm.seg_regex.finditer(s):
             fts = self.fm.fts(seg.group(0))
             for mask, label in self.dogol_prime:
-                if self.fm.match(mask, fts):
+                if fts >= mask:
                     segs.append(label)
                     break
         return ''.join(segs)

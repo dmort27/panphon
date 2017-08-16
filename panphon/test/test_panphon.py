@@ -2,19 +2,19 @@
 from __future__ import print_function, unicode_literals, division, absolute_import
 
 import unittest
-import panphon
+from panphon import _panphon
 
 
 class TestFeatureTable(unittest.TestCase):
 
     def setUp(self):
-        self.ft = panphon.FeatureTable()
+        self.ft = _panphon.FeatureTable()
 
     def test_fts_contrast2(self):
         inv = 'p t k b d ɡ a e i o u'.split(' ')
         self.assertTrue(self.ft.fts_contrast2([('-', 'syl')], 'voi', inv))
         self.assertFalse(self.ft.fts_contrast2([('+', 'syl')], 'cor', inv))
-        self.assertTrue(self.ft.fts_contrast2(panphon.fts('+ant -cor'), 'voi', inv))
+        self.assertTrue(self.ft.fts_contrast2(_panphon.fts('+ant -cor'), 'voi', inv))
 
     def test_fts(self):
         fts = self.ft.fts('ŋ')
@@ -55,7 +55,7 @@ class TestFeatureTable(unittest.TestCase):
 class TestIpaRe(unittest.TestCase):
 
     def setUp(self):
-        self.ft = panphon.FeatureTable()
+        self.ft = _panphon.FeatureTable()
 
     def test_compile_regex_from_str1(self):
         r = self.ft.compile_regex_from_str('[-son -cont][+syl -hi -lo]')
@@ -71,7 +71,7 @@ class TestIpaRe(unittest.TestCase):
 class TestXSampa(unittest.TestCase):
 
     def setUp(self):
-        self.ft = panphon.FeatureTable()
+        self.ft = _panphon.FeatureTable()
 
     def test_affricates(self):
         self.assertNotEqual(self.ft.word_to_vector_list(u'tS', xsampa=True),

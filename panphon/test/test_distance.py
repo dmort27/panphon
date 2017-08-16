@@ -6,7 +6,7 @@ import unittest
 import panphon
 from panphon import distance
 
-feature_model = 'permissive'
+feature_model = 'segment'
 
 
 class TestLevenshtein(unittest.TestCase):
