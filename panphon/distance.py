@@ -10,7 +10,7 @@ import regex as re
 import pkg_resources
 import yaml
 
-from . import _panphon, permissive, featuretable
+from . import _panphon, permissive, featuretable, xsampa
 
 
 def ftstr2dict(ftstr):
@@ -36,6 +36,7 @@ class Distance(object):
               'permissive': permissive.PermissiveFeatureTable,
               'segment': featuretable.FeatureTable}
         self.fm = fm[feature_model](feature_set=feature_set)
+        self.xs = xsampa.XSampa()
         self.dogol_prime = self._dogolpolsky_prime()
 
     def _dogolpolsky_prime(self, filename=os.path.join('data', 'dogolpolsky_prime.yml')):
@@ -340,7 +341,10 @@ class Distance(object):
 
                    Raw result is divided by the length of the longest argument
         """
-        maxlen = max(len(source), len(target))
+        if xsampa:
+            maxlen = max(len(self.xs.convert(source)), len(self.xs.convert(target)))
+        else:
+            maxlen = max(len(source), len(target))
         return self.feature_edit_distance(source, target, xsampa=xsampa) / maxlen
 
     def jt_feature_edit_distance_div_by_maxlen(self, source, target, xsampa=False):
@@ -358,7 +362,10 @@ class Distance(object):
 
                    Raw result is divided by the length of the longest argument
         """
-        maxlen = max(len(source), len(target))
+        if xsampa:
+            maxlen = max(len(self.xs.convert(source)), len(self.xs.convert(target)))
+        else:
+            maxlen = max(len(source), len(target))
         return self.jt_feature_edit_distance(source, target, xsampa=xsampa) / maxlen
 
     def hamming_substitution_cost(self, v1, v2):
@@ -456,7 +463,10 @@ class Distance(object):
         """
         source = self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa)
         target = self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa)
-        maxlen = max(len(source), len(target))
+        if xsampa:
+            maxlen = max(len(self.xs.convert(source)), len(self.xs.convert(target)))
+        else:
+            maxlen = max(len(source), len(target))
         raw = self.min_edit_distance(lambda v: 1,
                                      lambda v: 1,
                                      self.hamming_substitution_cost,
@@ -485,7 +495,10 @@ class Distance(object):
         """
         source = self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa)
         target = self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa)
-        maxlen = max(len(source), len(target))
+        if xsampa:
+            maxlen = max(len(self.xs.convert(source)), len(self.xs.convert(target)))
+        else:
+            maxlen = max(len(source), len(target))
         raw = self.min_edit_distance(lambda v: 0.25,
                                      lambda v: 0.25,
                                      self.hamming_substitution_cost,
@@ -621,7 +634,10 @@ class Distance(object):
         """
         source = self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa)
         target = self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa)
-        maxlen = max(len(source), len(target))
+        if xsampa:
+            maxlen = max(len(self.xs.convert(source)), len(self.xs.convert(target)))
+        else:
+            maxlen = max(len(source), len(target))
         return self.min_edit_distance(self.weighted_deletion_cost,
                                       self.weighted_insertion_cost,
                                       self.weighted_substitution_cost,
@@ -652,7 +668,10 @@ class Distance(object):
         """
         source = self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa)
         target = self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa)
-        maxlen = max(len(source), len(target))
+        if xsampa:
+            maxlen = max(len(self.xs.convert(source)), len(self.xs.convert(target)))
+        else:
+            maxlen = max(len(source), len(target))
         return self.min_edit_distance(partial(self.weighted_deletion_cost, gl_wt=0.25),
                                       partial(self.weighted_insertion_cost, gl_wt=0.25),
                                       self.weighted_substitution_cost,

@@ -47,6 +47,17 @@ class TestUnweightedFeatureEditDist(unittest.TestCase):
     def test_trivial2(self):
         self.assertEqual(self.dist.feature_edit_distance('ti', 'tʰi') * 22, 1)
 
+    def test_xsampa(self):
+        self.assertEqual(self.dist.feature_edit_distance('t i', 't_h i', xsampa=True) * 22, 1)
+
+    def test_xsampa2(self):
+        self.assertEqual(self.dist.feature_edit_distance('p u n', 'p y n', xsampa=True) * 22, 1)
+
+    def test_xsampa3(self):
+        ipa = self.dist.jt_feature_edit_distance_div_by_maxlen('kʰin', 'pʰin')
+        xs = self.dist.jt_feature_edit_distance_div_by_maxlen('k_h i n', 'p_h i n', xsampa=True)
+        self.assertEqual(ipa, xs)
+
 
 class TestWeightedFeatureEditDist(unittest.TestCase):
     def setUp(self):
