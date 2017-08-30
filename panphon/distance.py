@@ -177,7 +177,10 @@ class Distance(object):
         source = self.map_to_dogol_prime(source)
         target = self.map_to_dogol_prime(target)
         maxlen = max(len(source), len(target))
-        return self.fast_levenshtein_distance(source, target) / maxlen
+        if maxlen == 0:
+            return 0
+        else:
+            return self.fast_levenshtein_distance(source, target) / maxlen
 
     def min_edit_distance(self, del_cost, ins_cost, sub_cost, start, source, target):
         """Return minimum edit distance, parameterized, slow
@@ -345,7 +348,10 @@ class Distance(object):
             maxlen = max(len(self.xs.convert(source)), len(self.xs.convert(target)))
         else:
             maxlen = max(len(source), len(target))
-        return self.feature_edit_distance(source, target, xsampa=xsampa) / maxlen
+        if maxlen == 0:
+            return 0
+        else:
+            return self.feature_edit_distance(source, target, xsampa=xsampa) / maxlen
 
     def jt_feature_edit_distance_div_by_maxlen(self, source, target, xsampa=False):
         """Like `Distance.feature_edit_distance` but normalized by maxlen
@@ -366,7 +372,10 @@ class Distance(object):
             maxlen = max(len(self.xs.convert(source)), len(self.xs.convert(target)))
         else:
             maxlen = max(len(source), len(target))
-        return self.jt_feature_edit_distance(source, target, xsampa=xsampa) / maxlen
+        if maxlen == 0:
+            return 0
+        else:
+            return self.jt_feature_edit_distance(source, target, xsampa=xsampa) / maxlen
 
     def hamming_substitution_cost(self, v1, v2):
         """Substitution cost for feature vectors computed as Hamming distance.
