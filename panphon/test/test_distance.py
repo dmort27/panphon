@@ -54,8 +54,8 @@ class TestUnweightedFeatureEditDist(unittest.TestCase):
         self.assertEqual(self.dist.feature_edit_distance('p u n', 'p y n', xsampa=True) * 22, 1)
 
     def test_xsampa3(self):
-        ipa = self.dist.jt_feature_edit_distance_div_by_maxlen('kʰin', 'pʰin')
-        xs = self.dist.jt_feature_edit_distance_div_by_maxlen('k_h i n', 'p_h i n', xsampa=True)
+        ipa = self.dist.jt_feature_edit_distance_div_maxlen('kʰin', 'pʰin')
+        xs = self.dist.jt_feature_edit_distance_div_maxlen('k_h i n', 'p_h i n', xsampa=True)
         self.assertEqual(ipa, xs)
 
 
@@ -106,7 +106,7 @@ class TestMany(unittest.TestCase):
         self.assertEqual(self.dist.dogol_prime_distance('p', 'b'), 0)
 
     def test_dogol_prime_div_maxlen(self):
-        self.assertEqual(self.dist.dogol_prime_distance_div_by_maxlen('p', 'b'), 0)
+        self.assertEqual(self.dist.dogol_prime_distance_div_maxlen('p', 'b'), 0)
 
     def test_feature_edit_distance(self):
         self.assertEqual(self.dist.feature_edit_distance('p', 'b'), 1 / 22)
@@ -114,11 +114,11 @@ class TestMany(unittest.TestCase):
     def test_jt_feature_edit_distance(self):
         self.assertEqual(self.dist.jt_feature_edit_distance('p', 'b'), 1 / 22)
 
-    def test_feature_edit_distance_div_by_maxlen(self):
-        self.assertEqual(self.dist.feature_edit_distance_div_by_maxlen('p', 'b'), 1 / 22)
+    def test_feature_edit_distance_div_maxlen(self):
+        self.assertEqual(self.dist.feature_edit_distance_div_maxlen('p', 'b'), 1 / 22)
 
-    def test_jt_feature_edit_distance_div_by_maxlen(self):
-        self.assertEqual(self.dist.jt_feature_edit_distance_div_by_maxlen('p', 'b'), 1 / 22)
+    def test_jt_feature_edit_distance_div_maxlen(self):
+        self.assertEqual(self.dist.jt_feature_edit_distance_div_maxlen('p', 'b'), 1 / 22)
 
     def test_hamming_feature_edit_distance(self):
         self.assertEqual(self.dist.hamming_feature_edit_distance('p', 'b'), 1 / 22)

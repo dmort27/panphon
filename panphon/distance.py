@@ -13,6 +13,26 @@ import yaml
 from . import _panphon, permissive, featuretable, xsampa
 
 
+def zerodiviszero(f):
+    def wrapper(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except ZeroDivisionError:
+            return 0
+    return wrapper
+
+
+def xsampaopt(f):
+    def wrapper(*args, **kwargs):
+        if 'xsampa' in kwargs and kwargs['xsampa']:
+            self, source, target = args
+            source = self.xs.convert(source)
+            target = self.xs.convert(target)
+            args = (self, source, target)
+        return f(*args, **kwargs)
+    return wrapper
+
+
 def ftstr2dict(ftstr):
     fts = {}
     for m in re.finditer(r'([-0+])(\w+)', ftstr):
@@ -157,7 +177,9 @@ class Distance(object):
         target = self.map_to_dogol_prime(target)
         return self.fast_levenshtein_distance(source, target)
 
-    def dogol_prime_distance_div_by_maxlen(self, source, target):
+    @zerodiviszero
+    @xsampaopt
+    def dogol_prime_distance_div_maxlen(self, source, target, xsampa=False):
         """Levenshtein distance using D' classes, normalized by max length
 
         `source` and `target` are converted to Dogolpolsky' equivalence classes
@@ -177,10 +199,7 @@ class Distance(object):
         source = self.map_to_dogol_prime(source)
         target = self.map_to_dogol_prime(target)
         maxlen = max(len(source), len(target))
-        if maxlen == 0:
-            return 0
-        else:
-            return self.fast_levenshtein_distance(source, target) / maxlen
+        return self.fast_levenshtein_distance(source, target) / maxlen
 
     def min_edit_distance(self, del_cost, ins_cost, sub_cost, start, source, target):
         """Return minimum edit distance, parameterized, slow
@@ -282,6 +301,7 @@ class Distance(object):
         """
         return sum(map(lambda x: 0.5 if x == 0 else 1, v1)) / len(v1) * gl_wt
 
+    @xsampaopt
     def feature_edit_distance(self, source, target, xsampa=False):
         """String edit distance with equally-weighed features.
 
@@ -302,9 +322,10 @@ class Distance(object):
                                       self.unweighted_insertion_cost,
                                       self.unweighted_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa),
-                                      self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa))
+                                      self.fm.word_to_vector_list(source, numeric=True),
+                                      self.fm.word_to_vector_list(target, numeric=True))
 
+    @xsampaopt
     def jt_feature_edit_distance(self, source, target, xsampa=False):
         """String edit distance with equally-weighed features.
 
@@ -326,10 +347,12 @@ class Distance(object):
                                       partial(self.unweighted_insertion_cost, gl_wt=0.25),
                                       self.unweighted_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa),
-                                      self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa))
+                                      self.fm.word_to_vector_list(source, numeric=True),
+                                      self.fm.word_to_vector_list(target, numeric=True))
 
-    def feature_edit_distance_div_by_maxlen(self, source, target, xsampa=False):
+    @zerodiviszero
+    @xsampaopt
+    def feature_edit_distance_div_maxlen(self, source, target, xsampa=False):
         """Like `Distance.feature_edit_distance` but normalized by maxlen
 
         Args:
@@ -344,16 +367,12 @@ class Distance(object):
 
                    Raw result is divided by the length of the longest argument
         """
-        if xsampa:
-            maxlen = max(len(self.xs.convert(source)), len(self.xs.convert(target)))
-        else:
-            maxlen = max(len(source), len(target))
-        if maxlen == 0:
-            return 0
-        else:
-            return self.feature_edit_distance(source, target, xsampa=xsampa) / maxlen
+        maxlen = max(len(source), len(target))
+        return self.feature_edit_distance(source, target) / maxlen
 
-    def jt_feature_edit_distance_div_by_maxlen(self, source, target, xsampa=False):
+    @zerodiviszero
+    @xsampaopt
+    def jt_feature_edit_distance_div_maxlen(self, source, target, xsampa=False):
         """Like `Distance.feature_edit_distance` but normalized by maxlen
 
         Args:
@@ -368,14 +387,8 @@ class Distance(object):
 
                    Raw result is divided by the length of the longest argument
         """
-        if xsampa:
-            maxlen = max(len(self.xs.convert(source)), len(self.xs.convert(target)))
-        else:
-            maxlen = max(len(source), len(target))
-        if maxlen == 0:
-            return 0
-        else:
-            return self.jt_feature_edit_distance(source, target, xsampa=xsampa) / maxlen
+        maxlen = max(len(source), len(target))
+        return self.jt_feature_edit_distance(source, target) / maxlen
 
     def hamming_substitution_cost(self, v1, v2):
         """Substitution cost for feature vectors computed as Hamming distance.
@@ -394,6 +407,7 @@ class Distance(object):
         diffs = [ft1 != ft2 for (ft1, ft2) in zip(v1, v2)]
         return sum(diffs) / len(diffs)  # Booleans are cohersed to integers.
 
+    @xsampaopt
     def hamming_feature_edit_distance(self, source, target, xsampa=False):
         """String edit distance with equally-weighed features.
 
@@ -420,9 +434,10 @@ class Distance(object):
                                       lambda v: 1,
                                       self.hamming_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa),
-                                      self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa))
+                                      self.fm.word_to_vector_list(source, numeric=True),
+                                      self.fm.word_to_vector_list(target, numeric=True))
 
+    @xsampaopt
     def jt_hamming_feature_edit_distance(self, source, target, xsampa=False):
         """String edit distance with equally-weighed features.
 
@@ -449,9 +464,11 @@ class Distance(object):
                                       lambda v: 0.25,
                                       self.hamming_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa),
-                                      self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa))
+                                      self.fm.word_to_vector_list(source, numeric=True),
+                                      self.fm.word_to_vector_list(target, numeric=True))
 
+    @zerodiviszero
+    @xsampaopt
     def hamming_feature_edit_distance_div_maxlen(self, source, target, xsampa=False):
         """Hamming feature edit distance divded by maxlen
 
@@ -470,12 +487,9 @@ class Distance(object):
                    with high insdel costs, normalized by length of longest
                    argument
         """
-        source = self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa)
-        target = self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa)
-        if xsampa:
-            maxlen = max(len(self.xs.convert(source)), len(self.xs.convert(target)))
-        else:
-            maxlen = max(len(source), len(target))
+        source = self.fm.word_to_vector_list(source, numeric=True)
+        target = self.fm.word_to_vector_list(target, numeric=True)
+        maxlen = max(len(source), len(target))
         raw = self.min_edit_distance(lambda v: 1,
                                      lambda v: 1,
                                      self.hamming_substitution_cost,
@@ -484,6 +498,7 @@ class Distance(object):
                                      target)
         return raw / maxlen
 
+    @xsampaopt
     def jt_hamming_feature_edit_distance_div_maxlen(self, source, target, xsampa=False):
         """Hamming feature edit distance divded by maxlen
 
@@ -502,12 +517,9 @@ class Distance(object):
                    with low insdel costs, normalized by length of longest
                    argument
         """
-        source = self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa)
-        target = self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa)
-        if xsampa:
-            maxlen = max(len(self.xs.convert(source)), len(self.xs.convert(target)))
-        else:
-            maxlen = max(len(source), len(target))
+        source = self.fm.word_to_vector_list(source, numeric=True)
+        target = self.fm.word_to_vector_list(target, numeric=True)
+        maxlen = max(len(source), len(target))
         raw = self.min_edit_distance(lambda v: 0.25,
                                      lambda v: 0.25,
                                      self.hamming_substitution_cost,
@@ -599,6 +611,7 @@ class Distance(object):
                                       self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa),
                                       self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa))
 
+    @xsampaopt
     def jt_weighted_feature_edit_distance(self, source, target, xsampa=False):
         """String edit distance with weighted features
 
@@ -620,9 +633,11 @@ class Distance(object):
                                       partial(self.weighted_insertion_cost, gl_wt=0.25),
                                       self.weighted_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa),
-                                      self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa))
+                                      self.fm.word_to_vector_list(source, numeric=True),
+                                      self.fm.word_to_vector_list(target, numeric=True))
 
+    @zerodiviszero
+    @xsampaopt
     def weighted_feature_edit_distance_div_maxlen(self, source, target, xsampa=False):
         """String edit distance with weighted features, divided by maxlen
 
@@ -643,10 +658,7 @@ class Distance(object):
         """
         source = self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa)
         target = self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa)
-        if xsampa:
-            maxlen = max(len(self.xs.convert(source)), len(self.xs.convert(target)))
-        else:
-            maxlen = max(len(source), len(target))
+        maxlen = max(len(source), len(target))
         return self.min_edit_distance(self.weighted_deletion_cost,
                                       self.weighted_insertion_cost,
                                       self.weighted_substitution_cost,
@@ -654,6 +666,8 @@ class Distance(object):
                                       source,
                                       target) / maxlen
 
+    @zerodiviszero
+    @xsampaopt
     def jt_weighted_feature_edit_distance_div_maxlen(self, source, target, xsampa=False):
         """String edit distance with weighted features, cheap insdel, divided by maxlen
 
@@ -675,12 +689,9 @@ class Distance(object):
                    `target` divided by the lenght of the longest of these
                    arguments
         """
-        source = self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa)
-        target = self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa)
-        if xsampa:
-            maxlen = max(len(self.xs.convert(source)), len(self.xs.convert(target)))
-        else:
-            maxlen = max(len(source), len(target))
+        source = self.fm.word_to_vector_list(source, numeric=True)
+        target = self.fm.word_to_vector_list(target, numeric=True)
+        maxlen = max(len(source), len(target))
         return self.min_edit_distance(partial(self.weighted_deletion_cost, gl_wt=0.25),
                                       partial(self.weighted_insertion_cost, gl_wt=0.25),
                                       self.weighted_substitution_cost,
