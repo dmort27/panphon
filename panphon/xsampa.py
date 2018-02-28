@@ -17,7 +17,7 @@ class XSampa(object):
         with open(filename, 'rb') as f:
             xs2ipa = {x[1]: x[0] for x in csv.reader(f, encoding='utf-8')}
         xs = sorted(xs2ipa.keys(), key=len, reverse=True)
-        xs_regex = re.compile('|'.join(map(re.escape, xs)))
+        xs_regex = re.compile('|'.join(list(map(re.escape, xs))))
         return xs_regex, xs2ipa
 
     def convert(self, xsampa):
@@ -31,5 +31,5 @@ class XSampa(object):
                 else:
                     seg = seg[1:]
             return ''.join(ipa)
-        ipasegs = map(seg2ipa, xsampa.split(self.delimiter))
+        ipasegs = list(map(seg2ipa, xsampa.split(self.delimiter)))
         return ''.join(ipasegs)
