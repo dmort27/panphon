@@ -1,5 +1,29 @@
 # PanPhon
 
+## Citing PanPhon
+
+If you use PanPhon in research, please cite the [following paper](https://www.aclweb.org/anthology/C/C16/C16-1328.pdf):
+
+David R. Mortensen, Patrick Littell, Akash Bharadwaj, Kartik Goyal, Chris Dyer, Lori Levin (2016). "PanPhon: A Resource for Mapping IPA Segments to Articulatory Feature Vectors." *Proceedings of COLING 2016, the 26th International Conference on Computational Linguistics: Technical Papers*, pages 3475–3484, Osaka, Japan, December 11-17 2016.
+
+Or in BibTeX:
+
+```
+@inproceedings{Mortensen-et-al:2016,
+  author    = {David R. Mortensen and
+               Patrick Littell and
+               Akash Bharadwaj and
+               Kartik Goyal and
+               Chris Dyer and
+               Lori S. Levin},
+  title     = {PanPhon: {A} Resource for Mapping {IPA} Segments to Articulatory Feature Vectors},
+  booktitle = {Proceedings of {COLING} 2016, the 26th International Conference on Computational Linguistics: Technical Papers},
+  pages     = {3475--3484},
+  publisher = {{ACL}},
+  year      = {2016}
+}
+```
+
 This package constitutes a database of segments in the International Phonetic Alphabet (IPA) and their equivalents in terms of (articulatory) phonological features. They include both data files and the tool `generate_ipa_all.py`, which allows the application of rules for diacritics and modifiers to collections of IPA characters, data files, and configuration/rule files and well as the tool `validate_ipa.py`, which checks Unicode IPA text from STDIN for well-formedness.
 
 ## Python API for Accessing Phonological Features of IPA Segments
@@ -22,7 +46,6 @@ False
 >>> ft.word_to_vector_list(u'sauɹ', numeric=False)
 [[u'-', u'-', u'+', u'+', u'-', u'-', u'-', u'0', u'-', u'-', u'-', u'+', u'+', u'-', u'-', u'-', u'-', u'-', u'-', u'-', u'0', u'-'], [u'+', u'+', u'-', u'+', u'-', u'-', u'-', u'0', u'+', u'-', u'-', u'0', u'-', u'0', u'-', u'-', u'+', u'+', u'-', u'-', u'+', u'-'], [u'+', u'+', u'-', u'+', u'-', u'-', u'-', u'0', u'+', u'-', u'-', u'0', u'-', u'0', u'+', u'+', u'-', u'+', u'+', u'-', u'+', u'-'], [u'-', u'+', u'-', u'+', u'-', u'-', u'-', u'0', u'+', u'-', u'-', u'+', u'+', u'-', u'-', u'+', u'-', u'+', u'+', u'-', u'0', u'-']]
 ```
-
 
 ## Summary of Functionality
 
@@ -273,27 +296,3 @@ The key **combinations** likewise points to a list of rules for combining the ru
   **diacritics** that are to be combined.
 
 The file `diacritic_definitions_schema.yml` is a [Kwalify](http://www.kuwata-lab.com/kwalify/) schema that defines a syntactically valid diacritics definition file.
-
-# Citing PanPhon
-
-If you use PanPhon in research, please cite the [following paper](https://www.aclweb.org/anthology/C/C16/C16-1328.pdf):
-
-David R. Mortensen, Patrick Littell, Akash Bharadwaj, Kartik Goyal, Chris Dyer, Lori Levin (2016). "PanPhon: A Resource for Mapping IPA Segments to Articulatory Feature Vectors." *Proceedings of COLING 2016, the 26th International Conference on Computational Linguistics: Technical Papers*, pages 3475–3484, Osaka, Japan, December 11-17 2016.
-
-Or in BibTeX:
-
-```
-@inproceedings{Mortensen-et-al:2016,
-  author    = {David R. Mortensen and
-               Patrick Littell and
-               Akash Bharadwaj and
-               Kartik Goyal and
-               Chris Dyer and
-               Lori S. Levin},
-  title     = {PanPhon: {A} Resource for Mapping {IPA} Segments to Articulatory Feature Vectors},
-  booktitle = {Proceedings of {COLING} 2016, the 26th International Conference on Computational Linguistics: Technical Papers},
-  pages     = {3475--3484},
-  publisher = {{ACL}},
-  year      = {2016}
-}
-```
