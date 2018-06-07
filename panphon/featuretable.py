@@ -270,7 +270,7 @@ class FeatureTable(object):
         Args:
            pat (list): pattern consisting of a sequence of feature dicts
            word (unicode): a Unicode IPA string consisting of zero or more
-                          segments
+                           segments
 
         Returns:
             list: corresponding list of feature dicts or, if there is no match,
