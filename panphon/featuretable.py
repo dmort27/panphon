@@ -338,7 +338,7 @@ class FeatureTable(object):
 
     def segment_to_vector(self, seg):
         """Given a Unicode IPA segment, return a list of feature specificiations
-        in cannonical order.
+        in canonical order.
 
         Args:
             seg (unicode): IPA consonant or vowel

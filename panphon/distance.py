@@ -591,7 +591,7 @@ class Distance(object):
         """String edit distance with weighted features
 
         The cost of changine an articulatory feature is weighted according to
-        the the class of the feature and the subjective probability of the
+        the class of the feature and the subjective probability of the
         feature changing in phonological alternation and loanword contexts.
         These weights are stored in `Distance.weights`.
 
@@ -616,7 +616,7 @@ class Distance(object):
         """String edit distance with weighted features
 
         The cost of changine an articulatory feature is weighted according to
-        the the class of the feature and the subjective probability of the
+        the class of the feature and the subjective probability of the
         feature changing in phonological alternation and loanword contexts.
         These weights are stored in `Distance.weights`.
 
@@ -642,7 +642,7 @@ class Distance(object):
         """String edit distance with weighted features, divided by maxlen
 
         The cost of changine an articulatory feature is weighted according to
-        the the class of the feature and the subjective probability of the
+        the class of the feature and the subjective probability of the
         feature changing in phonological alternation and loanword contexts.
         These weights are stored in `Distance.weights`.
 
@@ -653,7 +653,7 @@ class Distance(object):
 
         Returns:
             float: feature weighted string edit distance between `source` and
-                   `target` divided by the lenght of the longest of these
+                   `target` divided by the length of the longest of these
                    arguments
         """
         source = self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa)
@@ -672,7 +672,7 @@ class Distance(object):
         """String edit distance with weighted features, cheap insdel, divided by maxlen
 
         The cost of changine an articulatory feature is weighted according to
-        the the class of the feature and the subjective probability of the
+        the class of the feature and the subjective probability of the
         feature changing in phonological alternation and loanword contexts.
         These weights are stored in `Distance.weights`.
 
@@ -686,7 +686,7 @@ class Distance(object):
 
         Returns:
             float: feature weighted string edit distance between `source` and
-                   `target` divided by the lenght of the longest of these
+                   `target` divided by the length of the longest of these
                    arguments
         """
         source = self.fm.word_to_vector_list(source, numeric=True)
