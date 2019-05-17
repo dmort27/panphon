@@ -4,7 +4,6 @@ from __future__ import print_function, unicode_literals
 import argparse
 import codecs
 import copy
-# from types import DictType, ListType, StringTypes
 
 import yaml
 

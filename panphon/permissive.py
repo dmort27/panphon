@@ -134,10 +134,10 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
             bool: None if `segment` cannot be parsed; True if the feature values
                   of `fts_mask` are a subset of those for `segment`
         """
-        fts_mask = set(fts_mask)
         fts_seg = self.fts(segment)
         if fts_seg:
-            return fts_seg <= fts_mask
+            fts_mask = set(fts_mask)
+            return fts_mask <= segment
         else:
             return None
 
