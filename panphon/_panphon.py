@@ -154,7 +154,7 @@ class FeatureTable(object):
 
     def _build_seg_regex(self):
         # Build a regex that will match individual segments in a string.
-        segs = sorted(self.seg_dict.keys(), key=len, reverse=True)
+        segs = sorted(self.seg_dict.keys(), key=lambda x: len(x), reverse=True)
         return re.compile(r'(?P<all>{})'.format('|'.join(segs)))
 
     def fts(self, segment):
@@ -187,8 +187,7 @@ class FeatureTable(object):
         return set(ft_mask) <= set(ft_seg)
 
     def fts_match(self, features, segment):
-        """Answer question "do a set of features 'match' a segment (are a
-        subset of that segment's features)?"
+        """Answer question "are `ft_mask`'s features a subset of ft_seg?"
 
         This is like `FeatureTable.match` except that it checks whether a
         segment is valid and returns None if it is not.
@@ -201,8 +200,8 @@ class FeatureTable(object):
             bool: True iff all features in `ft_mask` are also in `ft_seg`; None
                   if segment is not valid
         """
+        features = set(features)
         if self.seg_known(segment):
-            features = set(features)
             return features <= self.fts(segment)
         else:
             return None
@@ -472,7 +471,7 @@ class FeatureTable(object):
         for seg, pairs in self.segments:
             if set(fts) <= set(pairs):
                 matching_segs.append(seg)
-        return sorted(matching_segs, key=len, reverse=True)
+        return sorted(matching_segs, key=lambda x: len(x), reverse=True)
 
     def compile_regex_from_str(self, ft_str):
         """Given a string describing features masks for a sequence of segments,

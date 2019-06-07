@@ -137,7 +137,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         fts_seg = self.fts(segment)
         if fts_seg:
             fts_mask = set(fts_mask)
-            return fts_mask <= segment
+            return fts_mask <= fts_seg
         else:
             return None
 

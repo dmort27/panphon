@@ -59,7 +59,8 @@ class TestFeatureTableAPI(unittest.TestCase):
         self.assertTrue(self.ft.fts_contrast2([], 'voi', ['p', 'b', 'r']))
 
     def test_fts_count(self):
-        self.assertEqual(self.ft.fts_count([('-', 'voi')], ['p', 't', 'k', 'r', '$']), 3)
+        self.assertEqual(self.ft.fts_count([('-', 'voi')], ['p', 't', 'k', 'r']), 3)
+        self.assertEqual(self.ft.fts_count([('-', 'voi')], ['r', '$']), 0)
 
     def test_match_pattern(self):
         self.assertEqual(len(self.ft.match_pattern([set([('-', 'voi')])], 'p')), 1)

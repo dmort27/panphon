@@ -13,6 +13,7 @@ class TestFeatureTableAPI(unittest.TestCase):
     def test_fts(self):
         self.assertEqual(len(self.ft.fts('u')), 22)
 
+    # def test_seg_fts(self):
     #     self.assertEqual(len(self.ft.seg_fts('p')), 21)
 
     def test_match(self):
@@ -58,7 +59,8 @@ class TestFeatureTableAPI(unittest.TestCase):
         self.assertTrue(self.ft.fts_contrast2([], 'voi', ['p', 'b', 'r']))
 
     def test_fts_count(self):
-        self.assertEqual(self.ft.fts_count([('-', 'voi')], ['p', 't', 'k', 'r', '$']), 4)
+        self.assertEqual(self.ft.fts_count([('-', 'voi')], ['p', 't', 'k', 'r']), 3)
+        self.assertEqual(self.ft.fts_count([('-', 'voi')], ['r', '$']), 0)
 
     def test_match_pattern(self):
         self.assertEqual(len(self.ft.match_pattern([set([('-', 'voi')])], 'p')), 1)
