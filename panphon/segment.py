@@ -98,7 +98,7 @@ class Segment(object):
             Segment: (name, value) pairs for each shared feature
         """
         data = dict(set(self.items()) & set(other.items()))
-        names = filter(lambda a: a in data, self.names)
+        names = list(filter(lambda a: a in data, self.names))
         return Segment(names, data)
 
     def __and__(self, other):
@@ -115,7 +115,7 @@ class Segment(object):
         """Return feature values as a list of strings"""
         if not names:
             names = self.names
-        return map(lambda x: self.n2s[x], self.numeric())
+        return list(map(lambda x: self.n2s[x], self.numeric()))
 
     def distance(self, other):
         """Compute a distance between `self` and `other`
