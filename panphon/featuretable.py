@@ -4,6 +4,7 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 import os.path
+import unicodedata
 
 import numpy
 import pkg_resources
@@ -87,7 +88,9 @@ class FeatureTable(object):
         Returns:
             list: list of strings corresponding to segments found in `word`
         """
-        return [m.group('all') for m in self.seg_regex.finditer(word)]
+        word = unicodedata.normalize('NFD', word)
+        return [unicodedata.normalize('NFC', m.group('all'))
+                for m in self.seg_regex.finditer(word)]
 
     def validate_word(self, word):
         """Returns True if `word` consists exhaustively of valid IPA segments
