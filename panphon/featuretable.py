@@ -38,7 +38,7 @@ class FeatureTable(object):
             header = next(reader)
             names = header[1:]
             for row in reader:
-                ipa = row[0]
+                ipa = unicodedata.normalize('NFD', row[0])
                 vals = [{'-': -1, '0': 0, '+': 1}[x] for x in row[1:]]
                 vec = Segment(names,
                               {n: v for (n, v) in zip(names, vals)},
@@ -89,7 +89,7 @@ class FeatureTable(object):
             list: list of strings corresponding to segments found in `word`
         """
         word = unicodedata.normalize('NFD', word)
-        return [unicodedata.normalize('NFC', m.group('all'))
+        return [unicodedata.normalize('NFD', m.group('all'))
                 for m in self.seg_regex.finditer(word)]
 
     def validate_word(self, word):
