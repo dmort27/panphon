@@ -1,10 +1,10 @@
 from setuptools import setup
 
 setup(name='panphon',
-      version='0.15',
+      version='0.16',
       description='Tools for using the International Phonetic Alphabet with phonological features',
       url='https://github.com/dmort27/panphon',
-      download_url='https://github.com/dmort27/panphon/archive/0.15.tar.gz',
+      download_url='https://github.com/dmort27/panphon/archive/0.16.tar.gz',
       author='David R. Mortensen',
       author_email='dmortens@cs.cmu.edu',
       license='MIT',
