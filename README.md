@@ -251,7 +251,9 @@ The IPA Character Table is a CSV file in which the first column contains an IPA 
 * **lo**: low (vowel/consonant, not tone)
 * **back**: back
 * **round**: round
+* **velaric**: velaric airstream mechanism (click)
 * **tense**: tense
+* **long**: long
 
 Inspiration for the data in these tables is drawn primarily from two sources: the data files for [HsSPE](https://github.com/dmort27/HsSPE) and Bruce Hayes's [feature spreadsheet](http://www.linguistics.ucla.edu/people/hayes/IP/#features). It has since be re-rationalizeds based on evidence from a wide range of sources. As such, any special relationship to these prior inspirations has been eliminated.
 
