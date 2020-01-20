@@ -698,3 +698,54 @@ class Distance(object):
                                       [[]],
                                       source,
                                       target) / maxlen
+
+    def partial_hamming_substitution_cost(self, v1, v2):
+        """Substitution cost for feature vectors computed in a manner sensitive to specification.
+
+        Substitution cost for feature vectors computed so that
+        specified-to-specified costs 1/|V| and specified-to-unspecified costs
+        1/2*|V|.
+
+        Args: v1 (list): feature vector v2 (list): feature vector
+
+        Returns: float: Special edit distance where substitutions are less
+        expensive of one of the features is not specified
+        """
+        def subcost(ft1, ft2):
+            if ft1 == ft2:
+                return 0
+            elif ft1 == 0 or ft2 == 0:
+                return 0.5
+            else:
+                return 1
+        diffs = [subcost(ft1, ft2) for (ft1, ft2) in zip(v1, v2)]
+        return sum(diffs) / len(diffs)
+
+    @xsampaopt
+    def partial_hamming_feature_edit_distance(self, source, target, xsampa=False):
+        """String edit distance with insdel cost = 1 and sub costs are 1/22 or 1/44 depending on specification.
+
+        This method implements a distance metric which is neither identical to
+        hamming distance nor to feature edit distance.
+
+        The insertion/deletion cost for segment is always 1. The cost of
+        substituting a specified feature for a specified feature is 1/|V| where
+        |V| is the number of dimensions in a feature vector. The cost of
+        substituting a feature specification for an unspecified feature is
+        1/2*|V|.
+
+        This function has no normalization and should obey the triangle
+        inequality and thus provide a true distance metric.
+
+        Args: source (unicode): source string target (unicode): target string
+            xsampa (bool): source and target are X-SAMPA
+
+        Returns: float: Partial hamming eature edit distance between `source` and
+            `target`
+        """
+        return self.min_edit_distance(lambda v: 1,
+                                      lambda v: 1,
+                                      self.partial_hamming_substitution_cost,
+                                      [[]],
+                                      self.fm.word_to_vector_list(source, numeric=True),
+                                      self.fm.word_to_vector_list(target, numeric=True))
