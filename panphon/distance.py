@@ -367,7 +367,8 @@ class Distance(object):
 
                    Raw result is divided by the length of the longest argument
         """
-        maxlen = max(len(source), len(target))
+        source_len, target_len = len(self.fm.word_to_vector_list(source)), len(self.fm.word_to_vector_list(target))
+        maxlen = max(source_len, target_len)
         return self.feature_edit_distance(source, target) / maxlen
 
     @zerodiviszero
@@ -387,7 +388,8 @@ class Distance(object):
 
                    Raw result is divided by the length of the longest argument
         """
-        maxlen = max(len(source), len(target))
+        source_len, target_len = len(self.fm.word_to_vector_list(source)), len(self.fm.word_to_vector_list(target))
+        maxlen = max(source_len, target_len)
         return self.jt_feature_edit_distance(source, target) / maxlen
 
     def hamming_substitution_cost(self, v1, v2):
