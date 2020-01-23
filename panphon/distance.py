@@ -742,12 +742,48 @@ class Distance(object):
         Args: source (unicode): source string target (unicode): target string
             xsampa (bool): source and target are X-SAMPA
 
-        Returns: float: Partial hamming eature edit distance between `source` and
-            `target`
+        Returns: float: Partial hamming feature edit distance between `source`
+            and `target`
         """
+        source = self.fm.word_to_vector_list(source, numeric=True)
+        target = self.fm.word_to_vector_list(target, numeric=True)
         return self.min_edit_distance(lambda v: 1,
                                       lambda v: 1,
                                       self.partial_hamming_substitution_cost,
                                       [[]],
-                                      self.fm.word_to_vector_list(source, numeric=True),
-                                      self.fm.word_to_vector_list(target, numeric=True))
+                                      source,
+                                      target)
+
+    @zerodiviszero
+    @xsampaopt
+    def partial_hamming_feature_edit_distance_div_maxlen(self, source, target, xsampa=False):
+        """String edit distance with insdel cost = 1 and sub costs are 1/22 or 1/44 depending on specification.
+
+        This method implements a distance metric which is neither identical to
+        hamming distance nor to feature edit distance and normalizes it by the
+        longest input.
+
+        The insertion/deletion cost for segment is always 1. The cost of
+        substituting a specified feature for a specified feature is 1/|V| where
+        |V| is the number of dimensions in a feature vector. The cost of
+        substituting a feature specification for an unspecified feature is
+        1/2*|V|.
+
+        This method is normalized and does not satisfy the triangle inequality.
+        It is thus not a true distance metric.
+
+        Args: source (unicode): source string target (unicode): target string
+            xsampa (bool): source and target are X-SAMPA
+
+        Returns: float: Normalized partial hamming feature edit distance between
+            `source` and `target`
+        """
+        source = self.fm.word_to_vector_list(source, numeric=True)
+        target = self.fm.word_to_vector_list(target, numeric=True)
+        maxlen = max(len(source), len(target))
+        return self.min_edit_distance(lambda v: 1,
+                                      lambda v: 1,
+                                      self.partial_hamming_substitution_cost,
+                                      [[]],
+                                      source,
+                                      target) / maxlen
