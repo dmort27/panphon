@@ -1,3 +1,4 @@
+IPA,X-SAMPA,Name
 p,p,vl bilabial plosive
 b,b,vd bilabial plosive
 t,t,vl alveolar plosive
@@ -40,7 +41,7 @@ z,z,vd alveolar fricative
 x,x,vl velar fricative
 ɣ,G,vd velar fricative
 χ,X,vl uvular fricative
-ʁ,R\,vd uvular fricative
+ʁ,R,vd uvular fricative
 ħ,X\,vl pharyngeal fricative
 ʕ,?\,vd pharyngeal fricative
 h,h,vl glottal fricative
@@ -80,6 +81,7 @@ e,e,close-mid front unrounded
 ɤ,7,close-mid back unrounded
 o,o,close-mid back rounded
 ə,@,schwa
+ɘ,@\,close-mid central unrounded vowel
 ɵ,8,rounded schwa
 ɛ,E,open-mid front unrounded
 œ,9,front open-mid rounded
@@ -88,6 +90,7 @@ o,o,close-mid back rounded
 æ,{,mid-open front unrounded vowel
 ɐ,6,open-mid schwa
 a,a,open front unrounded
+ă,a_X,extra short open front unrounded
 ɶ,&,front open rounded
 ɑ,A,open back unrounded
 ɒ,Q,open back rounded
@@ -115,7 +118,6 @@ a,a,open front unrounded
 ̴,_e,velarized or pharyngealized
 ̝,_r,raised
 ̞,_o,lowered
-ˀ,_k,glottalized
 ̃,~,nasalized
 ⁿ,_n,nasal release
 ˡ,_l,lateral release
@@ -132,7 +134,7 @@ a,a,open front unrounded
 ː,:,length mark
 ˑ,:\,half-length
 ̆,_X,extra-short
-0,none,syllable break
+.,.,syllable break
 ʍ,W,vl labial-velar fricative
 w,w,vd labio-velar approximant
 ɥ,H,labial-palatal approximant
@@ -143,7 +145,7 @@ w,w,vd labio-velar approximant
 ʑ,z\,vl alveolopalatal fricative
 ʘ,O\,bilabial click
 ǀ,|\,dental click
-!,!\,click
+ǃ,!\,click
 ǂ,'=\,alveolar click
 ǁ,|\|\,alveolar lateral click
 ɺ,l\,vl alveolar lateral flap
@@ -155,21 +157,17 @@ w,w,vd labio-velar approximant
 ɫ,5,velarized vl alveolar lateral
 ʄ,J\_<,vl palatal implosive
 ʼ,_>,ejective
-ʤ,dZ,vd postalveolar affricate
-ʴ,none,rhotacized
 ɝ,3`,rhotacized open-mid central
-t͡s,ts,voiceless alveolar affricate
-d͡z,dz,voiced alveolar affricate
-t͡ʃ,tS,
-d͡ʒ,dZ,
-t͡ɕ,ts\,
-d͡ʑ,dz\,
-t͡ɬ,tK,
-k͡p,kp,
-g͡b,gb,
-ŋ͡m,Nm,
-ʈ͡ʂ,ts`,
-ɖ͡ʐ,dz`,
+t͡ʃ,tS,vl postalveolar affricate
+d͡ʒ,dZ,vd postalveolar affricate
+t͡ɕ,ts\,vl alveolo-palatal affricate
+d͡ʑ,dz\,vd alveolo-palatal affricate
+t͡ɬ,tK,vl alveolar lateral affricate
+k͡p,kp,vl labial-velar plosive
+g͡b,gb,vd labial-velar plosive
+ŋ͡m,Nm,labial-velar nasal stop
+ʈ͡ʂ,ts`,vl retroflex affricate
+ɖ͡ʐ,tz`,vd retroflex affricate
 ˩,_B,extra low tone
 ˨,_L,low tone
 ˧,_M,mid tone 
