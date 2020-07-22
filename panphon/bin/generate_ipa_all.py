@@ -115,7 +115,7 @@ def read_ipa_bases(ipa_bases):
 
 
 def parse_dia_defs(dia_defs):
-    defs = yaml.load(codecs.open(dia_defs, "r", "utf-8").read())
+    defs = yaml.load(codecs.open(dia_defs, "r", "utf-8").read(), Loader=yaml.FullLoader)
     diacritics = {}
     for dia in defs['diacritics']:
         if 'exclude' in dia:
@@ -134,7 +134,7 @@ def parse_dia_defs(dia_defs):
 
 def sort_all_segments(sort_order, all_segments):
     all_segments_list = list(all_segments)
-    field_order = reversed(yaml.load(open(sort_order, 'r').read()))
+    field_order = reversed(yaml.load(open(sort_order, 'r').read(), Loader=yaml.FullLoader))
     for field in field_order:
         all_segments_list.sort(key=lambda seg: seg.features[field['name']],
                                reverse=field['reverse'])
