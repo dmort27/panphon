@@ -22,7 +22,7 @@ class Collapser(object):
         fn = pkg_resources.resource_filename(__name__, fn)
         with open(fn, 'r') as f:
             rules = []
-            table = yaml.load(f.read())
+            table = yaml.load(f.read(), Loader=yaml.FullLoader)
             for rule in table:
                 rules.append((_panphon.fts(rule['def']), rule['label']))
         return rules
