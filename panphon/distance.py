@@ -70,7 +70,7 @@ class Distance(object):
             __name__, filename)
         with open(filename, 'r') as f:
             rules = []
-            dogol_prime = yaml.load(f.read())
+            dogol_prime = yaml.load(f.read(), Loader=yaml.FullLoader)
             for rule in dogol_prime:
                 rules.append((ftstr2dict(rule['def']), rule['label']))
         return rules
