@@ -23,6 +23,13 @@ feature_sets = {
 
 class FeatureTable(object):
     def __init__(self, feature_set='spe+'):
+        """
+        Initialize the weights.
+
+        Args:
+            self: (todo): write your description
+            feature_set: (todo): write your description
+        """
         bases_fn, weights_fn = feature_sets[feature_set]
         self.weights = self._read_weights(weights_fn)
         self.segments, self.seg_dict, self.names = self._read_bases(bases_fn, self.weights)
@@ -31,6 +38,14 @@ class FeatureTable(object):
         self.xsampa = xsampa.XSampa()
 
     def _read_bases(self, fn, weights):
+        """
+        Read bases file.
+
+        Args:
+            self: (todo): write your description
+            fn: (str): write your description
+            weights: (array): write your description
+        """
         fn = pkg_resources.resource_filename(__name__, fn)
         segments = []
         with open(fn, 'rb') as f:
@@ -48,6 +63,13 @@ class FeatureTable(object):
         return segments, seg_dict, names
 
     def _read_weights(self, weights_fn):
+        """
+        Read weights from a csv file.
+
+        Args:
+            self: (todo): write your description
+            weights_fn: (str): write your description
+        """
         weights_fn = pkg_resources.resource_filename(__name__, weights_fn)
         with open(weights_fn, 'rb') as f:
             reader = csv.reader(f, encoding='utf-8')
@@ -56,10 +78,23 @@ class FeatureTable(object):
         return weights
 
     def _build_seg_regex(self):
+        """
+        Build a compiled regex for a regular expression
+
+        Args:
+            self: (todo): write your description
+        """
         segs = sorted(self.seg_dict.keys(), key=lambda x: len(x), reverse=True)
         return re.compile(r'(?P<all>{})'.format('|'.join(segs)))
 
     def fts(self, ipa):
+        """
+        Return the ipa associated with the given ipa.
+
+        Args:
+            self: (todo): write your description
+            ipa: (array): write your description
+        """
         if ipa in self.seg_dict:
             return self.seg_dict[ipa]
         else:

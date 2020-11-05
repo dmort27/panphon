@@ -96,6 +96,12 @@ def word2array(ft_names, word):
     vdict = {'+': 1, '-': -1, '0': 0}
 
     def seg2col(seg):
+        """
+        Convert seg2 seg2 column names.
+
+        Args:
+            seg: (todo): write your description
+        """
         seg = dict([(k, v) for (v, k) in seg])
         return [vdict[seg[ft]] for ft in ft_names]
     return numpy.array([seg2col(s) for s in word], order='F')
@@ -144,6 +150,16 @@ class FeatureTable(object):
         return segments, seg_dict, names
 
     def _read_weights(self, filename=os.path.join('data', 'feature_weights.csv')):
+        """
+        Read the weights from a csv file.
+
+        Args:
+            self: (todo): write your description
+            filename: (str): write your description
+            os: (str): write your description
+            path: (str): write your description
+            join: (str): write your description
+        """
         filename = pkg_resources.resource_filename(
             __name__, filename)
         with open(filename, 'rb') as f:
@@ -153,6 +169,12 @@ class FeatureTable(object):
         return weights
 
     def _build_seg_regex(self):
+        """
+        Build a compiled regex for a regular expression
+
+        Args:
+            self: (todo): write your description
+        """
         # Build a regex that will match individual segments in a string.
         segs = sorted(self.seg_dict.keys(), key=lambda x: len(x), reverse=True)
         return re.compile(r'(?P<all>{})'.format('|'.join(segs)))
@@ -510,6 +532,13 @@ class FeatureTable(object):
         return [ft_dict[name] for name in self.names]
 
     def tensor_to_numeric(self, t):
+        """
+        Convert a tensor to a tensor.
+
+        Args:
+            self: (todo): write your description
+            t: (todo): write your description
+        """
         return list(map(lambda a:
                     list(map(lambda b: {'+': 1, '-': -1, '0': 0}[b], a)), t))
 

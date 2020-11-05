@@ -66,6 +66,13 @@ class Diacritic(object):
         self.content = content
 
     def match(self, segment):
+        """
+        Returns true if the given segment matches the given segment.
+
+        Args:
+            self: (todo): write your description
+            segment: (int): write your description
+        """
         if segment.form not in self.exclude:
             for condition in self.conditions:
                 if set(condition.items()) <= set(segment.features.items()):
@@ -75,6 +82,13 @@ class Diacritic(object):
             return False
 
     def apply(self, segment):
+        """
+        Return a new segment.
+
+        Args:
+            self: (todo): write your description
+            segment: (int): write your description
+        """
         if self.match(segment):
             new_seg = copy.deepcopy(segment)
             for k, v in self.content.items():
@@ -90,10 +104,26 @@ class Diacritic(object):
 
 class Combination(object):
     def __init__(self, diacritics, name, sequence):
+        """
+        Initialize diacics.
+
+        Args:
+            self: (todo): write your description
+            diacritics: (todo): write your description
+            name: (str): write your description
+            sequence: (todo): write your description
+        """
         self.name = name
         self.sequence = [diacritics[d] for d in sequence]
 
     def apply(self, segment):
+        """
+        Apply a new segment to a new segment.
+
+        Args:
+            self: (todo): write your description
+            segment: (int): write your description
+        """
         new_seg = copy.deepcopy(segment)
         for dia in self.sequence:
             if dia.match(new_seg):
@@ -104,6 +134,12 @@ class Combination(object):
 
 
 def read_ipa_bases(ipa_bases):
+    """
+    Parse ipa - formatted ipa - format.
+
+    Args:
+        ipa_bases: (str): write your description
+    """
     segments = []
     with open(ipa_bases, 'rb') as f:
         dictreader = csv.DictReader(f, encoding='utf=8')
@@ -115,6 +151,12 @@ def read_ipa_bases(ipa_bases):
 
 
 def parse_dia_defs(dia_defs):
+    """
+    Parse dia dia file.
+
+    Args:
+        dia_defs: (todo): write your description
+    """
     defs = yaml.load(codecs.open(dia_defs, "r", "utf-8").read(), Loader=yaml.FullLoader)
     diacritics = {}
     for dia in defs['diacritics']:
@@ -133,6 +175,13 @@ def parse_dia_defs(dia_defs):
 
 
 def sort_all_segments(sort_order, all_segments):
+    """
+    Sort segmentlist_order order.
+
+    Args:
+        sort_order: (todo): write your description
+        all_segments: (todo): write your description
+    """
     all_segments_list = list(all_segments)
     field_order = reversed(yaml.load(open(sort_order, 'r').read(), Loader=yaml.FullLoader))
     for field in field_order:
@@ -142,6 +191,15 @@ def sort_all_segments(sort_order, all_segments):
 
 
 def write_ipa_all(ipa_bases, ipa_all, all_segments, sort_order):
+    """
+    Write a list ipa list of ipa list of ipa_all_all_segments.
+
+    Args:
+        ipa_bases: (list): write your description
+        ipa_all: (str): write your description
+        all_segments: (todo): write your description
+        sort_order: (str): write your description
+    """
     with open(ipa_bases, 'rb') as f:
         reader = csv.reader(f, encoding='utf-8')
         fieldnames = next(reader)
@@ -156,6 +214,15 @@ def write_ipa_all(ipa_bases, ipa_all, all_segments, sort_order):
 
 
 def main(ipa_bases, ipa_all, dia_defs, sort_order):
+    """
+    Main function.
+
+    Args:
+        ipa_bases: (str): write your description
+        ipa_all: (str): write your description
+        dia_defs: (int): write your description
+        sort_order: (int): write your description
+    """
     segments = read_ipa_bases(ipa_bases)
     diacritics, combinations = parse_dia_defs(dia_defs)
     all_segments = set(segments)
