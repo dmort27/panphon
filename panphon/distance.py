@@ -14,7 +14,18 @@ from . import _panphon, permissive, featuretable, xsampa
 
 
 def zerodiviszero(f):
+    """
+    Decorator to be called function f.
+
+    Args:
+        f: (todo): write your description
+    """
     def wrapper(*args, **kwargs):
+        """
+        Decorator to wrap the wrapped function.
+
+        Args:
+        """
         try:
             return f(*args, **kwargs)
         except ZeroDivisionError:
@@ -23,7 +34,18 @@ def zerodiviszero(f):
 
 
 def xsampaopt(f):
+    """
+    Decorator to convert a function into a function.
+
+    Args:
+        f: (todo): write your description
+    """
     def wrapper(*args, **kwargs):
+        """
+        Decorator todo.
+
+        Args:
+        """
         if 'xsampa' in kwargs and kwargs['xsampa']:
             self, source, target = args
             source = self.xs.convert(source)
@@ -34,6 +56,12 @@ def xsampaopt(f):
 
 
 def ftstr2dict(ftstr):
+    """
+    Convert ftstr to dict
+
+    Args:
+        ftstr: (str): write your description
+    """
     fts = {}
     for m in re.finditer(r'([-0+])(\w+)', ftstr):
         v, k = m.groups()
@@ -714,6 +742,13 @@ class Distance(object):
         expensive of one of the features is not specified
         """
         def subcost(ft1, ft2):
+            """
+            R returns the cost.
+
+            Args:
+                ft1: (todo): write your description
+                ft2: (todo): write your description
+            """
             if ft1 == ft2:
                 return 0
             elif ft1 == 0 or ft2 == 0:

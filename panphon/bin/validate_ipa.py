@@ -19,6 +19,13 @@ class Validator(object):
         self._validate_file(infile)
 
     def _validate_file(self, infile):
+        """
+        Validate file.
+
+        Args:
+            self: (todo): write your description
+            infile: (str): write your description
+        """
         for line in infile:
             line = unicode(line, 'utf-8')
             self.validate_line(line)

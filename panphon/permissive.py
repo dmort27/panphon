@@ -14,10 +14,23 @@ from . import _panphon, xsampa
 
 
 def flip(s):
+    """
+    Flip two - b
+
+    Args:
+        s: (array): write your description
+    """
     return [(b, a) for (a, b) in s]
 
 
 def update_ft_set(seg, dia):
+    """
+    Update the set of the set
+
+    Args:
+        seg: (dict): write your description
+        dia: (todo): write your description
+    """
     seg = dict(flip(seg))
     seg.update(dia)
     return flip(set(seg.items()))
@@ -56,6 +69,13 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         self.weights = self._read_weights()
 
     def _read_ipa_bases(self, fn):
+        """
+        Read bcbio.
+
+        Args:
+            self: (todo): write your description
+            fn: (str): write your description
+        """
         fn = pkg_resources.resource_filename(__name__, fn)
         with open(fn, 'rb') as f:
             reader = csv.reader(f, encoding='utf-8', delimiter=str(','))
@@ -67,6 +87,13 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         return bases, names
 
     def _read_dias(self, fn):
+        """
+        Read dia file.
+
+        Args:
+            self: (todo): write your description
+            fn: (str): write your description
+        """
         prefix, postfix = {}, {}
         with codecs.open(fn, 'r', 'utf-8') as f:
             defs = yaml.load(f.read(), Loader=yaml.FullLoader)
@@ -78,6 +105,15 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         return prefix, postfix
 
     def _compile_seg_regexes(self, bases, prefix, postfix):
+        """
+        Compile a regular expression.
+
+        Args:
+            self: (todo): write your description
+            bases: (todo): write your description
+            prefix: (str): write your description
+            postfix: (str): write your description
+        """
         pre_jnd = '|'.join(prefix.keys())
         post_jnd = '|'.join(postfix.keys())
         bases_jnd = '|'.join(bases.keys())
@@ -87,9 +123,25 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         return re.compile(pre_re), re.compile(post_re), re.compile(seg_re)
 
     def _build_seg_regex(self):
+        """
+        Builds a regular expression.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.seg_regex
 
     def _read_weights(self, filename=os.path.join('data', 'feature_weights.csv')):
+        """
+        Read the weights from a csv file.
+
+        Args:
+            self: (todo): write your description
+            filename: (str): write your description
+            os: (str): write your description
+            path: (str): write your description
+            join: (str): write your description
+        """
         filename = pkg_resources.resource_filename(
             __name__, filename)
         with open(filename, 'rb') as f:
@@ -183,6 +235,12 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
                   object
         """
         def whole_seg(seg):
+            """
+            Determine if the number of the segments.
+
+            Args:
+                seg: (todo): write your description
+            """
             m = self.seg_regex.match(seg)
             if m and m.group(0) == seg:
                 return True
@@ -191,7 +249,20 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         return list(filter(whole_seg, segs))
 
     def segment_word_segments(self, word):
+        """
+        Return a segment segments from word into a segment segments.
+
+        Args:
+            self: (todo): write your description
+            word: (str): write your description
+        """
         def n2s(s):
+            """
+            Convert string s to a number.
+
+            Args:
+                s: (int): write your description
+            """
             if s is None:
                 return ''
             else:
@@ -201,4 +272,10 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
 
     @property
     def all_segs_matching_fts(self):
+        """
+        Matches the segs : class :
+
+        Args:
+            self: (todo): write your description
+        """
         raise AttributeError("'PermissiveFeatureTable' object has no attribute 'all_segs_matching_fts'")

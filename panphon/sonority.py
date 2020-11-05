@@ -22,6 +22,12 @@ class BoolTree(object):
         self.f_node = f_node
 
     def get_value(self):
+        """
+        Returns the value of a node.
+
+        Args:
+            self: (todo): write your description
+        """
         if self.test:
             if isinstance(self.t_node, BoolTree):
                 return self.t_node.get_value()
@@ -60,6 +66,12 @@ class Sonority(object):
         """
 
         def match(m):
+            """
+            Return true if segments of the segment.
+
+            Args:
+                m: (todo): write your description
+            """
             return self.fm.match(fts(m), seg)
 
         minusHi = BoolTree(match('-hi'), 9, 8)
