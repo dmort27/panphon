@@ -69,7 +69,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
     def _read_dias(self, fn):
         prefix, postfix = {}, {}
         with codecs.open(fn, 'r', 'utf-8') as f:
-            defs = yaml.load(f.read())
+            defs = yaml.load(f.read(), Loader=yaml.FullLoader)
             for dia in defs['diacritics']:
                 if dia['position'] == 'pre':
                     prefix[dia['marker']] = dia['content']
