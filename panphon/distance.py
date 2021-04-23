@@ -560,7 +560,7 @@ class Distance(object):
             float: sum of weighted feature difference for each feature pair in
                    zip(v1, v2)
         """
-        return sum([abs(ft1 - ft2) / 2 * w
+        return sum([abs(ft1 - ft2) * w
                     for (w, ft1, ft2)
                     in zip(self.fm.weights, v1, v2)]) * gl_wt
 
