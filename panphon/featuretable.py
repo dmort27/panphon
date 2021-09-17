@@ -5,6 +5,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import os.path
 import unicodedata
+import collections
 
 import numpy
 import pkg_resources
@@ -128,6 +129,26 @@ class FeatureTable(object):
             ndarray: segments in rows, features in columns as [-1, 0, 1]
         """
         return numpy.array([s.numeric(ft_names) for s in self.word_fts(word)])
+
+    def bag_of_features(self, word):
+        """Return a vector in which each dimension is the number of times a feature-value pair occurs in the word
+        
+        Args:
+            word (unicode): word consisting of IPA segments
+
+        Returns:
+            array: array of integers corresponding to a bag of feature-value pair counts
+        """
+        word_features = self.word_fts(word)
+        features = [v + f for f in self.names for v in ['+', '0', '-']]
+        bag = collections.OrderedDict()
+        for f in features:
+            bag[f] = 0
+        vdict = {-1: '-', 0: '0', 1: '+'}
+        for w in word_features:
+            for (f, v) in w.items():
+                bag[vdict[v] + f] += 1
+        return numpy.array(list(bag.values()))
 
     def seg_known(self, segment):
         """Return True if `segment` is in segment <=> features database
