@@ -6,6 +6,8 @@ import panphon.featuretable
 
 
 class TestFeatureTable(unittest.TestCase):
+    LONG_IPA_STRING = 'tɐʉmɐtɐ.ɸɐkɐtɐŋihɐŋɐ.koːɐʉɐʉ.ɔ.tɐmɐtɛɐ.tʉɾi.pʉkɐkɐ.piki.mɐʉŋɐ.hɔɾɔ.nʉkʉ.pɔkɐi.ɸɛnʉɐ.ki.tɐnɐ.tɐhʉ'
+    TIMING_REPETITIONS = 1000
 
     def setUp(self):
         self.ft = panphon.featuretable.FeatureTable()
@@ -46,6 +48,22 @@ class TestFeatureTable(unittest.TestCase):
 
     def test_word_to_vector_list_aspiration_xsampa_len(self):
         self.assertEqual(len(self.ft.word_to_vector_list(u'p_h', xsampa=True)), 1)
+
+    def test_normalization(self):
+        u1 = 'ũ'
+        u2 = 'ũ'
+        assert len(u1) == 1 and len(u2) == 2
+        self.assertEqual(self.ft.longest_one_seg_prefix(u1), self.ft.longest_one_seg_prefix(u2))
+        self.assertEqual(self.ft.ipa_segs(u1), self.ft.ipa_segs(u2))
+        self.assertEqual(self.ft.segs_safe(u1), self.ft.segs_safe(u2))
+
+    def test_ipa_segs_timing(self):
+        for _ in range(self.TIMING_REPETITIONS):
+            self.ft.ipa_segs(self.LONG_IPA_STRING)
+
+    def test_segs_safe_timing(self):
+        for _ in range(self.TIMING_REPETITIONS):
+            self.ft.segs_safe(self.LONG_IPA_STRING)
 
 class TestIpaRe(unittest.TestCase):
 
