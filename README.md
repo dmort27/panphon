@@ -177,9 +177,9 @@ A Python implementation of Levenshtein's string edit distance.
 
 A C implementation of Levenshtein's string edit distance. Unsurprisingly, must faster than the former.
 
-`panphon.distance.Distance` .**dogol_prime_distance**
+`panphon.distance.Distance` .**dolgo_prime_distance**
 
-Fast Levenshtein distance after collapsing segments into an enhanced version of Dogolpolsky's equivalence classes.
+Fast Levenshtein distance after collapsing segments into an enhanced version of Dolgopolsky's equivalence classes.
 
 `panphon.distance.Distance` .**feature_edit_distance**
 
@@ -197,9 +197,9 @@ Edit distance where costs of feature edits are differently weighted depending on
 ```python
 >>> import panphon.distance
 >>> dst = panphon.distance.Distance()
->>> dst.dogol_prime_distance(u'pops', u'bobz')
+>>> dst.dolgo_prime_distance(u'pops', u'bobz')
 0
->>> dst.dogol_prime_distance(u'pops', u'bobo')
+>>> dst.dolgo_prime_distance(u'pops', u'bobo')
 1
 ```
 
@@ -255,7 +255,7 @@ The IPA Character Table is a CSV file in which the first column contains an IPA 
 * **tense**: tense
 * **long**: long
 
-Inspiration for the data in these tables is drawn primarily from two sources: the data files for [HsSPE](https://github.com/dmort27/HsSPE) and Bruce Hayes's [feature spreadsheet](http://www.linguistics.ucla.edu/people/hayes/IP/#features). It has since be re-rationalizeds based on evidence from a wide range of sources. As such, any special relationship to these prior inspirations has been eliminated.
+Inspiration for the data in these tables is drawn primarily from two sources: the data files for [HsSPE](https://github.com/dmort27/HsSPE) and Bruce Hayes's [feature spreadsheet](http://www.linguistics.ucla.edu/people/hayes/IP/#features). It has since been re-rationalized based on evidence from a wide range of sources. As such, any special relationship to these prior inspirations has been eliminated.
 
 The IPA Character Table `ipa_bases.csv` is intended to contain all of the unmodified segmental symbols in IPA, as well as all common affricates and dually-articulated segments. It is meant to be augmented by the rule-driven application of diacritics and modifiers.
 
