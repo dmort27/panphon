@@ -53,7 +53,6 @@ class TestFeatureTable(unittest.TestCase):
         u1 = '\u00e3'
         u2 = 'a\u0303'
         self.assertEqual(self.ft.ipa_segs(u1), self.ft.ipa_segs(u2))
-        self.assertEqual(self.ft.segs_safe(u1), self.ft.segs_safe(u2))
 
     def test_ipa_segs_timing(self):
         for _ in range(self.TIMING_REPETITIONS):
