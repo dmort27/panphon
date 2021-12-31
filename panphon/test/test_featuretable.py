@@ -50,10 +50,8 @@ class TestFeatureTable(unittest.TestCase):
         self.assertEqual(len(self.ft.word_to_vector_list(u'p_h', xsampa=True)), 1)
 
     def test_normalization(self):
-        u1 = 'ũ'
-        u2 = 'ũ'
-        assert len(u1) == 1 and len(u2) == 2
-        self.assertEqual(self.ft.longest_one_seg_prefix(u1), self.ft.longest_one_seg_prefix(u2))
+        u1 = '\u00e3'
+        u2 = 'a\u0303'
         self.assertEqual(self.ft.ipa_segs(u1), self.ft.ipa_segs(u2))
         self.assertEqual(self.ft.segs_safe(u1), self.ft.segs_safe(u2))
 
