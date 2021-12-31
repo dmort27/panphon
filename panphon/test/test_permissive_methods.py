@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals, division, absolute_impo
 import unittest
 from panphon import permissive
 
+dim = 24
 
 class TestFeatureTableAPI(unittest.TestCase):
 
@@ -11,10 +12,10 @@ class TestFeatureTableAPI(unittest.TestCase):
         self.ft = permissive.PermissiveFeatureTable()
 
     def test_fts(self):
-        self.assertEqual(len(self.ft.fts('u')), 22)
+        self.assertEqual(len(self.ft.fts('u')), dim)
 
     # def test_seg_fts(self):
-    #     self.assertEqual(len(self.ft.seg_fts('p')), 21)
+    #     self.assertEqual(len(self.ft.seg_fts('p')), 24)
 
     def test_match(self):
         self.assertTrue(self.ft.match(self.ft.fts('u'), self.ft.fts('u')))
@@ -75,7 +76,7 @@ class TestFeatureTableAPI(unittest.TestCase):
         pass
 
     def test_segment_to_vector(self):
-        self.assertEqual(len(self.ft.segment_to_vector('p')), 22)
+        self.assertEqual(len(self.ft.segment_to_vector('p')), dim)
 
     def test_word_to_vector_list(self):
         self.assertEqual(len(self.ft.word_to_vector_list('pup')), 3)
