@@ -15,6 +15,7 @@ import unicodecsv as csv
 
 from . import xsampa
 from .segment import Segment
+from functools import reduce
 
 feature_sets = {
     'spe+': (os.path.join('data', 'ipa_all.csv'),
@@ -117,6 +118,8 @@ class FeatureTable(object):
         Returns:
             list: list of strings corresponding to segments found in `word`
         """
+        if normalize:
+            word = FeatureTable.normalize(word)
         return self._segs(word, include_invalid=False, normalize=normalize)
 
     def validate_word(self, word, normalize=True):
@@ -208,6 +211,8 @@ class FeatureTable(object):
             list: list of Unicode IPA strings corresponding to segments in
                   `word`
         """
+        if normalize:
+            word = FeatureTable.normalize(word)
         return self._segs(word, include_invalid=True, normalize=normalize)
 
     def _segs(self, word, *, include_valid=True, include_invalid, normalize):
