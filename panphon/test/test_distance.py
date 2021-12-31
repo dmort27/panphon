@@ -132,13 +132,6 @@ class TestMany(unittest.TestCase):
     def test_jt_hamming_feature_edit_distance_div_maxlen(self):
         self.assertEqual(self.dist.jt_hamming_feature_edit_distance_div_maxlen('p', 'b'), 1 / dim)
 
-    def test_weighted_feature_edit_distance(self):
-        self.assertEqual(self.dist.weighted_feature_edit_distance('p', 'b'), 1 / 8)
-
-    def test_weighted_feature_edit_distance_div_maxlen(self):
-        self.assertEqual(self.dist.weighted_feature_edit_distance_div_maxlen('p', 'b'), 1 / 8)
-
-
 class TestXSampa(unittest.TestCase):
     def setUp(self):
         self.dist = distance.Distance(feature_model=feature_model)
