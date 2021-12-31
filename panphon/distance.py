@@ -57,26 +57,26 @@ class Distance(object):
               'segment': featuretable.FeatureTable}
         self.fm = fm[feature_model](feature_set=feature_set)
         self.xs = xsampa.XSampa()
-        self.dogol_prime = self._dogolpolsky_prime()
+        self.dolgo_prime = self._dolgopolsky_prime()
 
-    def _dogolpolsky_prime(self, filename=os.path.join('data', 'dogolpolsky_prime.yml')):
-        """Reads Dogolpolsky classes and constructs function cascade
+    def _dolgopolsky_prime(self, filename=os.path.join('data', 'dolgopolsky_prime.yml')):
+        """Reads dolgopolsky classes and constructs function cascade
 
         Args:
             filename (str): path to YAML file (from panphon root) containing
-                            Dogolpolsky classes
+                            dolgopolsky classes
         """
         filename = pkg_resources.resource_filename(
             __name__, filename)
         with open(filename, 'r') as f:
             rules = []
-            dogol_prime = yaml.load(f.read(), Loader=yaml.FullLoader)
-            for rule in dogol_prime:
+            dolgo_prime = yaml.load(f.read(), Loader=yaml.FullLoader)
+            for rule in dolgo_prime:
                 rules.append((ftstr2dict(rule['def']), rule['label']))
         return rules
 
-    def map_to_dogol_prime(self, s):
-        """Map a string to Dogolpolsky' classes
+    def map_to_dolgo_prime(self, s):
+        """Map a string to dolgopolsky' classes
 
         Args:
             s (unicode): IPA word
@@ -87,7 +87,7 @@ class Distance(object):
         segs = []
         for seg in self.fm.seg_regex.finditer(s):
             fts = self.fm.fts(seg.group(0))
-            for mask, label in self.dogol_prime:
+            for mask, label in self.dolgo_prime:
                 if fts >= mask:
                     segs.append(label)
                     break
@@ -157,10 +157,10 @@ class Distance(object):
         maxlen = max(len(source), len(target))
         return int(editdistance.eval(source, target)) / maxlen
 
-    def dogol_prime_distance(self, source, target):
+    def dolgo_prime_distance(self, source, target):
         """Levenshtein distance using D' phonetic equivalence classes
 
-        `source` and `target` are converted to Dogolpolsky' equivalence classes
+        `source` and `target` are converted to dolgopolsky' equivalence classes
         (each segment is mapped to the appropriate class) and then the
         Levenshtein distance between the resulting representations is
         computed.
@@ -171,18 +171,18 @@ class Distance(object):
 
         Returns:
             int: minimum number of Levenshtein edits required to get from
-                 Dogolpolsky' versions of `source` to `target`
+                 dolgopolsky' versions of `source` to `target`
         """
-        source = self.map_to_dogol_prime(source)
-        target = self.map_to_dogol_prime(target)
+        source = self.map_to_dolgo_prime(source)
+        target = self.map_to_dolgo_prime(target)
         return self.fast_levenshtein_distance(source, target)
 
     @zerodiviszero
     @xsampaopt
-    def dogol_prime_distance_div_maxlen(self, source, target, xsampa=False):
+    def dolgo_prime_distance_div_maxlen(self, source, target, xsampa=False):
         """Levenshtein distance using D' classes, normalized by max length
 
-        `source` and `target` are converted to Dogolpolsky' equivalence classes
+        `source` and `target` are converted to dolgopolsky' equivalence classes
         (each segment is mapped to the appropriate class) and then the
         Levenshtein distance between the resulting representations is
         computed. The result is divided by the length of the longest argument
@@ -194,10 +194,10 @@ class Distance(object):
 
         Returns:
             int: minimum number of Levenshtein edits required to get from
-                 Dogolpolsky' versions of `source` to `target`
+                 dolgopolsky' versions of `source` to `target`
         """
-        source = self.map_to_dogol_prime(source)
-        target = self.map_to_dogol_prime(target)
+        source = self.map_to_dolgo_prime(source)
+        target = self.map_to_dolgo_prime(target)
         maxlen = max(len(source), len(target))
         return self.fast_levenshtein_distance(source, target) / maxlen
 

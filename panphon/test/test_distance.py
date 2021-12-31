@@ -20,15 +20,15 @@ class TestLevenshtein(unittest.TestCase):
         self.assertEqual(self.dist.levenshtein_distance('pop', 'pʰom'), 2)
 
 
-class TestDogolPrime(unittest.TestCase):
+class TestDolgoPrime(unittest.TestCase):
     def setUp(self):
         self.dist = distance.Distance(feature_model=feature_model)
 
     def test_trivial1(self):
-        self.assertEqual(self.dist.dogol_prime_distance('pop', 'bob'), 0)
+        self.assertEqual(self.dist.dolgo_prime_distance('pop', 'bob'), 0)
 
     def test_trivial2(self):
-        self.assertEqual(self.dist.dogol_prime_distance('pop', 'bab'), 0)
+        self.assertEqual(self.dist.dolgo_prime_distance('pop', 'bab'), 0)
 
 
 class TestUnweightedFeatureEditDist(unittest.TestCase):
@@ -102,11 +102,11 @@ class TestMany(unittest.TestCase):
     def test_fast_levenshtein_distance_div_maxlen(self):
         self.assertEqual(self.dist.fast_levenshtein_distance_div_maxlen('p', 'b'), 1)
 
-    def test_dogol_prime_distance(self):
-        self.assertEqual(self.dist.dogol_prime_distance('p', 'b'), 0)
+    def test_dolgo_prime_distance(self):
+        self.assertEqual(self.dist.dolgo_prime_distance('p', 'b'), 0)
 
-    def test_dogol_prime_div_maxlen(self):
-        self.assertEqual(self.dist.dogol_prime_distance_div_maxlen('p', 'b'), 0)
+    def test_dolgo_prime_div_maxlen(self):
+        self.assertEqual(self.dist.dolgo_prime_distance_div_maxlen('p', 'b'), 0)
 
     def test_feature_edit_distance(self):
         self.assertEqual(self.dist.feature_edit_distance('p', 'b'), 1 / dim)
