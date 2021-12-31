@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
+from os import stat
+import unicodedata
 
 import os.path
 from functools import reduce
@@ -124,6 +126,10 @@ class FeatureTable(object):
         self.longest_seg = max([len(x) for x in self.seg_dict.keys()])
         self.xsampa = xsampa.XSampa()
 
+    @staticmethod
+    def normalize(data):
+        return unicodedata.normalize('NFD', data)
+
     def _read_table(self, filename):
         """Read the data from data/ipa_all.csv into self.segments, a
         list of 2-tuples of unicode strings and sets of feature tuples and
@@ -218,8 +224,8 @@ class FeatureTable(object):
             unicode: longest single-segment prefix of `word` in database
         """
         if normalize:
-            word = featuretable.normalize(word)
-            
+            word = FeatureTable.normalize(word)
+
         for i in range(self.longest_seg, 0, -1):
             if word[:i] in self.seg_dict:
                 return word[:i]
