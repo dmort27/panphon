@@ -10,6 +10,8 @@ import pkg_resources
 import regex as re
 import unicodecsv as csv
 
+from panphon import featuretable
+
 from . import xsampa
 
 from panphon.errors import SegmentError
@@ -206,7 +208,7 @@ class FeatureTable(object):
         else:
             return None
 
-    def longest_one_seg_prefix(self, word):
+    def longest_one_seg_prefix(self, word, normalize=True):
         """Return longest Unicode IPA prefix of a word
 
         Args:
@@ -215,6 +217,9 @@ class FeatureTable(object):
         Returns:
             unicode: longest single-segment prefix of `word` in database
         """
+        if normalize:
+            word = featuretable.normalize(word)
+            
         for i in range(self.longest_seg, 0, -1):
             if word[:i] in self.seg_dict:
                 return word[:i]
