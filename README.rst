@@ -95,10 +95,10 @@ A Python implementation of Levenshtein's string edit distance.
 A C implementation of Levenshtein's string edit distance.
 Unsurprisingly, must faster than the former.
 
-``panphon.distance.Distance`` .\ **dogol\_prime\_distance**
+``panphon.distance.Distance`` .\ **dolgo\_prime\_distance**
 
 Fast Levenshtein distance after collapsing segments into an enhanced
-version of Dogolpolsky's equivalence classes.
+version of Dolgopolsky's equivalence classes.
 
 ``panphon.distance.Distance`` .\ **feature\_edit\_distance**
 
@@ -122,9 +122,9 @@ below:
 
     >>> import panphon.distance
     >>> dst = panphon.distance.Distance()
-    >>> dst.dogol_prime_distance(u'pops', u'bobz')
+    >>> dst.dolgo_prime_distance(u'pops', u'bobz')
     0
-    >>> dst.dogol_prime_distance(u'pops', u'bobo')
+    >>> dst.dolgo_prime_distance(u'pops', u'bobo')
     1
 
 Scripts
