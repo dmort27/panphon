@@ -12,7 +12,6 @@ import yaml
 
 from . import _panphon, permissive, featuretable, xsampa
 
-
 def zerodiviszero(f):
     def wrapper(*args, **kwargs):
         try:
@@ -391,6 +390,27 @@ class Distance(object):
         source_len, target_len = len(self.fm.word_to_vector_list(source)), len(self.fm.word_to_vector_list(target))
         maxlen = max(source_len, target_len)
         return self.jt_feature_edit_distance(source, target) / maxlen
+
+    def feature_error_rate(self, hyp, ref, xsampa=False):
+        """Feature error rate over lists of hypothesized and reference strings.
+        
+        Args:
+            hyp (list[unicode]): hypothesized strings
+            ref (list[unicode]): reference strings
+
+        Returns:
+            float: feature error rate (FER)
+
+        """
+        if hyp and ref:
+            try:
+                n_features = len(self.fm.word_to_vector_list(ref[0])[0])
+            except IndexError:
+                n_features = 23
+            errors = sum([self.feature_edit_distance(h, r) for (h, r) in zip(hyp, ref)])
+            return errors/len(''.join(ref)) * n_features
+        else:
+            return 0.0
 
     def hamming_substitution_cost(self, v1, v2):
         """Substitution cost for feature vectors computed as Hamming distance.
