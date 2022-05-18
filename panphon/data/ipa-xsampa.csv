@@ -7,14 +7,14 @@ d,d,vd alveolar plosive
 ɖ,d`,vd retroflex plosive
 c,c,vl palatal plosive
 ɟ,J\,vd palatal plosive
-k,k,ld velar plosive
+k,k,vl velar plosive
 ɡ,g,vd velar plosive
 q,q,vl uvular plosive
 ɢ,G\,vd uvular plosive
-ʔ,?,glottal plosive
-m,m,bilabial nasal
+ʔ,?,vl glottal plosive
+m,m,vd bilabial nasal
 ɱ,F,vl labiodental nasal
-n,n,alveolar nasal
+n,n,vd alveolar nasal
 ɳ,n`,vl retroflex nasal
 ɲ,J,vl palatal nasal
 ŋ,N,vl velar nasal
@@ -45,7 +45,6 @@ x,x,vl velar fricative
 ħ,X\,vl pharyngeal fricative
 ʕ,?\,vd pharyngeal fricative
 h,h,vl glottal fricative
-ʔ,?,glottal plosive
 ɬ,K,vl alveolar lateral fricative
 ɮ,K\,vd alveolar lateral fricative
 ʋ,P,vd labiodental approximant
@@ -77,21 +76,21 @@ u,u,close back rounded
 ʏ,Y,lax close front rounded
 ʊ,U,lax close back rounded
 e,e,close-mid front unrounded
-ø,2,front close-mid rounded
+ø,2,close-mid front rounded
 ɤ,7,close-mid back unrounded
 o,o,close-mid back rounded
 ə,@,schwa
-ɘ,@\,close-mid central unrounded vowel
-ɵ,8,rounded schwa
+ɘ,@\,close-mid central unrounded
+ɵ,8,close-mid central rounded
 ɛ,E,open-mid front unrounded
 œ,9,front open-mid rounded
 ʌ,V,open-mid back unrounded
 ɔ,O,open-mid back rounded
-æ,{,mid-open front unrounded vowel
+æ,{,mid-open front unrounded
 ɐ,6,open-mid schwa
 a,a,open front unrounded
 ă,a_X,extra short open front unrounded
-ɶ,&,front open rounded
+ɶ,&,open front rounded
 ɑ,A,open back unrounded
 ɒ,Q,open back rounded
 ̥,_0,voiceless
@@ -136,10 +135,10 @@ a,a,open front unrounded
 ̆,_X,extra-short
 .,.,syllable break
 ʍ,W,vl labial-velar fricative
-w,w,vd labio-velar approximant
-ɥ,H,labial-palatal approximant
-ʜ,H\,vl epiglottal fricative
-ʢ,<\,vl epiglottal fricative
+w,w,vd labial-velar approximant
+ɥ,H,vd labial-palatal approximant
+ʜ,H\,vl epiglottal trill
+ʢ,<\,vd epiglottal trill
 ʡ,>\,vl epiglottal plosive
 ɕ,s\,vl alveolopalatal fricative
 ʑ,z\,vl alveolopalatal fricative
@@ -149,7 +148,7 @@ w,w,vd labio-velar approximant
 ǂ,'=\,alveolar click
 ǁ,|\|\,alveolar lateral click
 ɺ,l\,vl alveolar lateral flap
-ɜ,3,open-mid central
+ɜ,3,open-mid central unrounded
 ʛ,G\_<,vl uvular implosive
 ɚ,@`,rhotacized schwa
 ɞ,3\,open-mid central rounded
@@ -165,7 +164,7 @@ d͡ʑ,dz\,vd alveolo-palatal affricate
 t͡ɬ,tK,vl alveolar lateral affricate
 k͡p,kp,vl labial-velar plosive
 g͡b,gb,vd labial-velar plosive
-ŋ͡m,Nm,labial-velar nasal stop
+ŋ͡m,Nm,vd labial-velar nasal
 ʈ͡ʂ,ts`,vl retroflex affricate
 ɖ͡ʐ,tz`,vd retroflex affricate
 ˩,_B,extra low tone
