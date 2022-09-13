@@ -404,7 +404,9 @@ class Distance(object):
         """
         if hyp and ref:
             errors = sum([self.feature_edit_distance(h, r) for (h, r) in zip(hyp, ref)])
-            return errors/len(''.join(ref))
+            ft = featuretable.FeatureTable()
+            total_phones = sum([len(ft.ipa_segs(r)) for r in ref])
+            return errors / total_phones
         else:
             return 0.0
 
