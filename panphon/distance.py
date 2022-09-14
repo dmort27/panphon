@@ -403,12 +403,10 @@ class Distance(object):
 
         """
         if hyp and ref:
-            try:
-                n_features = len(self.fm.word_to_vector_list(ref[0])[0])
-            except IndexError:
-                n_features = 23
             errors = sum([self.feature_edit_distance(h, r) for (h, r) in zip(hyp, ref)])
-            return errors/len(''.join(ref)) * n_features
+            ft = featuretable.FeatureTable()
+            total_phones = sum([len(ft.ipa_segs(r)) for r in ref])
+            return errors / total_phones
         else:
             return 0.0
 
