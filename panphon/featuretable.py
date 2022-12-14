@@ -79,94 +79,6 @@ class FeatureTable(object):
             node[self.TRIE_LEAF_MARKER] = None
         return trie
 
-    def _triphthongize(self, fts, word):
-        """Return a list of triphthong-ized Segments.
-        """
-        def get_seg_type(segment):
-            is_syllabic = segment['syl'] == 1
-            is_vowel = segment['cons'] == -1
-            is_tone = segment['syl'] == 0
-
-            if is_syllabic and is_vowel:
-                seg_type = 1  # vowel
-            elif not is_syllabic and is_vowel:
-                seg_type = 2  # semivowel
-            elif is_tone:
-                seg_type = 3  # tone
-            else:
-                seg_type = 4  # other
-
-            return seg_type
-
-        def zero_seg_like(segment):
-            names = segment.names
-            weights = segment.weights
-            return Segment(
-                names=names,
-                features={},
-                weights=weights
-            )
-
-        seg_types = [get_seg_type(segment) for segment in fts]
-
-        patterns = [
-            [4],
-            [1, 2], [1],
-            [2, 1, 2], [2, 1], [2],
-            [3, 3, 3], [3, 3], [3]
-        ]  # order is important - enforces priority
-
-        ret = []
-        _ret = []
-        _ret1 = []
-        __ret = []
-        __ret1 = []
-        idx = 0
-
-        ###########
-        ipa_segs = self.ipa_segs(word)
-
-        while idx < len(fts):
-            for seg_type_pattern in patterns:
-                if seg_types[idx: idx + len(seg_type_pattern)] == seg_type_pattern:
-                    triphthongized = fts[idx: idx + len(seg_type_pattern)]
-                    _ret.append(seg_type_pattern)
-                    _ret1.append(ipa_segs[idx: idx + len(seg_type_pattern)])
-                    
-                    # pad with placeholder (all-zero) segments
-                    sample_seg = triphthongized[0]
-                    if len(triphthongized) == 1:
-                        triphthongized = [zero_seg_like(sample_seg)] \
-                                         + triphthongized + [zero_seg_like(sample_seg)]
-
-                        __ret.append([0] + seg_type_pattern + [0])
-                        __ret1.append([0] + ipa_segs[idx: idx + len(seg_type_pattern)] + [0]) 
-                    elif len(triphthongized) == 2:
-                        if seg_type_pattern[0] == 1:
-                            triphthongized = [zero_seg_like(sample_seg)] + triphthongized
-
-                            __ret.append([0] + seg_type_pattern)
-                            __ret1.append([0] + ipa_segs[idx: idx + len(seg_type_pattern)])
-                        elif seg_type_pattern[1] in {1, 3}:
-                            triphthongized = triphthongized + [zero_seg_like(sample_seg)]
-                            
-                            __ret.append(seg_type_pattern + [0])
-                            __ret1.append(ipa_segs[idx: idx + len(seg_type_pattern)] + [0])
-                    else:
-                        __ret.append(seg_type_pattern)
-                        __ret1.append(ipa_segs[idx: idx + len(seg_type_pattern)])
-
-                    ret.append(triphthongized)
-                    idx += len(seg_type_pattern)
-                    break  # skip remaining patterns
-
-        print(ipa_segs)#, [get_seg_type(v) for v in fts])
-        print(_ret1)#, _ret)
-        print(__ret1)#, __ret)
-        print()
-
-        return ret
-
     def fts(self, ipa, normalize=True):
         if normalize:
             ipa = FeatureTable.normalize(ipa)
@@ -224,7 +136,7 @@ class FeatureTable(object):
         """
         return not self._segs(word, include_valid=False, include_invalid=True, normalize=normalize)
 
-    def word_fts(self, word, normalize=True, triphthongize=False):
+    def word_fts(self, word, normalize=True):
         """Return a list of Segment objects corresponding to the segments in
            word.
 
@@ -235,11 +147,7 @@ class FeatureTable(object):
         Returns:
             list: list of Segment objects corresponding to word
         """
-        fts = [self.fts(ipa, False) for ipa in self.ipa_segs(word, normalize)]
-        if triphthongize:
-            return self._triphthongize(fts, word)
-        else:
-            return fts
+        return [self.fts(ipa, False) for ipa in self.ipa_segs(word, normalize)]
 
     def word_array(self, ft_names, word, normalize=True):
         """Return a nparray of features namd in ft_name for the segments in word
