@@ -77,6 +77,25 @@ class TestIpaRe(unittest.TestCase):
         self.assertIsNotNone(r.match('pj'))
         self.assertIsNone(r.match('ts'))
 
+    def test_word_vector_list_english(self):
+        input_word=u'maɪkɫbɛniætɡimeɪldɑtkʰɔm' # michaelbennie@gmail.com
+        vector_list =self.ft.word_to_vector_list(input_word,numeric=True)
+        new_word_list=self.ft.vector_list_to_word(vector_list)
+        self.assertEqual(input_word,new_word_list)
+
+    def test_word_vector_list_chinese(self):
+        input_word=u'tɕi˥pʰu˧˥tʰɑʊ˧˥pu˥˩tʰu˩˨pʰu˧˥tʰɑʊ˧˥pʰi˧˥pu˥˩tɕi˥pʰu˧˥tʰɑʊ˧˥tɑʊ˥˩tʰu˩˨pʰu˧˥tʰɑʊ˧˥pʰi˧˥'
+        vector_list =self.ft.word_to_vector_list(input_word,numeric=True)
+        new_word_list=self.ft.vector_list_to_word(vector_list)
+        self.assertEqual(input_word,new_word_list)
+
+
+    def test_word_vector_list_french(self):
+        input_word=u'ʒəkɔ̃pytəʁɛilzoʁɛkɔ̃pyte'
+        vector_list =self.ft.word_to_vector_list(input_word,numeric=True)
+        new_word_list=self.ft.vector_list_to_word(vector_list)
+        self.assertEqual(input_word,new_word_list)
+
 
 class TestXSampa(unittest.TestCase):
 
