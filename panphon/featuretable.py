@@ -345,7 +345,7 @@ class FeatureTable(object):
 
         Args:
            pat (list): pattern consisting of a sequence of feature dicts
-           word (unicode): a Unicode IPA string consisting of zero or more
+           word (unicode): an Unicode IPA string consisting of zero or more
                            segments
            normalize (bool): whether to pre-normalize the word
 
@@ -415,7 +415,7 @@ class FeatureTable(object):
         return re.compile(regexp)
 
     def segment_to_vector(self, seg, normalize=True):
-        """Given a Unicode IPA segment, return a list of feature specificiations
+        """Given an Unicode IPA segment, return a list of feature specificiations
         in canonical order.
 
         Args:
@@ -429,7 +429,7 @@ class FeatureTable(object):
         return self.fts(seg, normalize).strings()
 
     def word_to_vector_list(self, word, numeric=False, xsampa=False, normalize=True):
-        """Return a list of feature vectors, given a Unicode IPA word.
+        """Return a list of feature vectors, given an Unicode IPA word.
 
         Args:
             word (unicode): string in IPA (or X-SAMPA, provided `xsampa` is True)
