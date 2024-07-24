@@ -491,12 +491,14 @@ class FeatureTable(object):
                 return 1
         return 0  # Vectors are equal
 
-    def _binary_search(self, segment_list, target):
+    def _binary_search(self, segment_list, target, fuzzy_search=False):
         """Binary search to find the segment matching the target vector.
 
         Args:
             segment_list (list): List of segments where each segment is a tuple (IPA, feature vector).
             target (list): Target feature vector to search for.
+            fuzzy_search (bool): whether to search for the closest vector match if an exact match is not found.
+                If disabled and an exact match is not found, a None value is returned.
 
         Returns:
             str: The IPA segment matching the target vector, or None if not found.
@@ -516,6 +518,10 @@ class FeatureTable(object):
             else:
                 high = mid - 1
 
+        if best_match_index is None and fuzzy_search:
+            # Used for fuzzy searching
+            best_match_index = mid
+
         if best_match_index is not None:
             # Check neighboring rows within the range of +-5
             best_match = segment_list[best_match_index]
@@ -531,15 +537,14 @@ class FeatureTable(object):
 
         return None
 
-    def vector_list_to_word(self, tensor, xsampa=False,normalize=True):
+    def vector_list_to_word(self, tensor, xsampa=False,fuzzy_search=False):
         """Return a Unicode IPA word, given a list of feature vectors.
 
         Args:
             tensor (list): a list of lists of '+'/'-'/'0' or 1/-1/0
             xsampa (bool): whether to return the word in X-SAMPA instead of IPA
-            normalize (bool): whether to post-normalize the word (applies to IPA only)
-
-
+            fuzzy_search (bool): whether to search for the closest vector match if an exact match is not found.
+                If disabled and an exact match is not found, a `ValueError` is raised.
         Returns:
             unicode: string in IPA (or X-SAMPA, provided `xsampa` is True)
         """
@@ -548,15 +553,11 @@ class FeatureTable(object):
 
         word = ""
         for vector in tensor:
-            match = self._binary_search(self.sorted_segments.segments, vector)
+            match = self._binary_search(self.sorted_segments.segments, vector, fuzzy_search)
             if match:
                 word += match
             else:
                 raise ValueError(f"No matching segment found for vector: {vector}")
-
-        if normalize:
-            word = FeatureTable.normalize(word)
-
         if xsampa:
             word = self.xsampa.convert(word)
 
