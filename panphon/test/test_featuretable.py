@@ -83,6 +83,11 @@ class TestIpaRe(unittest.TestCase):
         new_word_list=self.ft.vector_list_to_word(vector_list)
         self.assertEqual(input_word,new_word_list)
 
+        input_word2 = u'kʰælɪkʰəʊkʰats'  # michaelbennie@gmail.com
+        vector_list = self.ft.word_to_vector_list(input_word2, numeric=True)
+        new_word_list = self.ft.vector_list_to_word(vector_list)
+        self.assertEqual(input_word2, new_word_list)
+
     def test_word_vector_list_chinese(self):
         input_word=u'tɕi˥pʰu˧˥tʰɑʊ˧˥pu˥˩tʰu˩˨pʰu˧˥tʰɑʊ˧˥pʰi˧˥pu˥˩tɕi˥pʰu˧˥tʰɑʊ˧˥tɑʊ˥˩tʰu˩˨pʰu˧˥tʰɑʊ˧˥pʰi˧˥'
         vector_list =self.ft.word_to_vector_list(input_word,numeric=True)

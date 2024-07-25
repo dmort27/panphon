@@ -525,7 +525,7 @@ class FeatureTable(object):
         if best_match_index is not None:
             # Check neighboring rows within the range of +-5
             best_match = segment_list[best_match_index]
-            for offset in range(-9, 4):
+            for offset in range(-9, 5):
                 neighbor_index = best_match_index + offset
                 if 0 <= neighbor_index < len(segment_list):
                     neighbor_segment = segment_list[neighbor_index]
