@@ -23,8 +23,15 @@ feature_sets = {
 }
 
 class SegmentSorter:
-    def __init__(self, segments):
-        self.segments = segments
+    def __init__(self, segments,):
+        self._segments = segments
+        self._sorted=False
+
+    @property
+    def segments(self):
+        if not self._sorted:
+            self.sort_segments()
+        return self._segments
 
     def sort_segments(self):
         self.segments.sort(key=self.segment_key)
@@ -55,7 +62,6 @@ class FeatureTable(object):
         self.xsampa = xsampa.XSampa()
 
         self.sorted_segments = SegmentSorter(self.segments) #used for quick binary searches
-        self.sorted_segments.sort_segments()
 
 
 
@@ -452,7 +458,14 @@ class FeatureTable(object):
         """
         return self.fts(seg, normalize).strings()
 
-    def word_to_vector_list(self, word, numeric=False, xsampa=False, normalize=True):
+    def standardize_tones(self, word, nonstandard_tones=['¹','²','³','⁴','⁵']):
+        standard_tones = ['˩', '˨', '˧', '˦', '˥']
+        tone_map = dict(zip(nonstandard_tones, standard_tones))
+        standardized_word = ''.join(tone_map.get(char, char) for char in word)
+        return standardized_word
+
+
+    def word_to_vector_list(self, word, numeric=False, xsampa=False, nonstandard_tones=['¹','²','³','⁴','⁵'], normalize=True):
         """Return a list of feature vectors, given a Unicode IPA word.
 
         Args:
@@ -461,13 +474,18 @@ class FeatureTable(object):
                             of strings
             xsampa (bool): whether the word is in X-SAMPA instead of IPA
             normalize: whether to pre-normalize the word (applies to IPA only)
-
+            nonstandard_tones (list): list of 5 nonstandard tones to be conveted
+                            to IPA tone markers.
+                            The order and numbering of the tones can be changed to reflect data.
         Returns:
             list: a list of lists of '+'/'-'/'0' or 1/-1/0
         """
         if xsampa:
             word = self.xsampa.convert(word)
+        if nonstandard_tones:
+            word=self.standardize_tones(word,nonstandard_tones)
         segs = self.word_fts(word, normalize or xsampa)
+
         if numeric:
             tensor = [x.numeric() for x in segs]
         else:

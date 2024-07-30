@@ -49,6 +49,9 @@ class TestFeatureTable(unittest.TestCase):
     def test_word_to_vector_list_aspiration_xsampa_len(self):
         self.assertEqual(len(self.ft.word_to_vector_list(u'p_h', xsampa=True)), 1)
 
+    def test_word_to_vector_list_numeric_tones_len(self):
+        self.assertEqual(self.ft.word_to_vector_list(u'i²⁴'), self.ft.word_to_vector_list(u'i˨˦'))
+
     def test_normalization(self):
         u1 = '\u00e3'
         u2 = 'a\u0303'
