@@ -49,6 +49,9 @@ class TestFeatureTable(unittest.TestCase):
     def test_word_to_vector_list_aspiration_xsampa_len(self):
         self.assertEqual(len(self.ft.word_to_vector_list(u'p_h', xsampa=True)), 1)
 
+    def test_word_to_vector_list_numeric_tones_len(self):
+        self.assertEqual(self.ft.word_to_vector_list(u'i²⁴'), self.ft.word_to_vector_list(u'i˨˦'))
+
     def test_normalization(self):
         u1 = '\u00e3'
         u2 = 'a\u0303'
@@ -76,6 +79,30 @@ class TestIpaRe(unittest.TestCase):
         r = self.ft.compile_regex_from_str('[-son -cont][+son +cont]')
         self.assertIsNotNone(r.match('pj'))
         self.assertIsNone(r.match('ts'))
+
+    def test_word_vector_list_english(self):
+        input_word=u'maɪkɫbɛniætɡimeɪldɑtkʰɔm' # michaelbennie@gmail.com
+        vector_list =self.ft.word_to_vector_list(input_word,numeric=True)
+        new_word_list=self.ft.vector_list_to_word(vector_list)
+        self.assertEqual(input_word,new_word_list)
+
+        input_word2 = u'kʰælɪkʰəʊkʰats'  # michaelbennie@gmail.com
+        vector_list = self.ft.word_to_vector_list(input_word2, numeric=True)
+        new_word_list = self.ft.vector_list_to_word(vector_list)
+        self.assertEqual(input_word2, new_word_list)
+
+    def test_word_vector_list_chinese(self):
+        input_word=u'tɕi˥pʰu˧˥tʰɑʊ˧˥pu˥˩tʰu˩˨pʰu˧˥tʰɑʊ˧˥pʰi˧˥pu˥˩tɕi˥pʰu˧˥tʰɑʊ˧˥tɑʊ˥˩tʰu˩˨pʰu˧˥tʰɑʊ˧˥pʰi˧˥'
+        vector_list =self.ft.word_to_vector_list(input_word,numeric=True)
+        new_word_list=self.ft.vector_list_to_word(vector_list)
+        self.assertEqual(input_word,new_word_list)
+
+
+    def test_word_vector_list_french(self):
+        input_word=u'ʒəkɔ̃pytəʁɛilzoʁɛkɔ̃pyte'
+        vector_list =self.ft.word_to_vector_list(input_word,numeric=True)
+        new_word_list=self.ft.vector_list_to_word(vector_list)
+        self.assertEqual(input_word,new_word_list)
 
 
 class TestXSampa(unittest.TestCase):

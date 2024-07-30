@@ -1,9 +1,9 @@
 -
-    name: voiceless labiodental fricatives
+    name: voiceless labiodental fricative
     def: "[-son +cont -voi +strid +ant -cor +lab]"
     label: f
 -
-    name: voiceless labiodental fricatives
+    name: voiced labiodental fricative
     def: "[-son +cont +voi +strid +ant -cor +lab]"
     label: v
 -
@@ -11,11 +11,11 @@
     def: "[+son +nas +ant -cor +lab]"
     label: m
 -
-    name: voiceless bilabial obstruents
+    name: voiceless bilabial obstruent
     def: "[-son -voi +ant -cor +lab]"
     label: p
 -
-    name: voiced bilabial obstruents
+    name: voiced bilabial obstruent
     def: "[-son +voi +ant -cor +lab]"
     label: b
 -
@@ -31,7 +31,7 @@
     def: "[-son -cont -voi +ant +cor -dist]"
     label: t
 -
-    name: voiceless alveolar stop
+    name: voiced alveolar stop
     def: "[-son -cont +voi +ant +cor -dist]"
     label: d
 -
@@ -39,11 +39,11 @@
     def: "[-son -cont -voi +ant +cor -dist]"
     label: s
 -
-    name: voiceless alveolar fricative
+    name: voiced alveolar fricative
     def: "[-son -cont +voi +ant +cor -dist]"
     label: z
 -
-    name: alveolar affricates
+    name: alveolar affricate
     def: "[-son +delrel +ant +cor -dist]"
     label: c
 -
@@ -55,15 +55,15 @@
     def: "[-son +cont -voi -ant +cor +dist]"
     label: S
 -
-    name: voiceless postalveolar fricative
+    name: voiced postalveolar fricative
     def: "[-son +cont +voi -ant +cor +dist]"
     label: Z
 -
-    name: alveolar affricates
+    name: alveolar affricate
     def: "[-son +delrel -voi -ant +cor +dist]"
     label: C
 -
-    name: alveolar affricates
+    name: alveolar affricate
     def: "[-son +delrel +voi -ant +cor +dist]"
     label: j
 -
