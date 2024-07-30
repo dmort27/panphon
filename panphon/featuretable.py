@@ -207,7 +207,7 @@ class FeatureTable(object):
         Returns:
             array: array of integers corresponding to a bag of feature-value pair counts
         """
-        word_features = self.word_fts(word: str, normalize: bool=True)
+        word_features = self.word_fts(word, normalize)
         features = [v + f for f in self.names for v in ['+', '0', '-']]
         bag = collections.OrderedDict()
         for f in features:
