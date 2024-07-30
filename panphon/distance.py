@@ -391,6 +391,36 @@ class Distance(object):
         maxlen = max(source_len, target_len)
         return self.jt_feature_edit_distance(source, target) / maxlen
 
+    def phoneme_error_rate(self, hyp, ref):
+        """Phoneme error rate over lists of hypothesized and reference strings.
+        Calculates edit distance in terms of phonemes, instead of Unicode characters
+        Normalizes by the total number of phones in the reference
+
+        Args:
+            hyp (list[unicode]): hypothesized strings
+            ref (list[unicode]): reference strings
+
+        Returns:
+            float: phoneme error rate (PER)
+        """
+        if hyp and ref:
+            errors = []
+            for (h, r) in zip(hyp, ref):
+                phoneme_edits = self.min_edit_distance(
+                    lambda v: 1,
+                    lambda v: 1,
+                    lambda x,y: 0 if x == y else 1,
+                    [[]],
+                    self.fm.ipa_segs(h),
+                    self.fm.ipa_segs(r)
+                )
+                errors.append(phoneme_edits)
+            total_phones = sum([len(self.fm.ipa_segs(r)) for r in ref])
+
+            return sum(errors) / total_phones
+        else:
+            return 0.0
+
     def feature_error_rate(self, hyp, ref, xsampa=False):
         """Feature error rate over lists of hypothesized and reference strings.
         
@@ -403,12 +433,10 @@ class Distance(object):
 
         """
         if hyp and ref:
-            try:
-                n_features = len(self.fm.word_to_vector_list(ref[0])[0])
-            except IndexError:
-                n_features = 23
             errors = sum([self.feature_edit_distance(h, r) for (h, r) in zip(hyp, ref)])
-            return errors/len(''.join(ref)) * n_features
+            ft = featuretable.FeatureTable()
+            total_phones = sum([len(ft.ipa_segs(r)) for r in ref])
+            return errors / total_phones
         else:
             return 0.0
 
