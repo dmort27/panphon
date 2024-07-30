@@ -1,23 +1,22 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import annotations
 
+from collections.abc import Iterator, Iterable, Mapping
+from typing import TypeVar
 import regex as re
 
+T = TypeVar('T')
 
-class Segment(object):
-    """Models a phonological segment as a vector of features."""
-    def __init__(self, names, features={}, ftstr='', weights=None):
-        """Construct a `Segment` object
-
-        Args:
-            names (list): ordered list of feature names
-            features (dict): name-value pairs for specified features
-            ftstr (unicode): a string, each /(+|0|-)\w+/ sequence of which is
-                             interpreted as a feature specification
-            weights (float): order list of feature weights/saliences
-            """
+class Segment(Mapping[str, int]):
+    """Constructs a `Segment` object that models a phonological segment as a vector of features.
+    
+    :param names list[str]: An ordered list of feature names.
+    :param feature dict[str, int]: name-feature pairs for specified features.
+    :param ftstr str: A string, each /(+|0|-)\w+/ sequence of which is interpreted as a feature specification.
+    :param weights list[float]: An ordered list of feature weights/saliences.
+    """
+    def __init__(self, names: list[str], features: dict[str, int]={}, ftstr: str='', weights: "list[float]"=[]):
         self.n2s = {-1: '-', 0: '0', 1: '+'}
         self.s2n = {k: v for (v, k) in self.n2s.items()}
         self.names = names
@@ -36,36 +35,44 @@ class Segment(object):
         else:
             self.weights = [1 for _ in names]
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> int:
         """Get a feature specification"""
         return self.data[key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: int):
         """Set a feature specification"""
         if key in self.names:
             self.data[key] = value
         else:
             raise KeyError('Unknown feature name.')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a string representation of a feature vector"""
         pairs = [(self.n2s[self.data[k]], k) for k in self.names]
         fts = ', '.join(['{}{}'.format(*pair) for pair in pairs])
         return '<Segment [{}]>'.format(fts)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         """Return an iterator over the feature names"""
         return iter(self.names)
 
-    def items(self):
-        """Return a list of the features as (name, value) pairs"""
+    def items(self) -> list[tuple[str, int]]:
+        """Return a list of the features as (name, value) pairs
+        
+        :return: List of features as (name, value) pairs
+        :rtype: list[tuple[str, int]]
+        """
         return [(k, self.data[k]) for k in self.names]
 
-    def iteritems(self):
-        """Return an iterator over the features as (name, value) pairs"""
+    def iteritems(self) -> Iterator[tuple[str, int]]:
+        """Return an iterator over the features as (name, value) pairs
+        
+        :return: Iterator over features as (name, value) pairs
+        :rtype: Iterator[tuple[str, int]]
+        """
         return ((k, self.data[k]) for k in self.names)
 
-    def update(self, features):
+    def update(self, features: dict[str, int]):
         """Update the objects features to match `features`.
 
         Args:
@@ -73,7 +80,7 @@ class Segment(object):
         """
         self.data.update(features)
 
-    def match(self, ft_mask):
+    def match(self, ft_mask: Segment) -> bool:
         """Determine whether `self`'s features are a superset of `features`'s
 
         Args:
@@ -84,11 +91,11 @@ class Segment(object):
         """
         return all([self.data[k] == v for (k, v) in ft_mask.items()])
 
-    def __ge__(self, other):
+    def __ge__(self, other: Segment) -> bool:
         """Determine whether `self`'s features are a superset of `other`'s"""
         return self.match(other)
 
-    def intersection(self, other):
+    def intersection(self, other: Segment) -> Segment:
         """Return dict of features shared by `self` and `other`
 
         Args:
@@ -101,23 +108,23 @@ class Segment(object):
         names = list(filter(lambda a: a in data, self.names))
         return Segment(names, data)
 
-    def __and__(self, other):
-        """Return dict of features shared by `self` and `other`"""
+    def __and__(self, other: Segment) -> Segment:
+        """Return Segment of features shared by `self` and `other`"""
         return self.intersection(other)
 
-    def numeric(self, names=None):
+    def numeric(self, names: list[str]=[]) -> list[int]:
         if not names:
             names = self.names
         """Return feature values as a list of integers"""
         return [self.data[k] for k in names]
 
-    def strings(self, names=None):
+    def strings(self, names: list[str]=[]) -> list[str]:
         """Return feature values as a list of strings"""
         if not names:
             names = self.names
         return list(map(lambda x: self.n2s[x], self.numeric()))
 
-    def distance(self, other):
+    def distance(self, other: Segment) -> int:
         """Compute a distance between `self` and `other`
 
         Args:
@@ -129,7 +136,7 @@ class Segment(object):
         """
         return sum(abs(a - b) for (a, b) in zip(self.numeric(), other.numeric()))
 
-    def norm_distance(self, other):
+    def norm_distance(self, other: Segment) -> float:
         """Compute a distance, normalized by vector length
 
         Args:
@@ -142,11 +149,11 @@ class Segment(object):
         """
         return self.distance(other) / len(self.names)
 
-    def __sub__(self, other):
+    def __sub__(self, other: Segment) -> float:
         """Distance between segments, normalized by vector length"""
         return self.norm_distance(other)
 
-    def hamming_distance(self, other):
+    def hamming_distance(self, other) -> int:
         """Compute Hamming distance between feature vectors
 
         Args:
@@ -157,7 +164,7 @@ class Segment(object):
         """
         return sum(int(a != b) for (a, b) in zip(self.numeric(), other.numeric()))
 
-    def norm_hamming_distance(self, other):
+    def norm_hamming_distance(self, other: Segment) -> float:
         """Compute Hamming distance, normalized by vector length
 
         Args:
@@ -168,7 +175,7 @@ class Segment(object):
         """
         return self.hamming_distance(other) / len(self.names)
 
-    def weighted_distance(self, other):
+    def weighted_distance(self, other: Segment) -> float:
         """Compute weighted distance
 
         Args:
@@ -180,7 +187,7 @@ class Segment(object):
         return sum([abs(a - b) * c for (a, b, c)
                    in zip(self.numeric(), other.numeric(), self.weights)])
 
-    def norm_weighted_distance(self, other):
+    def norm_weighted_distance(self, other: Segment) -> float:
         """Compute weighted distance, normalized by vector length
 
         Args:
@@ -192,7 +199,7 @@ class Segment(object):
         """
         return self.weighted_distance(other) / sum(self.weights)
 
-    def specified(self):
+    def specified(self) -> dict[str, int]:
         """Return dictionary of features that are specified '+' or '-' (1 or -1)
 
         Returns:
@@ -200,7 +207,7 @@ class Segment(object):
         """
         return {k: v for (k, v) in self.data.items() if v != 0}
 
-    def differing_specs(self, other):
+    def differing_specs(self, other: Segment) -> list[str]:
         """Return a list of feature names that differ in their specified values
 
         Args:
