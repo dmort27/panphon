@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='panphon',
-      version='0.20.0',
+      version='0.21.0',
       description='Tools for using the International Phonetic Alphabet with phonological features',
       url='https://github.com/dmort27/panphon',
       download_url='https://github.com/dmort27/panphon/archive/0.19.1.tar.gz',
@@ -25,7 +25,6 @@ setup(name='panphon',
       package_data={'panphon': ['data/*.csv', 'data/*.yml']},
       zip_safe=True,
       classifiers=['Operating System :: OS Independent',
-                   'Programming Language :: Python :: 2',
                    'Programming Language :: Python :: 3',
                    'Topic :: Software Development :: Libraries :: Python Modules',
                    'Topic :: Text Processing :: Linguistic']
