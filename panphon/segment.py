@@ -35,6 +35,9 @@ class Segment(Mapping[str, int]):
         else:
             self.weights = [1 for _ in names]
 
+    def __len__(self) -> int:
+        return len(self.data)
+
     def __getitem__(self, key: str) -> int:
         """Get a feature specification"""
         return self.data[key]
