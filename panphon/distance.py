@@ -67,7 +67,7 @@ class Distance(object):
         """
         filename = pkg_resources.resource_filename(
             __name__, filename)
-        with open(filename, 'r') as f:
+        with open(filename, 'r', encoding='utf-8') as f:
             rules = []
             dolgo_prime = yaml.load(f.read(), Loader=yaml.FullLoader)
             for rule in dolgo_prime:

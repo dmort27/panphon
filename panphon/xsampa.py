@@ -14,7 +14,7 @@ class XSampa(object):
     def read_xsampa_table(self):
         filename = os.path.join('data', 'ipa-xsampa.csv')
         filename = pkg_resources.resource_filename(__name__, filename)
-        with open(filename, 'rb') as f:
+        with open(filename, 'rb', encoding='utf-8') as f:
             xs2ipa = {x[1]: x[0] for x in csv.reader(f, encoding='utf-8')}
         xs = sorted(xs2ipa.keys(), key=len, reverse=True)
         xs_regex = re.compile('|'.join(list(map(re.escape, xs))))
