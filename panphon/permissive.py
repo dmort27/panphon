@@ -58,7 +58,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
     def _read_ipa_bases(self, fn):
         fn = pkg_resources.resource_filename(__name__, fn)
         with open(fn, 'rb') as f:
-            reader = csv.reader(f, encoding='utf-8', delimiter=str(','))
+            reader = csv.reader(f, delimiter=str(','))
             names = next(reader)[1:]
             bases = {}
             for row in reader:
@@ -93,7 +93,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         filename = pkg_resources.resource_filename(
             __name__, filename)
         with open(filename, 'rb') as f:
-            reader = csv.reader(f, encoding='utf-8')
+            reader = csv.reader(f)
             next(reader)
             weights = [float(x) for x in next(reader)]
         return weights

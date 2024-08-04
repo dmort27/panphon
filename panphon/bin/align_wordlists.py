@@ -44,8 +44,8 @@ def score(indices):
 
 def main(wordlist1, wordlist2, dist_funcs):
     with open(wordlist1, 'rb') as file_a, open(wordlist2, 'rb') as file_b:
-        reader_a = csv.reader(file_a, encoding='utf-8')
-        reader_b = csv.reader(file_b, encoding='utf-8')
+        reader_a = csv.reader(file_a)
+        reader_b = csv.reader(file_b)
         print('Reading word lists...')
         words = zip([(w, g) for (g, w) in reader_a],
                     [(w, g) for (g, w) in reader_b])

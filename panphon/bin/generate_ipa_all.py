@@ -134,7 +134,7 @@ def parse_dia_defs(dia_defs):
 
 def sort_all_segments(sort_order, all_segments):
     all_segments_list = list(all_segments)
-    field_order = reversed(yaml.load(open(sort_order, 'r').read(), Loader=yaml.FullLoader))
+    field_order = reversed(yaml.load(open(sort_order, 'r', encoding='utf-8').read(), Loader=yaml.FullLoader))
     for field in field_order:
         all_segments_list.sort(key=lambda seg: seg.features[field['name']],
                                reverse=field['reverse'])
@@ -143,7 +143,7 @@ def sort_all_segments(sort_order, all_segments):
 
 def write_ipa_all(ipa_bases, ipa_all, all_segments, sort_order):
     with open(ipa_bases, 'rb') as f:
-        reader = csv.reader(f, encoding='utf-8')
+        reader = csv.reader(f)
         fieldnames = next(reader)
     with open(ipa_all, 'wb') as f:
         writer = csv.DictWriter(f, encoding='utf-8', fieldnames=fieldnames)
