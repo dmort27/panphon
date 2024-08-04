@@ -63,3 +63,6 @@ target/
 .vscode/settings.json
 .DS_Store
 .gitignore
+
+
+venv

@@ -23,22 +23,23 @@ feature_sets = {
 }
 
 class SegmentSorter:
-    def __init__(self, segments,):
+    def __init__(self, segments):
         self._segments = segments
-        self._sorted=False
+        self._sorted = False
 
     @property
     def segments(self):
         if not self._sorted:
-            self.sort_segments()
+            self._sort_segments()
         return self._segments
 
-    def sort_segments(self):
-        self.segments.sort(key=self.segment_key)
+    def _sort_segments(self):
+        self._segments.sort(key=self.segment_key)
+        self._sorted = True
 
     @staticmethod
     def segment_key(segment_tuple):
-        segment_data=segment_tuple[1]
+        segment_data = segment_tuple[1]
         return (
             segment_data['syl'], segment_data['son'], segment_data['cons'], segment_data['cont'],
             segment_data['delrel'], segment_data['lat'], segment_data['nas'], segment_data['strid'],
@@ -65,7 +66,7 @@ class FeatureTable(object):
         self.longest_seg = max([len(x) for x in self.seg_dict.keys()])
         self.xsampa = xsampa.XSampa()
 
-        self.sorted_segments = SegmentSorter(self.segments) #used for quick binary searches
+        self.sorted_segments = SegmentSorter(self.segments)
 
 
 
@@ -542,18 +543,15 @@ class FeatureTable(object):
                 high = mid - 1
 
         if best_match_index is None and fuzzy_search:
-            # Used for fuzzy searching
             best_match_index = mid
 
         if best_match_index is not None:
-            # Check neighboring rows within the range of +-5
             best_match = segment_list[best_match_index]
             for offset in range(-9, 5):
                 neighbor_index = best_match_index + offset
                 if 0 <= neighbor_index < len(segment_list):
                     neighbor_segment = segment_list[neighbor_index]
-                    if not self._compare_vectors(self.sorted_segments.segment_key(neighbor_segment),target):
-                        # Check if the neighbor segment has a shorter name
+                    if not self._compare_vectors(self.sorted_segments.segment_key(neighbor_segment), target):
                         if len(neighbor_segment[0]) < len(best_match[0]):
                             best_match = neighbor_segment
             return best_match[0]
