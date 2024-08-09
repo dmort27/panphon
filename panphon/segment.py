@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterator, Iterable, Mapping
-from typing import TypeVar
+from typing import Iterator, Mapping, TypeVar
 import regex as re
 
 T = TypeVar('T')
