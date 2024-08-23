@@ -12,7 +12,7 @@ class Segment(Mapping[str, int]):
     
     :param names list[str]: An ordered list of feature names.
     :param feature dict[str, int]: name-feature pairs for specified features.
-    :param ftstr str: A string, each /(+|0|-)\w+/ sequence of which is interpreted as a feature specification.
+    :param ftstr str: A string, each /(+|0|-)\\w+/ sequence of which is interpreted as a feature specification.
     :param weights list[float]: An ordered list of feature weights/saliences.
     """
     def __init__(self, names: list[str], features: dict[str, int]={}, ftstr: str='', weights: "list[float]"=[]):

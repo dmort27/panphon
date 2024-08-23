@@ -34,7 +34,7 @@ class SegmentSorter:
         return self._segments
 
     def sort_segments(self):
-        self.segments.sort(key=self.segment_key)
+        self._segments.sort(key=self.segment_key)
 
     @staticmethod
     def segment_key(segment_tuple):
@@ -76,7 +76,7 @@ class FeatureTable(object):
     def _read_bases(self, fn: str, weights):
         fn = pkg_resources.resource_filename(__name__, fn)
         segments = []
-        with open(fn) as f:
+        with open(fn, encoding="utf8") as f:
             reader = csv.reader(f)
             header = next(reader)
             names = header[1:]
@@ -585,4 +585,3 @@ class FeatureTable(object):
             word = self.xsampa.convert(word)
 
         return word
-
