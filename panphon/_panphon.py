@@ -1,22 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from os import stat
-import unicodedata
 
 import os.path
+import unicodedata
 from functools import reduce
+from importlib.resources import files
 
-import numpy
-import pkg_resources
-
+import numpy as np
 import regex as re
 import unicodecsv as csv
 
-from panphon import featuretable
-
 from . import xsampa
-
-from panphon.errors import SegmentError
 
 # logging.basicConfig(level=logging.DEBUG)
 
@@ -102,7 +96,7 @@ def word2array(ft_names, word):
     def seg2col(seg):
         seg = dict([(k, v) for (v, k) in seg])
         return [vdict[seg[ft]] for ft in ft_names]
-    return numpy.array([seg2col(s) for s in word], order='F')
+    return np.array([seg2col(s) for s in word], order='F')
 
 
 class FeatureTable(object):
@@ -130,14 +124,13 @@ class FeatureTable(object):
     def normalize(data):
         return unicodedata.normalize('NFD', data)
 
-    def _read_table(self, filename):
+    def _read_table(self, filename: str):
         """Read the data from data/ipa_all.csv into self.segments, a
         list of 2-tuples of unicode strings and sets of feature tuples and
         self.seg_dict, a dictionary mapping from unicode segments and sets of
         feature tuples.
         """
-        filename = pkg_resources.resource_filename(
-            __name__, filename)
+        filename = files('panphon').joinpath(filename)
         segments = []
         with open(filename, 'rb') as f:
             reader = csv.reader(f, encoding='utf-8')
@@ -151,9 +144,10 @@ class FeatureTable(object):
         seg_dict = dict(segments)
         return segments, seg_dict, names
 
-    def _read_weights(self, filename=os.path.join('data', 'feature_weights.csv')):
-        filename = pkg_resources.resource_filename(
-            __name__, filename)
+    def _read_weights(self, filename=os.path.join(
+            'data', 'feature_weights.csv')
+    ):
+        filename = files('panphon').joinpath(filename)
         with open(filename, 'rb') as f:
             reader = csv.reader(f, encoding='utf-8')
             next(reader)
@@ -334,7 +328,8 @@ class FeatureTable(object):
         return list(filter(self.seg_known, segs))
 
     def filter_string(self, word):
-        """Return a string like the input but containing only legal IPA segments
+        """Return a string like the input but containing only legal IPA 
+        segments
 
         Args:
             word (unicode): input string to be filtered

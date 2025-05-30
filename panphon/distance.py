@@ -3,14 +3,15 @@ from __future__ import (absolute_import, division, print_function,
 
 import os.path
 from functools import partial
+from importlib.resources import files
 
 import editdistance
 import numpy as np
 import regex as re
-import pkg_resources
 import yaml
 
-from . import _panphon, permissive, featuretable, xsampa
+from . import _panphon, featuretable, permissive, xsampa
+
 
 def zerodiviszero(f):
     def wrapper(*args, **kwargs):
@@ -65,8 +66,7 @@ class Distance(object):
             filename (str): path to YAML file (from panphon root) containing
                             dolgopolsky classes
         """
-        filename = pkg_resources.resource_filename(
-            __name__, filename)
+        filename = files('panphon').joinpath(fn)
         with open(filename, 'r') as f:
             rules = []
             dolgo_prime = yaml.load(f.read(), Loader=yaml.FullLoader)
