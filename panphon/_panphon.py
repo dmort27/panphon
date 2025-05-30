@@ -10,6 +10,8 @@ import numpy as np
 import regex as re
 import unicodecsv as csv
 
+import pandas as pd
+
 from . import xsampa
 
 # logging.basicConfig(level=logging.DEBUG)
@@ -124,25 +126,42 @@ class FeatureTable(object):
     def normalize(data):
         return unicodedata.normalize('NFD', data)
 
+    # def _read_table(self, filename: str):
+    #     """Read the data from data/ipa_all.csv into self.segments, a
+    #     list of 2-tuples of unicode strings and sets of feature tuples and
+    #     self.seg_dict, a dictionary mapping from unicode segments and sets of
+    #     feature tuples.
+    #     """
+        
+    #     segments = []
+    #     with files('panphon').joinpath(filename).open('rb') as f:
+    #         reader = csv.reader(f, encoding='utf-8')
+    #         header = next(reader)
+    #         names = header[1:]
+    #         for row in reader:
+    #             seg = row[0]
+    #             vals = row[1:]
+    #             specs = set(zip(vals, names))
+    #             segments.append((seg, specs))
+    #     seg_dict = dict(segments)
+    #     return segments, seg_dict, names
+
     def _read_table(self, filename: str):
         """Read the data from data/ipa_all.csv into self.segments, a
         list of 2-tuples of unicode strings and sets of feature tuples and
         self.seg_dict, a dictionary mapping from unicode segments and sets of
         feature tuples.
         """
-        
-        segments = []
         with files('panphon').joinpath(filename).open('rb') as f:
-            reader = csv.reader(f, encoding='utf-8')
-            header = next(reader)
-            names = header[1:]
-            for row in reader:
-                seg = row[0]
-                vals = row[1:]
-                specs = set(zip(vals, names))
-                segments.append((seg, specs))
+            df = pd.read_csv(f)
+        header = df.columns
+        names = header[1:]
+        ft_dicts = df[header].to_dict(orient='records')
+        specs = [[(v, n) for n, v in ft_dict.items()] for ft_dict in ft_dicts]
+        ipa = df['ipa']
+        segments = zip(ipa, specs)
         seg_dict = dict(segments)
-        return segments, seg_dict, names
+        return segments. seg_dict, names
 
     def _read_weights(self, filename=os.path.join(
             'data', 'feature_weights.csv')
