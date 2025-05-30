@@ -55,8 +55,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         self.weights = self._read_weights()
 
     def _read_ipa_bases(self, fn):
-        fn = files('panphon').joinpath(fn)
-        with open(fn, 'rb') as f:
+        with files('panphon').joinpath(fn).open('rb') as f:
             reader = csv.reader(f, encoding='utf-8', delimiter=str(','))
             names = next(reader)[1:]
             bases = {}
@@ -65,9 +64,9 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
                 bases[seg] = (set(zip(vals, names)))
         return bases, names
 
-    def _read_dias(self, fn):
+    def _read_dias(self, dias):
         prefix, postfix = {}, {}
-        with codecs.open(fn, 'r', 'utf-8') as f:
+        with dias.open('r', 'utf-8') as f:
             defs = yaml.load(f.read(), Loader=yaml.FullLoader)
             for dia in defs['diacritics']:
                 if dia['position'] == 'pre':
@@ -89,8 +88,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         return self.seg_regex
 
     def _read_weights(self, filename=os.path.join('data', 'feature_weights.csv')):
-        filename = files('panphon').joinpath(filename)
-        with open(filename, 'rb') as f:
+        with files('panphon').joinpath(filename).open('rb') as f:
             reader = csv.reader(f, encoding='utf-8')
             next(reader)
             weights = [float(x) for x in next(reader)]
