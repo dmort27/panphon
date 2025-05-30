@@ -76,7 +76,7 @@ class FeatureTable(object):
     def _read_bases(self, fn: str, weights):
         fn  = files('panphon').joinpath(fn)
         segments = []
-        with open(fn) as f:
+        with open(fn, encoding='utf-8') as f:
             reader = csv.reader(f)
             header = next(reader)
             names = header[1:]
