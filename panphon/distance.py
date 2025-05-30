@@ -66,8 +66,7 @@ class Distance(object):
             filename (str): path to YAML file (from panphon root) containing
                             dolgopolsky classes
         """
-        filename = files('panphon').joinpath(fn)
-        with open(filename, 'r') as f:
+        with files('panphon').joinpath(filename).open('r') as f:
             rules = []
             dolgo_prime = yaml.load(f.read(), Loader=yaml.FullLoader)
             for rule in dolgo_prime:
