@@ -1,21 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-from typing import Any, Pattern
-
+import collections
 import os.path
 import unicodedata
-import collections
+from functools import reduce
+from importlib.resources import files
+from typing import Any, Pattern
 
 import numpy
-from importlib.resources import files
-
+import pandas as pd
 import regex as re
-import csv
 
 from . import xsampa
 from .segment import Segment
-from functools import reduce
 
 feature_sets = {
     'spe+': (os.path.join('data', 'ipa_all.csv'),
@@ -67,35 +65,44 @@ class FeatureTable(object):
 
         self.sorted_segments = SegmentSorter(self.segments) #used for quick binary searches
 
-
-
     @staticmethod
     def normalize(data: str) -> str:
         return unicodedata.normalize('NFD', data)
 
-    def _read_bases(self, fn: str, weights):
-        fn  = files('panphon').joinpath(fn)
-        segments = []
-        with open(fn) as f:
-            reader = csv.reader(f)
-            header = next(reader)
-            names = header[1:]
-            for row in reader:
-                ipa = FeatureTable.normalize(row[0])
-                vals = [{'-': -1, '0': 0, '+': 1}[x] for x in row[1:]]
-                vec = Segment(names,
-                              {n: v for (n, v) in zip(names, vals)},
-                              weights=weights)
-                segments.append((ipa, vec))
+    def _read_bases(self, fn: str, weights) -> tuple[
+        list[tuple[str, Segment]],
+        dict[str, Segment],
+        list[str],
+    ]:
+        # Define the specification to integer mapping
+        spec_to_int = {"+": 1, "0": 0, "-": -1}
+
+        # Read the file name with the phonemes and their feature specification
+        f = files("panphon").joinpath(fn)
+        df = pd.read_csv(f.open())
+
+        # Normalize the IPA representations
+        df["ipa"] = df["ipa"].apply(self.normalize)
+
+        # Compute a list of feature names and convert the corresponding
+        # specifications to integers
+        feature_names = list(df.columns[1:])
+        df[feature_names] = df[feature_names].replace(spec_to_int)
+        # Create the segments list
+        segments = [
+            (row["ipa"], Segment(feature_names, row[1:].to_dict(), weights=weights))
+            for (_, row) in df.iterrows()
+        ]
+
+        # Convert to dictionary
         seg_dict = dict(segments)
-        return segments, seg_dict, names
+
+        return segments, seg_dict, feature_names
 
     def _read_weights(self, weights_fn: str) -> list[float]:
-        weights_fn = files('panphon').joinpath(weights_fn)
-        with open(weights_fn) as f:
-            reader = csv.reader(f)
-            next(reader)
-            weights = [float(x) for x in next(reader)]
+        weights_path = files('panphon').joinpath(weights_fn)
+        df = pd.read_csv(weights_path.open())
+        weights = df.iloc[0].astype(float).tolist()
         return weights
 
     def _build_seg_regex(self) -> re.Pattern:
@@ -469,7 +476,6 @@ class FeatureTable(object):
         standardized_word = ''.join(tone_map.get(char, char) for char in word)
         return standardized_word
 
-
     def word_to_vector_list(self, word, numeric=False, xsampa=False, nonstandard_tones=['¹','²','³','⁴','⁵'], normalize=True):
         """Return a list of feature vectors, given a Unicode IPA word.
 
@@ -572,8 +578,6 @@ class FeatureTable(object):
             unicode: string in IPA (or X-SAMPA, provided `xsampa` is True)
         """
 
-
-
         word = ""
         for vector in tensor:
             match = self._binary_search(self.sorted_segments.segments, vector, fuzzy_search)
@@ -585,4 +589,3 @@ class FeatureTable(object):
             word = self.xsampa.convert(word)
 
         return word
-
