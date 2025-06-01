@@ -5,12 +5,11 @@ import os.path
 import unicodedata
 from functools import reduce
 from importlib.resources import files
-from typing import Any, Hashable, Iterable, Iterator, Sequence, Union
+from typing import Iterable
 
 import numpy as np
 import pandas as pd
 import regex as re
-from segment import Segment
 
 from . import xsampa
 
