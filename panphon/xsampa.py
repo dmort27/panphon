@@ -5,6 +5,7 @@ import unicodecsv as csv
 import os.path
 from importlib.resources import files
 
+
 class XSampa(object):
     def __init__(self, delimiter=' '):
         self.delimiter = delimiter
