@@ -48,7 +48,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
             dias (str): path from panphon root to YAML file containing rules
                         for diacritics and modifiers
         """
-        dias = files("panphon").joinpath(dias)
+        dias = files("panphon") / dias
         self.bases, self.names = self._read_ipa_bases(ipa_bases)
         self.prefix_dias, self.postfix_dias = self._read_dias(dias)
         self.pre_regex, self.post_regex, self.seg_regex = \
@@ -62,8 +62,8 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         self, fn: str
     ) -> tuple[dict[str, set[tuple[str, str]]], list[str]]:
         # Open file from package
-        path = files("panphon").joinpath(fn)
-        df = pd.read_csv(path.open(), encoding="utf-8")
+        path = files("panphon") / fn
+        df = pd.read_csv(path.open())
 
         # Compute the
         names = list(df.columns[1:])  # feature names
@@ -76,7 +76,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
 
     def _read_dias(self, dias):
         prefix, postfix = {}, {}
-        with dias.open('r', 'utf-8') as f:
+        with dias.open('r') as f:
             defs = yaml.load(f.read(), Loader=yaml.FullLoader)
             for dia in defs['diacritics']:
                 if dia['position'] == 'pre':
@@ -104,7 +104,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
             filename=os.path.join(
                 "data", "feature_weights.csv")):
         path = files("panphon").joinpath(filename)
-        df = pd.read_csv(path.open(), encoding="utf-8")
+        df = pd.read_csv(path.open())
 
         # Weights are in first row
         weights = df.iloc[0].astype(float).tolist()
