@@ -63,7 +63,8 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
     ) -> tuple[dict[str, set[tuple[str, str]]], list[str]]:
         # Open file from package
         path = files("panphon") / fn
-        df = pd.read_csv(path.open())
+        with path.open() as f:
+            df = pd.read_csv(f)
 
         # Compute the
         names = list(df.columns[1:])  # feature names
@@ -104,7 +105,8 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
             filename=os.path.join(
                 "data", "feature_weights.csv")):
         path = files("panphon").joinpath(filename)
-        df = pd.read_csv(path.open())
+        with path.open() as f:
+            df = pd.read_csv(f)
 
         # Weights are in first row
         weights = df.iloc[0].astype(float).tolist()
