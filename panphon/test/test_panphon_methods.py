@@ -6,6 +6,7 @@ import panphon._panphon as panphon
 
 dim = 24
 
+
 class TestFeatureTableAPI(unittest.TestCase):
 
     def setUp(self):

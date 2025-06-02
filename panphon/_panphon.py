@@ -145,7 +145,7 @@ class FeatureTable(object):
         names: list[str] = header[1:]
 
         ft_dicts: list[dict[str, str]] = \
-            df[header].to_dict(orient='records')  # type: ignore
+            df[names].to_dict(orient='records')  # type: ignore
 
         specs: list[list[tuple[str, str]]] = [
             [(v, n) for n, v in ft_dict.items()]
@@ -157,13 +157,13 @@ class FeatureTable(object):
             zip(ipa, specs)
         seg_dict: dict[str, list[tuple[str, str]]] = dict(segments)
 
-        return zip(ipa, specs), seg_dict, names
+        return list(zip(ipa, specs))[1:], seg_dict, names
 
     def _read_weights(self, filename=os.path.join(
             'data', 'feature_weights.csv')
     ):
-        f = files('panphon').joinpath(filename).open()
-        df = pd.read_csv(f)
+        with files('panphon').joinpath(filename).open() as f:
+            df = pd.read_csv(f)
         weights = df.iloc[0].astype(float).tolist()
         return weights
 
@@ -172,7 +172,7 @@ class FeatureTable(object):
         segs = sorted(self.seg_dict.keys(), key=lambda x: len(x), reverse=True)
         return re.compile(r'(?P<all>{})'.format('|'.join(segs)))
 
-    def fts(self, segment: str) -> list[tuple[str, str]] | None:
+    def fts(self, segment: str) -> list[tuple[str, str]]:
         """Returns features corresponding to `segment` as list of (value,
         feature) tuples.
 
@@ -185,7 +185,7 @@ class FeatureTable(object):
             otherwise,
                  None
         """
-        return self.seg_dict.get(segment, None)
+        return self.seg_dict.get(segment, [])
 
     def match(self, ft_mask, ft_seg):
         """Answer question "are `ft_mask`'s features a subset of ft_seg?"
@@ -409,7 +409,11 @@ class FeatureTable(object):
             bool: `True` if two segments in `inv` are identical in features except
                   for feature `ft_name`
         """
-        inv_fts = [self.fts(x) for x in inv if set(fs) <= self.fts(x)]
+        inv_fts = [
+            set(self.fts(x))
+            for x in inv
+            if set(fs) <= set(self.fts(x))
+        ]
         for a in inv_fts:
             for b in inv_fts:
                 if a != b:
@@ -454,7 +458,7 @@ class FeatureTable(object):
         if len(pat) != len(segs):
             return None
         else:
-            if all([set(p) <= s for (p, s) in zip(pat, segs)]):
+            if all([set(p) <= set(s) for (p, s) in zip(pat, segs)]):
                 return segs
 
     def match_pattern_seq(self, pat, const):
@@ -476,7 +480,7 @@ class FeatureTable(object):
         if len(pat) != len(segs):
             return False
         else:
-            return all([set(p) <= s for (p, s) in zip(pat, segs)])
+            return all([set(p) <= set(s) for (p, s) in zip(pat, segs)])
 
     def all_segs_matching_fts(self, fts):
         """Return segments matching a feature mask, both as (value, feature)

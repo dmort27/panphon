@@ -6,6 +6,7 @@ from panphon import permissive
 
 dim = 24
 
+
 class TestFeatureTableAPI(unittest.TestCase):
 
     def setUp(self):

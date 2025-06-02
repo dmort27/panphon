@@ -20,6 +20,7 @@ feature_sets = {
              os.path.join('data', 'feature_weights.csv'))
 }
 
+
 class SegmentSorter:
     def __init__(self, segments,):
         self._segments = segments
@@ -36,6 +37,7 @@ class SegmentSorter:
 
     @staticmethod
     def segment_key(segment_tuple):
+        print('segment_tuple=', segment_tuple)
         segment_data=segment_tuple[1]
         return (
             segment_data['syl'], segment_data['son'], segment_data['cons'], segment_data['cont'],
@@ -63,7 +65,7 @@ class FeatureTable(object):
         self.longest_seg = max([len(x) for x in self.seg_dict.keys()])
         self.xsampa = xsampa.XSampa()
 
-        self.sorted_segments = SegmentSorter(self.segments) #used for quick binary searches
+        self.sorted_segments = SegmentSorter(self.segments) # used for quick binary searches
 
     @staticmethod
     def normalize(data: str) -> str:
@@ -78,8 +80,8 @@ class FeatureTable(object):
         spec_to_int = {"+": 1, "0": 0, "-": -1}
 
         # Read the file name with the phonemes and their feature specification
-        f = files("panphon").joinpath(fn)
-        df = pd.read_csv(f.open())
+        with files("panphon").joinpath(fn).open() as f:
+            df = pd.read_csv(f)  
 
         # Normalize the IPA representations
         df["ipa"] = df["ipa"].apply(self.normalize)
@@ -87,7 +89,7 @@ class FeatureTable(object):
         # Compute a list of feature names and convert the corresponding
         # specifications to integers
         feature_names = list(df.columns[1:])
-        df[feature_names] = df[feature_names].replace(spec_to_int)
+        df[feature_names] = df[feature_names].map(lambda x: spec_to_int[x])
         # Create the segments list
         segments = [
             (row["ipa"], Segment(feature_names, row[1:].to_dict(), weights=weights))
@@ -100,8 +102,8 @@ class FeatureTable(object):
         return segments, seg_dict, feature_names
 
     def _read_weights(self, weights_fn: str) -> list[float]:
-        weights_path = files('panphon').joinpath(weights_fn)
-        df = pd.read_csv(weights_path.open())
+        with files('panphon').joinpath(weights_fn).open() as f:
+            df = pd.read_csv(f)
         weights = df.iloc[0].astype(float).tolist()
         return weights
 
