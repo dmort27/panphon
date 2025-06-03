@@ -40,7 +40,6 @@ def generate_feature_vectors(feature_table='ipa_bases.csv') -> FeatureVectors:
     df[feature_names] = df[feature_names].map(lambda s: plus_minus_to_int[s])
     df[feature_names] = df[feature_names].astype(int)
     feature_vectors = np.array(df[feature_names])
-    print(f'feature vectors=\n{feature_vectors}')
     vector_map = dict(zip(phonemes, feature_vectors))
 
     feature_cols = df.columns[1:]  # all columns after 'ipa'
@@ -139,14 +138,12 @@ def get_new_vector(ipa: str) -> np.ndarray:
     # segments
     if match := segment_re.match(ipa):
         pre, base, post = match.groups()
-        vector = features.vector_map[base]
-        print(f'start={vector}')
+        vector = features.vector_map[base].copy()
 
         # Iterate through the modifiers, updating the feature representations
         for marker in (post + pre):
             feature_tr, _ = modifiers.transforms[marker]
             vector[feature_tr != 0] = feature_tr[feature_tr != 0]
-            print(f'updat={vector}')
         features.vector_map[ipa] = vector
         features.phoneme_map[tuple(vector)] = [ipa]
         return vector
