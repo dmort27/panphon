@@ -153,6 +153,22 @@ def get_new_vector(ipa: str) -> np.ndarray:
 
 
 def encode(ipa: str) -> np.ndarray:
+    """
+    Encode an IPA string as a NumPy array representing the features of each
+    segment.
+
+    Parameters
+    ----------
+    ipa : str
+       The string of phonemes, represented in IPA, to be converted to vectors.
+
+    Returns
+    -------
+    np.ndarray
+        An array of integers in which each row corresponds to a phoneme. The
+        value 1 indicates an active feature (+), the value -1 indicates and
+        inactive feature (-), and the value 0 indicates an irrelevant feature.
+    """
     segment_re = get_segment_re()
     features = get_features()
     rows = [
