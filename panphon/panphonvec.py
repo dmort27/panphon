@@ -180,6 +180,7 @@ def add_and_get_new_vector(ipa: str) -> np.ndarray:
         warnings.warn(f'Phoneme {ipa} cannot be analyzed.')
         return np.zeros(len(features.feature_names))
 
+
 @lru_cache
 def encode(ipa: str) -> np.ndarray:
     """
@@ -230,7 +231,8 @@ def add_and_get_new_phoneme(target_vector: np.ndarray) -> list[str]:
         # Iterate through the modifiers, trying each of them
         for _, (vector_tr, phoneme_tr) in modifiers.transforms.items():
             vector_candidate = np.where(vector_tr != 0, vector_tr, vector)
-            if np.array_equal(vector_candidate, vector): continue
+            if np.array_equal(vector_candidate, vector):
+                continue
             phoneme_candidate = phoneme_tr(phoneme)
             # If a perfect match is found, stop
             if np.array_equal(vector_candidate, target_vector):
@@ -277,7 +279,6 @@ def decode(matrix: np.ndarray) -> str:
             phonemes = features.phoneme_map[vector]
             return phonemes[0]
         else:
-            return add_and_get_new_phoneme(vector)[0] # type: ignore
+            return add_and_get_new_phoneme(vector)[0]  # type: ignore
 
     return ''.join([get_phoneme(row) for row in matrix])
-
