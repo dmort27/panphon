@@ -25,6 +25,7 @@ class Modifiers(NamedTuple):
 
 
 DIM = 24
+MAX_ITER = 10
 
 _modifiers = None
 _features = None
@@ -42,9 +43,13 @@ def generate_feature_vectors(feature_table='ipa_bases.csv') -> FeatureVectors:
     with feature_table.open('r') as f:
         df = pd.read_csv(f)
     feature_names = df.columns[1:]
-    df = df.sort_values(by='ipa', key=lambda col: col.str.len(), ascending=False)
+    df = df.sort_values(
+        by='ipa',
+        key=lambda col: col.str.len(),
+        ascending=False
+        )
     phonemes = df['ipa']
-    df[feature_names] = df[feature_names].applymap(
+    df[feature_names] = df[feature_names].map(
         lambda s: plus_minus_to_int[s]
         )  # type: ignore
     # df[feature_names] = df[feature_names].map(lambda s: plus_minus_to_int[s])
@@ -85,7 +90,7 @@ def generate_feature_vectors(feature_table='ipa_bases.csv') -> FeatureVectors:
             vector_to_tuple(vector),
             handle_missing_vector(vector)
         )
-        return sorted(phonemes[0], key=lambda s: len(s.encode('utf-8')))[0]
+        return sorted(phonemes, key=lambda s: len(s.encode('utf-8')))[0]
 
     return FeatureVectors(
         vector_map,
@@ -230,7 +235,7 @@ def get_new_phoneme(target_vector: np.ndarray) -> list[str]:
     vector = features.vector_map[phoneme].copy()
 
     # Iterate through the modifiers in multiple passes
-    while 1:
+    for _ in range(MAX_ITER):
         found = False
         candidates = []
         # Iterate through the modifiers, trying each of them
@@ -247,9 +252,6 @@ def get_new_phoneme(target_vector: np.ndarray) -> list[str]:
             # Compute the loss for each candidate
             loss = hamming_distance(vector_candidate, target_vector)
             candidates.append((loss, vector_candidate, phoneme_candidate))
-        # If the loop completed without a perfect match, examine the candidates
-        # and pick the best one. Probably, this greedy method should be
-        # replaced with beam search or a more sophisticated search algorithm
         if found:
             break
         else:
