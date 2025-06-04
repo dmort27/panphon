@@ -4,7 +4,7 @@ import numpy as np
 
 
 class TestFeature(unittest.TestCase):
-                  
+
     def setUp(self):
         self.feature_vectors = panphonvec.get_features()
 
@@ -22,7 +22,9 @@ class TestFeature(unittest.TestCase):
     def test_phoneme_map(self):
         vector = np.array([-1, -1, 1, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, 0, -1, 1, -1, -1, -1, -1, 0, -1, 0, 0])
         # tuple_vector = tuple(int(x) for x in vector)
-        self.assertIn('c', self.feature_vectors.lookup_phoneme(vector))  # type: ignore
+        self.assertIn(
+            "c", self.feature_vectors.phoneme_map[panphonvec.vector_to_tuple(vector)]
+        )  # type: ignore
 
     def test_vector_map(self):
         vector = np.array([-1, -1, 1, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, 0, -1, 1, -1, -1, -1, -1, 0, -1, 0, 0])
@@ -35,9 +37,9 @@ class TestFeature(unittest.TestCase):
         )
 
     def test_round_trip(self):
-        vec = self.feature_vectors.vector_map['k']
+        vector = self.feature_vectors.vector_map['k']
         self.assertEqual(
-            self.feature_vectors.lookup_phoneme(vec), 'k'
+            self.feature_vectors.phoneme_map[panphonvec.vector_to_tuple(vector)], ['k']
         )  # type: ignore
 
 

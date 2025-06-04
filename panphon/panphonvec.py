@@ -1,21 +1,21 @@
 import re
 import warnings
 from collections import OrderedDict
+from functools import lru_cache
+from importlib.resources import files
+from typing import Callable, NamedTuple
 
 import numpy as np
 import pandas as pd
 from yaml import safe_load
-from typing import NamedTuple, Callable
-from importlib.resources import files
 
 
 class FeatureVectors(NamedTuple):
     vector_map: dict[str, np.ndarray]
-    phoneme_map: dict[tuple[int], list[str]]
+    phoneme_map: dict[tuple[int, ...], list[str]]
     feature_names: list[str]
     phonemes: list[str]
     feature_vectors: np.ndarray
-    lookup_phoneme: Callable[[np.ndarray], str]
 
 
 class Modifiers(NamedTuple):
@@ -24,8 +24,7 @@ class Modifiers(NamedTuple):
     transforms: dict[str, tuple[np.ndarray, Callable[[str], str]]]
 
 
-DIM = 24
-MAX_ITER = 10
+MAX_STEPS = 10
 
 _modifiers = None
 _features = None
@@ -52,7 +51,6 @@ def generate_feature_vectors(feature_table='ipa_bases.csv') -> FeatureVectors:
     df[feature_names] = df[feature_names].map(
         lambda s: plus_minus_to_int[s]
         )  # type: ignore
-    # df[feature_names] = df[feature_names].map(lambda s: plus_minus_to_int[s])
     df[feature_names] = df[feature_names].astype(int)
     feature_vectors = np.array(df[feature_names])
     vector_map = dict(zip(phonemes, feature_vectors))
@@ -85,20 +83,12 @@ def generate_feature_vectors(feature_table='ipa_bases.csv') -> FeatureVectors:
         warnings.warn(f"Vector not found as key={vector}")
         return ''
 
-    def lookup_phonemes(vector):
-        phonemes = phoneme_map.get(
-            vector_to_tuple(vector),
-            handle_missing_vector(vector)
-        )
-        return sorted(phonemes, key=lambda s: len(s.encode('utf-8')))[0]
-
     return FeatureVectors(
         vector_map,
         phoneme_map,
         list(feature_names),
         list(phonemes),
         feature_vectors,
-        lookup_phonemes
     )
 
 
@@ -166,7 +156,7 @@ def get_segment_re() -> re.Pattern:
     return _segment_re
 
 
-def get_new_vector(ipa: str) -> np.ndarray:
+def add_and_get_new_vector(ipa: str) -> np.ndarray:
     # Access the shared data structure
     features = get_features()
     modifiers = get_modifiers()
@@ -184,14 +174,13 @@ def get_new_vector(ipa: str) -> np.ndarray:
             vector[feature_tr != 0] = feature_tr[feature_tr != 0]
         features.vector_map[ipa] = vector
         tuple_vector = vector_to_tuple(vector)
-        # warnings.warn(f'tuple_vector not found as key in phoneme_map: {tuple_vector}. Adding it.')
         features.phoneme_map[tuple_vector] = [ipa]  # type: ignore
         return vector
     else:
         warnings.warn(f'Phoneme {ipa} cannot be analyzed.')
-        return np.zeros(DIM)
+        return np.zeros(len(features.feature_names))
 
-
+@lru_cache
 def encode(ipa: str) -> np.ndarray:
     """
     Encode an IPA string as a NumPy array representing the features of each
@@ -212,17 +201,17 @@ def encode(ipa: str) -> np.ndarray:
     segment_re = get_segment_re()
     features = get_features()
     rows = [
-        features.vector_map.get(m.group(0), get_new_vector(m.group(0)))
+        features.vector_map.get(m.group(0), add_and_get_new_vector(m.group(0)))
         for m in segment_re.finditer(ipa)
     ]
     return np.stack(rows)
 
 
-def hamming_distance(u: np.ndarray, v: np.ndarray):
+def hamming_distance(u: np.ndarray, v: np.ndarray) -> int:
     return int(np.sum(u != v))
 
 
-def get_new_phoneme(target_vector: np.ndarray) -> list[str]:
+def add_and_get_new_phoneme(target_vector: np.ndarray) -> list[str]:
     # Obtain shared resources
     features = get_features()
     modifiers = get_modifiers()
@@ -235,7 +224,7 @@ def get_new_phoneme(target_vector: np.ndarray) -> list[str]:
     vector = features.vector_map[phoneme].copy()
 
     # Iterate through the modifiers in multiple passes
-    for _ in range(MAX_ITER):
+    for _ in range(MAX_STEPS):
         found = False
         candidates = []
         # Iterate through the modifiers, trying each of them
@@ -288,7 +277,7 @@ def decode(matrix: np.ndarray) -> str:
             phonemes = features.phoneme_map[vector]
             return phonemes[0]
         else:
-            return get_new_phoneme(vector)[0] # type: ignore
+            return add_and_get_new_phoneme(vector)[0] # type: ignore
 
     return ''.join([get_phoneme(row) for row in matrix])
 
