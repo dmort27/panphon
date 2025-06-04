@@ -19,9 +19,43 @@ class TestFeature(unittest.TestCase):
             )
         )
 
+    def test_phoneme_map(self):
+        vector = np.array([-1, -1, 1, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, 0, -1, 1, -1, -1, -1, -1, 0, -1, 0, 0])
+        # tuple_vector = tuple(int(x) for x in vector)
+        self.assertIn('c', self.feature_vectors.lookup_phoneme(vector))  # type: ignore
+
+    def test_vector_map(self):
+        vector = np.array([-1, -1, 1, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, 0, -1, 1, -1, -1, -1, -1, 0, -1, 0, 0])
+        new_vector = self.feature_vectors.vector_map['c']
+        self.assertTrue(
+            np.array_equal(
+                vector,
+                new_vector
+            )
+        )
+
     def test_round_trip(self):
         vec = self.feature_vectors.vector_map['k']
-        vec_tuple = tuple(vec)
-        self.assertEqual(self.feature_vectors.phoneme_map[vec_tuple], ['k'])
+        self.assertEqual(
+            self.feature_vectors.lookup_phoneme(vec), 'k'
+        )  # type: ignore
 
-    
+
+class TestEncodeDecode(unittest.TestCase):
+
+    def setUp(self):
+        self.encode = panphonvec.encode
+        self.decode = panphonvec.decode
+
+    def test_round_trip1(self):
+        self.assertEquals(self.decode(self.encode('wɛlp')), 'wɛlp')
+
+    def test_round_trip2(self):
+        self.assertEquals(self.decode(self.encode('pʰʲa')), 'pʰʲa')
+
+    def test_round_trip2(self):
+        self.assertEquals(self.decode(self.encode('ox')), 'ox')
+
+    def test_decode1(self):
+        v = np.array([[-1, -1,  1, -1, -1, -1, -1,  0, -1,  1, -1,  1, -1,  0,  1, -1, -1, -1, -1, -1,  0, -1,  0,  0]])
+        self.assertEqual(self.decode(v), 'pʰ')
