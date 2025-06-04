@@ -44,7 +44,10 @@ def generate_feature_vectors(feature_table='ipa_bases.csv') -> FeatureVectors:
     feature_names = df.columns[1:]
     df = df.sort_values(by='ipa', key=lambda col: col.str.len(), ascending=False)
     phonemes = df['ipa']
-    df[feature_names] = df[feature_names].map(lambda s: plus_minus_to_int[s])
+    df[feature_names] = df[feature_names].applymap(
+        lambda s: plus_minus_to_int[s]
+        )  # type: ignore
+    # df[feature_names] = df[feature_names].map(lambda s: plus_minus_to_int[s])
     df[feature_names] = df[feature_names].astype(int)
     feature_vectors = np.array(df[feature_names])
     vector_map = dict(zip(phonemes, feature_vectors))
@@ -64,7 +67,10 @@ def generate_feature_vectors(feature_table='ipa_bases.csv') -> FeatureVectors:
         return tuple(int(x) for x in row[numeric_cols])
 
     phoneme_map_items = grouped_df.apply(
-        lambda row: (row_key(row), row['ipa'].split(';')),
+        lambda row: (
+            row_key(row),
+            sorted(row['ipa'].split(';'))
+        ),
         axis=1
     ).tolist()
 
@@ -273,13 +279,14 @@ def decode(matrix: np.ndarray) -> str:
     """
 
     features = get_features()
-    return ''.join(
-        [
-            features.phoneme_map.get(
-                vector_to_tuple(v),  # type: ignore
-                get_new_phoneme(vector_to_tuple(v))  # type: ignore
-            )[0]  # type: ignore
-            for v in matrix
-        ]
-    )
+
+    def get_phoneme(vector):
+        vector = vector_to_tuple(vector)
+        if vector in features.phoneme_map:
+            phonemes = features.phoneme_map[vector]
+            return phonemes[0]
+        else:
+            return get_new_phoneme(vector)[0] # type: ignore
+
+    return ''.join([get_phoneme(row) for row in matrix])
 

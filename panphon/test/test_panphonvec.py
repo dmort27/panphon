@@ -47,14 +47,14 @@ class TestEncodeDecode(unittest.TestCase):
         self.encode = panphonvec.encode
         self.decode = panphonvec.decode
 
+    def test_round_trip3(self):
+        self.assertEquals(self.decode(self.encode('ox')), 'ox')
+
     def test_round_trip1(self):
         self.assertEquals(self.decode(self.encode('wɛlp')), 'wɛlp')
 
     def test_round_trip2(self):
         self.assertEquals(self.decode(self.encode('pʰʲa')), 'pʰʲa')
-
-    def test_round_trip2(self):
-        self.assertEquals(self.decode(self.encode('ox')), 'ox')
 
     def test_decode1(self):
         v = np.array([[-1, -1,  1, -1, -1, -1, -1,  0, -1,  1, -1,  1, -1,  0,  1, -1, -1, -1, -1, -1,  0, -1,  0,  0]])
