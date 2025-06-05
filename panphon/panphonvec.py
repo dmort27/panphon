@@ -112,7 +112,6 @@ def generate_feature_vectors(feature_table='ipa_bases.csv') -> FeatureVectors:
         feature_vectors,
     )
 
-@lru_cache
 def get_features():
     global _features
     if _features is None:
