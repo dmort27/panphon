@@ -9,7 +9,10 @@ import numpy as np
 import pandas as pd
 from yaml import safe_load
 
+# Maximum number of iterations allowed in deriving new phonemes
+MAX_STEPS = 10
 
+# Data structure for representing mappings between feature vectors and phonemes
 class FeatureVectors(NamedTuple):
     vector_map: dict[str, np.ndarray]
     phoneme_map: dict[tuple[int, ...], list[str]]
@@ -18,26 +21,44 @@ class FeatureVectors(NamedTuple):
     feature_vectors: np.ndarray
 
 
+# Data structure for representing modifiers and the corresponding transforms to
+# phonemes and feature vectors
 class Modifiers(NamedTuple):
     prefix_modifiers: list[str]
     postfix_modifiers: list[str]
     transforms: dict[str, tuple[np.ndarray, Callable[[str], str]]]
 
-
-MAX_STEPS = 10
-
+# Variables representing the cached data structures
 _modifiers = None
 _features = None
 _segment_re = None
 
+# Mapping between string and numeric representation of features
 plus_minus_to_int = {'+': 1, '0': 0, '-': -1}
 
 
 def vector_to_tuple(vector: np.ndarray) -> tuple:
-    return tuple(int(x) for x in vector)
+    """
+    Convert np.ndarray feature vectors to tuples of integers
+    """
+    return tuple(vector)
 
 
 def generate_feature_vectors(feature_table='ipa_bases.csv') -> FeatureVectors:
+    """
+    Build a FeatureVectors object based on the contents of a feature table file.
+
+    Parameters
+    ----------
+    feature_table : str
+    
+    Returns
+    -------
+    FeatureVectors
+        An object with mappings from phonemes to vectors and vectors to phonemes
+        as well as the names of the features, the phonemes themselves, and the
+        feature vectors.
+    """
     feature_table = files('panphon') / 'data' / feature_table
     with feature_table.open('r') as f:
         df = pd.read_csv(f)
@@ -91,7 +112,7 @@ def generate_feature_vectors(feature_table='ipa_bases.csv') -> FeatureVectors:
         feature_vectors,
     )
 
-
+@lru_cache
 def get_features():
     global _features
     if _features is None:
