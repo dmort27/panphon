@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='panphon',
-      version='0.22.1',
+      version='0.22.2',
       description='Tools for using the International Phonetic Alphabet ' +
       'with phonological features',
       url='https://github.com/dmort27/panphon',
@@ -15,7 +15,7 @@ setup(name='panphon',
                         'unicodecsv',
                         'PyYAML',
                         'regex',
-                        'numpy>=1.20.3',
+                        'numpy>=1.20.2',
                         'editdistance',
                         'munkres',
                         'pandas',],
