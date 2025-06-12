@@ -12,6 +12,7 @@ from yaml import safe_load
 # Maximum number of iterations allowed in deriving new phonemes
 MAX_STEPS = 10
 
+
 # Data structure for representing mappings between feature vectors and phonemes
 class FeatureVectors(NamedTuple):
     vector_map: dict[str, np.ndarray]
@@ -27,6 +28,7 @@ class Modifiers(NamedTuple):
     prefix_modifiers: list[str]
     postfix_modifiers: list[str]
     transforms: dict[str, tuple[np.ndarray, Callable[[str], str]]]
+
 
 # Variables representing the cached data structures
 _modifiers = None
@@ -46,16 +48,18 @@ def vector_to_tuple(vector: np.ndarray) -> tuple:
 
 def generate_feature_vectors(feature_table='ipa_bases.csv') -> FeatureVectors:
     """
-    Build a FeatureVectors object based on the contents of a feature table file.
+    Build a FeatureVectors object based on the contents of a feature table
+    file.
 
     Parameters
     ----------
     feature_table : str
-    
+
     Returns
     -------
     FeatureVectors
-        An object with mappings from phonemes to vectors and vectors to phonemes
+        An object with mappings from phonemes to vectors and vectors to
+        phonemes
         as well as the names of the features, the phonemes themselves, and the
         feature vectors.
     """
@@ -111,6 +115,7 @@ def generate_feature_vectors(feature_table='ipa_bases.csv') -> FeatureVectors:
         list(phonemes),
         feature_vectors,
     )
+
 
 def get_features():
     global _features
@@ -237,7 +242,7 @@ def add_and_get_new_phoneme(target_vector: np.ndarray) -> list[str]:
     features = get_features()
     modifiers = get_modifiers()
 
-    # Find the closest known vector to the target vector (as well as the 
+    # Find the closest known vector to the target vector (as well as the
     # corresponding phoneme)
     distances = np.sum(features.feature_vectors != target_vector, axis=1)
     idx = np.argmin(distances)
