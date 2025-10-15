@@ -1,6 +1,3 @@
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
 import os.path
 from functools import partial
 from importlib.resources import files
@@ -77,10 +74,10 @@ class Distance(object):
         """Map a string to dolgopolsky' classes
 
         Args:
-            s (unicode): IPA word
+            s (str): IPA word
 
         Returns:
-            (unicode): word with all segments collapsed to D' classes
+            (str): word with all segments collapsed to D' classes
         """
         segs = []
         for seg in self.fm.seg_regex.finditer(s):
@@ -95,8 +92,8 @@ class Distance(object):
         """Slow implementation of Levenshtein distance using NumPy arrays
 
         Args:
-            source (unicode): source word
-            target (unicode): target word
+            source (str): source word
+            target (str): target word
 
         Returns:
             int: minimum number of Levenshtein edits required to get from
@@ -131,8 +128,8 @@ class Distance(object):
         """Wrapper for the distance function in the Levenshtein module
 
         Args:
-            source (unicode): source word
-            target (unicode): target word
+            source (str): source word
+            target (str): target word
 
         Returns:
             int: minimum number of Levenshtein edits required to get from
@@ -144,8 +141,8 @@ class Distance(object):
         """Levenshtein distance divided by maxlen
 
         Args:
-            source (unicode): source word
-            target (unicode): target word
+            source (str): source word
+            target (str): target word
 
         Returns:
             int: minimum number of Levenshtein edits required to get from
@@ -164,8 +161,8 @@ class Distance(object):
         computed.
 
         Args:
-            source (unicode): source word
-            target (unicode): target word
+            source (str): source word
+            target (str): target word
 
         Returns:
             int: minimum number of Levenshtein edits required to get from
@@ -187,8 +184,8 @@ class Distance(object):
         (`source` or `target`) after mapping to D' classes.
 
         Args:
-            source (unicode): source word
-            target (unicode): target word
+            source (str): source word
+            target (str): target word
 
         Returns:
             int: minimum number of Levenshtein edits required to get from
@@ -308,8 +305,8 @@ class Distance(object):
         between two features with oppoiste values.
 
         Args:
-            source (unicode): source string
-            target (unicode): target string
+            source (str): source string
+            target (str): target string
 
         Returns:
             float: feature edit distance with equally-weighed features an insdel
@@ -332,8 +329,8 @@ class Distance(object):
         between two features with oppoiste values. Insdel costs are cheap.
 
         Args:
-            source (unicode): source string
-            target (unicode): target string
+            source (str): source string
+            target (str): target string
             xsampa (bool): source and target are X-SAMPA
 
         Returns:
@@ -354,8 +351,8 @@ class Distance(object):
         """Like `Distance.feature_edit_distance` but normalized by maxlen
 
         Args:
-            source (unicode): source string
-            target (unicode): target string
+            source (str): source string
+            target (str): target string
             xsampa (bool): source and target are X-SAMPA
 
         Returns:
@@ -375,8 +372,8 @@ class Distance(object):
         """Like `Distance.feature_edit_distance` but normalized by maxlen
 
         Args:
-            source (unicode): source string
-            target (unicode): target string
+            source (str): source string
+            target (str): target string
             xsampa (bool): source and target are X-SAMPA
 
         Returns:
@@ -396,8 +393,8 @@ class Distance(object):
         Normalizes by the total number of phones in the reference
 
         Args:
-            hyp (list[unicode]): hypothesized strings
-            ref (list[unicode]): reference strings
+            hyp (list[str]): hypothesized strings
+            ref (list[str]): reference strings
 
         Returns:
             float: phoneme error rate (PER)
@@ -424,8 +421,8 @@ class Distance(object):
         """Feature error rate over lists of hypothesized and reference strings.
         
         Args:
-            hyp (list[unicode]): hypothesized strings
-            ref (list[unicode]): reference strings
+            hyp (list[str]): hypothesized strings
+            ref (list[str]): reference strings
 
         Returns:
             float: feature error rate (FER)
@@ -471,8 +468,8 @@ class Distance(object):
         inequality and thus provide a true distance metric.
 
         Args:
-            source (unicode): source string
-            target (unicode): target string
+            source (str): source string
+            target (str): target string
             xsampa (bool): source and target are X-SAMPA
 
         Returns:
@@ -501,8 +498,8 @@ class Distance(object):
         inequality and thus provide a true distance metric.
 
         Args:
-            source (unicode): source string
-            target (unicode): target string
+            source (str): source string
+            target (str): target string
             xsampa (bool): source and target are X-SAMPA
 
         Returns:
@@ -527,8 +524,8 @@ class Distance(object):
         metric.
 
         Args:
-            source (unicode): source string
-            target (unicode): target string
+            source (str): source string
+            target (str): target string
             xsampa (bool): source and target are X-SAMPA
 
         Returns:
@@ -557,8 +554,8 @@ class Distance(object):
         metric.
 
         Args:
-            source (unicode): source string
-            target (unicode): target string
+            source (str): source string
+            target (str): target string
             xsampa (bool): source and target are X-SAMPA
 
         Returns:
@@ -645,7 +642,7 @@ class Distance(object):
         These weights are stored in `Distance.weights`.
 
         Args:
-            source (unicode): source string
+            source (str): source string
             target (uniocde): target string
             xsampa (bool): source and target are X-SAMPA
 
@@ -670,7 +667,7 @@ class Distance(object):
         These weights are stored in `Distance.weights`.
 
         Args:
-            source (unicode): source string
+            source (str): source string
             target (uniocde): target string
             xsampa (bool): source and target are X-SAMPA
 
@@ -696,7 +693,7 @@ class Distance(object):
         These weights are stored in `Distance.weights`.
 
         Args:
-            source (unicode): source string
+            source (str): source string
             target (uniocde): target string
             xsampa (bool): source and target are X-SAMPA
 
@@ -729,7 +726,7 @@ class Distance(object):
         with low insdel costs (1/4 the cost of a complete substitution).
 
         Args:
-            source (unicode): source string
+            source (str): source string
             target (uniocde): target string
             xsampa (bool): source and target are X-SAMPA
 
@@ -786,7 +783,7 @@ class Distance(object):
         This function has no normalization and should obey the triangle
         inequality and thus provide a true distance metric.
 
-        Args: source (unicode): source string target (unicode): target string
+        Args: source (str): source string target (str): target string
             xsampa (bool): source and target are X-SAMPA
 
         Returns: float: Partial hamming feature edit distance between `source`
@@ -819,7 +816,7 @@ class Distance(object):
         This method is normalized and does not satisfy the triangle inequality.
         It is thus not a true distance metric.
 
-        Args: source (unicode): source string target (unicode): target string
+        Args: source (str): source string target (str): target string
             xsampa (bool): source and target are X-SAMPA
 
         Returns: float: Normalized partial hamming feature edit distance between

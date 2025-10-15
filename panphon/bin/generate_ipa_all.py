@@ -1,13 +1,11 @@
 #!/usr/bin/env python
-from __future__ import print_function, unicode_literals
 
 import argparse
-import codecs
 import copy
 
 import yaml
 
-import unicodecsv as csv
+import csv
 
 
 class Segment(object):
@@ -26,7 +24,7 @@ class Segment(object):
     def __repr__(self):
         """Output string representation of Segment."""
         return 'Segment("{}", {})'.format(self.form,
-                                          repr(self.features)).encode('utf-8')
+                                          repr(self.features))
 
     def feature_vector(self, feature_names):
         """Return feature vector for segment.
@@ -47,7 +45,7 @@ class Diacritic(object):
         """Construct a diacritic object.
 
         Args:
-            marker (unicode): the string form of the diacritic
+            marker (str): the string form of the diacritic
             position (str): 'pre' or 'post', determining whether the diacritic
                             attaches before or after the base
             conditions (list): feature specification on which application of
@@ -105,8 +103,8 @@ class Combination(object):
 
 def read_ipa_bases(ipa_bases):
     segments = []
-    with open(ipa_bases, 'rb') as f:
-        dictreader = csv.DictReader(f, encoding='utf=8')
+    with open(ipa_bases, 'r', encoding='utf-8') as f:
+        dictreader = csv.DictReader(f)
         for record in dictreader:
             form = record['ipa']
             features = {k: v for k, v in record.items() if k != 'ipa'}
@@ -115,7 +113,8 @@ def read_ipa_bases(ipa_bases):
 
 
 def parse_dia_defs(dia_defs):
-    defs = yaml.load(codecs.open(dia_defs, "r", "utf-8").read(), Loader=yaml.FullLoader)
+    with open(dia_defs, "r", encoding="utf-8") as f:
+        defs = yaml.load(f.read(), Loader=yaml.FullLoader)
     diacritics = {}
     for dia in defs['diacritics']:
         if 'exclude' in dia:
@@ -134,7 +133,8 @@ def parse_dia_defs(dia_defs):
 
 def sort_all_segments(sort_order, all_segments):
     all_segments_list = list(all_segments)
-    field_order = reversed(yaml.load(open(sort_order, 'r').read(), Loader=yaml.FullLoader))
+    with open(sort_order, 'r', encoding='utf-8') as f:
+        field_order = reversed(yaml.load(f.read(), Loader=yaml.FullLoader))
     for field in field_order:
         all_segments_list.sort(key=lambda seg: seg.features[field['name']],
                                reverse=field['reverse'])
@@ -142,12 +142,12 @@ def sort_all_segments(sort_order, all_segments):
 
 
 def write_ipa_all(ipa_bases, ipa_all, all_segments, sort_order):
-    with open(ipa_bases, 'rb') as f:
-        reader = csv.reader(f, encoding='utf-8')
+    with open(ipa_bases, 'r', encoding='utf-8') as f:
+        reader = csv.reader(f)
         fieldnames = next(reader)
-    with open(ipa_all, 'wb') as f:
-        writer = csv.DictWriter(f, encoding='utf-8', fieldnames=fieldnames)
-        writer.writerow({k: k for k in fieldnames})
+    with open(ipa_all, 'w', encoding='utf-8', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
         all_segments_list = sort_all_segments(sort_order, all_segments)
         for segment in all_segments_list:
             fields = copy.copy(segment.features)

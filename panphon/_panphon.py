@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
 
 import os.path
 import unicodedata
@@ -33,7 +32,7 @@ def segment_text(text, seg_regex=SEG_REGEX):
     """Return an iterator of segments in the text.
 
     Args:
-        text (unicode): string of IPA Unicode text
+        text (str): string of IPA Unicode text
         seg_regex (_regex.Pattern): compiled regex defining a segment (base +
                                     modifiers)
 
@@ -177,7 +176,7 @@ class FeatureTable(object):
         feature) tuples.
 
         Args:
-           segment (unicode): segment for which features are to be returned as
+           segment (str): segment for which features are to be returned as
                               Unicode IPA string.
 
         Returns:
@@ -227,10 +226,10 @@ class FeatureTable(object):
         """Return longest Unicode IPA prefix of a word
 
         Args:
-            word (unicode): input word as Unicode IPA string
+            word (str): input word as Unicode IPA string
 
         Returns:
-            unicode: longest single-segment prefix of `word` in database
+            str: longest single-segment prefix of `word` in database
         """
         if normalize:
             word = FeatureTable.normalize(word)
@@ -244,7 +243,7 @@ class FeatureTable(object):
         """Returns True if `word` consists exhaustively of valid IPA segments
 
         Args:
-            word (unicode): input word as Unicode IPA string
+            word (str): input word as Unicode IPA string
 
         Returns:
             bool: True if `word` can be divided exhaustively into IPA segments
@@ -263,7 +262,7 @@ class FeatureTable(object):
         """Returns a list of segments from a word
 
         Args:
-            word (unicode): input word as Unicode IPA string
+            word (str): input word as Unicode IPA string
 
         Returns:
             list: list of strings corresponding to segments found in `word`
@@ -274,7 +273,7 @@ class FeatureTable(object):
         """Return featural analysis of `word`
 
         Args:
-            word (unicode):  one or more IPA segments
+            word (str):  one or more IPA segments
 
         Returns:
             list: list of lists (value, feature) tuples where each inner list
@@ -287,7 +286,7 @@ class FeatureTable(object):
 
         Args:
             ft_names (list): list of feature names in order
-            word (unicode): word as an IPA string
+            word (str): word as an IPA string
 
         Returns:
             ndarray: segments in rows, features in columns as [-1, 0 , 1]
@@ -298,7 +297,7 @@ class FeatureTable(object):
         """Return True if `segment` is in segment <=> features database
 
         Args:
-            segment (unicode): consonant or vowel
+            segment (str): consonant or vowel
 
         Returns:
             bool: True, if `segment` is in the database
@@ -312,7 +311,7 @@ class FeatureTable(object):
         individual characters.
 
         Args:
-            word (unicode): word as an IPA string
+            word (str): word as an IPA string
 
         Returns:
             list: list of Unicode IPA strings corresponding to segments in
@@ -346,10 +345,10 @@ class FeatureTable(object):
         segments
 
         Args:
-            word (unicode): input string to be filtered
+            word (str): input string to be filtered
 
         Returns:
-            unicode: string identical to `word` but with invalid IPA segments
+            str: string identical to `word` but with invalid IPA segments
                      absent
 
         """
@@ -447,7 +446,7 @@ class FeatureTable(object):
         Args:
            pat (list): pattern consisting of a sequence of sets of (value,
                        feature) tuples
-           word (unicode): a Unicode IPA string consisting of zero or more
+           word (str): a Unicode IPA string consisting of zero or more
                           segments
 
         Returns:
@@ -525,7 +524,7 @@ class FeatureTable(object):
         in cannonical order.
 
         Args:
-            seg (unicode): IPA consonant or vowel
+            seg (str): IPA consonant or vowel
 
         Returns:
             list: feature specifications ('+'/'-'/'0') in the order from
@@ -542,7 +541,7 @@ class FeatureTable(object):
         """Return a list of feature vectors, given a Unicode IPA word.
 
         Args:
-            word (unicode): string in IPA
+            word (str): string in IPA
             numeric (bool): if True, return features as numeric values instead
                             of strings
 

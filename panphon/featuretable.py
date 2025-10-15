@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import annotations
 
 import collections
 import os.path
@@ -33,11 +32,11 @@ class SegmentSorter:
         return self._segments
 
     def sort_segments(self):
-        self.segments.sort(key=self.segment_key)
+        self._segments.sort(key=self.segment_key)
+        self._sorted = True
 
     @staticmethod
     def segment_key(segment_tuple):
-        print('segment_tuple=', segment_tuple)
         segment_data=segment_tuple[1]
         return (
             segment_data['syl'], segment_data['son'], segment_data['cons'], segment_data['cont'],
@@ -134,11 +133,11 @@ class FeatureTable(object):
         """Return longest Unicode IPA prefix of a word
 
         Args:
-            word (unicode): input word as Unicode IPA string
+            word (str): input word as Unicode IPA string
             normalize (bool): whether the word should be pre-normalized
 
         Returns:
-            unicode: longest single-segment prefix of `word` in database
+            str: longest single-segment prefix of `word` in database
         """
         if normalize:
             word = FeatureTable.normalize(word)
@@ -156,7 +155,7 @@ class FeatureTable(object):
         """Returns a list of segments from a word
 
         Args:
-            word (unicode): input word as Unicode IPA string
+            word (str): input word as Unicode IPA string
             normalize (bool): whether to pre-normalize the word
 
         Returns:
@@ -170,7 +169,7 @@ class FeatureTable(object):
         """Returns True if `word` consists exhaustively of valid IPA segments
 
         Args:
-            word (unicode): input word as Unicode IPA string
+            word (str): input word as Unicode IPA string
             normalize (bool): whether to pre-normalize the word
 
         Returns:
@@ -185,7 +184,7 @@ class FeatureTable(object):
            word.
 
         Args:
-            word (unicode): word consisting of IPA segments
+            word (str): word consisting of IPA segments
             normalize (bool): whether to pre-normalize the word
 
         Returns:
@@ -198,7 +197,7 @@ class FeatureTable(object):
 
         Args:
             ft_names (list): strings naming subset of features in self.names
-            word (unicode): word to be analyzed
+            word (str): word to be analyzed
             normalize (bool): whether to pre-normalize the word
 
         Returns:
@@ -210,7 +209,7 @@ class FeatureTable(object):
         """Return a vector in which each dimension is the number of times a feature-value pair occurs in the word
         
         Args:
-            word (unicode): word consisting of IPA segments
+            word (str): word consisting of IPA segments
             normalize (bool): whether to pre-normalize the word
 
         Returns:
@@ -231,7 +230,7 @@ class FeatureTable(object):
         """Return True if `segment` is in segment <=> features database
 
         Args:
-            segment (unicode): consonant or vowel
+            segment (str): consonant or vowel
             normalize (bool): whether to pre-normalize the segment
 
         Returns:
@@ -248,7 +247,7 @@ class FeatureTable(object):
         individual characters.
 
         Args:
-            word (unicode): word as an IPA string
+            word (str): word as an IPA string
             normalize (bool): whether to pre-normalize the word
 
         Returns:
@@ -292,11 +291,11 @@ class FeatureTable(object):
         """Return a string like the input but containing only legal IPA segments
 
         Args:
-            word (unicode): input string to be filtered
+            word (str): input string to be filtered
             normalize (bool): whether to pre-normalize the word (and return a normalized string)
 
         Returns:
-            unicode: string identical to `word` but with invalid IPA segments
+            str: string identical to `word` but with invalid IPA segments
                      absent
 
         """
@@ -389,7 +388,7 @@ class FeatureTable(object):
 
         Args:
            pat (list): pattern consisting of a sequence of feature dicts
-           word (unicode): a Unicode IPA string consisting of zero or more
+           word (str): a Unicode IPA string consisting of zero or more
                            segments
            normalize (bool): whether to pre-normalize the word
 
@@ -463,7 +462,7 @@ class FeatureTable(object):
         in canonical order.
 
         Args:
-            seg (unicode): IPA consonant or vowel
+            seg (str): IPA consonant or vowel
             normalize: whether to pre-normalize the segment
 
         Returns:
@@ -482,7 +481,7 @@ class FeatureTable(object):
         """Return a list of feature vectors, given a Unicode IPA word.
 
         Args:
-            word (unicode): string in IPA (or X-SAMPA, provided `xsampa` is True)
+            word (str): string in IPA (or X-SAMPA, provided `xsampa` is True)
             numeric (bool): if True, return features as numeric values instead
                             of strings
             xsampa (bool): whether the word is in X-SAMPA instead of IPA
@@ -577,7 +576,7 @@ class FeatureTable(object):
             fuzzy_search (bool): whether to search for the closest vector match if an exact match is not found.
                 If disabled and an exact match is not found, a `ValueError` is raised.
         Returns:
-            unicode: string in IPA (or X-SAMPA, provided `xsampa` is True)
+            str: string in IPA (or X-SAMPA, provided `xsampa` is True)
         """
 
         word = ""
