@@ -8,7 +8,6 @@ version = "0.22.2"
 description = "Tools for using the International Phonetic Alphabet with phonological features"
 readme = "README.md"
 license = {text = "MIT-Modern-Variant"}
-license-files = ["LICENSE.txt"]
 authors = [
     {name = "David R. Mortensen", email = "dmortens@cs.cmu.edu"}
 ]
