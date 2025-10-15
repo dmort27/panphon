@@ -5,7 +5,7 @@ import os.path
 import unicodedata
 from functools import reduce
 from importlib.resources import files
-from typing import Any, Pattern
+from typing import Any, Pattern, List, Dict, Tuple, Optional, Union, Set
 
 import numpy
 import pandas as pd
@@ -21,22 +21,22 @@ feature_sets = {
 
 
 class SegmentSorter:
-    def __init__(self, segments,):
+    def __init__(self, segments: List[Any]) -> None:
         self._segments = segments
         self._sorted=False
 
     @property
-    def segments(self):
+    def segments(self) -> List[Any]:
         if not self._sorted:
             self.sort_segments()
         return self._segments
 
-    def sort_segments(self):
+    def sort_segments(self) -> None:
         self._segments.sort(key=self.segment_key)
         self._sorted = True
 
     @staticmethod
-    def segment_key(segment_tuple):
+    def segment_key(segment_tuple: Tuple[str, Dict[str, Any]]) -> Tuple[Any, ...]:
         segment_data=segment_tuple[1]
         return (
             segment_data['syl'], segment_data['son'], segment_data['cons'], segment_data['cont'],

@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from typing import TextIO, Optional
 import panphon
 import regex as re
 import sys
 
 
 class Validator(object):
-    def __init__(self, infile=sys.stdin):
+    def __init__(self, infile: TextIO = sys.stdin) -> None:
         """Validate Unicode IPA from file relative to panphon database.
 
         infile -- File from which input is taken; by default, STDIN.
@@ -16,11 +17,11 @@ class Validator(object):
         self.ft = panphon.FeatureTable()
         self._validate_file(infile)
 
-    def _validate_file(self, infile):
+    def _validate_file(self, infile: TextIO) -> None:
         for line in infile:
             self.validate_line(line)
 
-    def validate_line(self, line):
+    def validate_line(self, line: str) -> None:
         """Validate Unicode IPA string relative to panphon.
 
         line -- String of IPA characters. Can contain whitespace and limited

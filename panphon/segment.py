@@ -2,7 +2,7 @@
 
 
 from collections.abc import Iterator, Iterable, Mapping
-from typing import TypeVar
+from typing import TypeVar, List, Dict, Optional, Union, Any
 import regex as re
 
 T = TypeVar('T')
@@ -15,7 +15,7 @@ class Segment(Mapping[str, int]):
     :param ftstr str: A string, each /(+|0|-)\\w+/ sequence of which is interpreted as a feature specification.
     :param weights list[float]: An ordered list of feature weights/saliences.
     """
-    def __init__(self, names: list[str], features: dict[str, int]={}, ftstr: str='', weights: "list[float]"=[]):
+    def __init__(self, names: List[str], features: Dict[str, int] = {}, ftstr: str = '', weights: List[float] = []) -> None:
         self.n2s = {-1: '-', 0: '0', 1: '+'}
         self.s2n = {k: v for (v, k) in self.n2s.items()}
         self.names = names
@@ -58,7 +58,7 @@ class Segment(Mapping[str, int]):
         """Return an iterator over the feature names"""
         return iter(self.names)
 
-    def items(self) -> list[tuple[str, int]]:
+    def items(self) -> List[tuple[str, int]]:
         """Return a list of the features as (name, value) pairs
         
         :return: List of features as (name, value) pairs
@@ -74,7 +74,7 @@ class Segment(Mapping[str, int]):
         """
         return ((k, self.data[k]) for k in self.names)
 
-    def update(self, features: dict[str, int]):
+    def update(self, features: Dict[str, int]) -> None:
         """Update the objects features to match `features`.
 
         Args:
@@ -114,13 +114,13 @@ class Segment(Mapping[str, int]):
         """Return Segment of features shared by `self` and `other`"""
         return self.intersection(other)
 
-    def numeric(self, names: list[str]=[]) -> list[int]:
+    def numeric(self, names: List[str] = []) -> List[int]:
         if not names:
             names = self.names
         """Return feature values as a list of integers"""
         return [self.data[k] for k in names]
 
-    def strings(self, names: list[str]=[]) -> list[str]:
+    def strings(self, names: List[str] = []) -> List[str]:
         """Return feature values as a list of strings"""
         if not names:
             names = self.names
@@ -201,7 +201,7 @@ class Segment(Mapping[str, int]):
         """
         return self.weighted_distance(other) / sum(self.weights)
 
-    def specified(self) -> dict[str, int]:
+    def specified(self) -> Dict[str, int]:
         """Return dictionary of features that are specified '+' or '-' (1 or -1)
 
         Returns:
@@ -209,7 +209,7 @@ class Segment(Mapping[str, int]):
         """
         return {k: v for (k, v) in self.data.items() if v != 0}
 
-    def differing_specs(self, other: "Segment") -> list[str]:
+    def differing_specs(self, other: "Segment") -> List[str]:
         """Return a list of feature names that differ in their specified values
 
         Args:

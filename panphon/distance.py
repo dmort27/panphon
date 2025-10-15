@@ -1,6 +1,7 @@
 import os.path
 from functools import partial
 from importlib.resources import files
+from typing import Callable, Any, List, Dict, Tuple, Optional, Union
 
 import editdistance
 import numpy as np
@@ -10,8 +11,8 @@ import yaml
 from . import _panphon, featuretable, permissive, xsampa
 
 
-def zerodiviszero(f):
-    def wrapper(*args, **kwargs):
+def zerodiviszero(f: Callable) -> Callable:
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         try:
             return f(*args, **kwargs)
         except ZeroDivisionError:
@@ -19,8 +20,8 @@ def zerodiviszero(f):
     return wrapper
 
 
-def xsampaopt(f):
-    def wrapper(*args, **kwargs):
+def xsampaopt(f: Callable) -> Callable:
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         if 'xsampa' in kwargs and kwargs['xsampa']:
             self, source, target = args
             source = self.xs.convert(source)
@@ -30,7 +31,7 @@ def xsampaopt(f):
     return wrapper
 
 
-def ftstr2dict(ftstr):
+def ftstr2dict(ftstr: str) -> Dict[str, int]:
     fts = {}
     for m in re.finditer(r'([-0+])(\w+)', ftstr):
         v, k = m.groups()
@@ -41,7 +42,7 @@ def ftstr2dict(ftstr):
 class Distance(object):
     """Measures of phonological distance."""
 
-    def __init__(self, feature_set='spe+', feature_model='segment'):
+    def __init__(self, feature_set: str = 'spe+', feature_model: str = 'segment') -> None:
         """Construct a `Distance` object
 
         Args:
