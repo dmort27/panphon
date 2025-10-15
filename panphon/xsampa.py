@@ -13,7 +13,7 @@ class XSampa(object):
     def read_xsampa_table(self):
         filename = os.path.join('data', 'ipa-xsampa.csv')
         filename = files('panphon').joinpath(filename)
-        with open(filename, 'r', encoding='utf-8') as f:
+        with filename.open('r', encoding='utf-8') as f:
             xs2ipa = {x[1]: x[0] for x in csv.reader(f)}
         xs = sorted(xs2ipa.keys(), key=len, reverse=True)
         xs_regex = re.compile('|'.join(list(map(re.escape, xs))))
