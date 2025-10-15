@@ -31,41 +31,57 @@ filenames = {
 def segment_text(text: str, seg_regex: re.Pattern = SEG_REGEX) -> Iterator[str]:
     """Return an iterator of segments in the text.
 
-    Args:
-        text (str): string of IPA Unicode text
-        seg_regex (_regex.Pattern): compiled regex defining a segment (base +
-                                    modifiers)
+    Parameters
+    ----------
+    text : str
+        String of IPA Unicode text to segment.
+    seg_regex : re.Pattern, optional
+        Compiled regex defining a segment (base + modifiers).
+        Default is SEG_REGEX.
 
-    Return:
-        generator: segments in the input text
+    Returns
+    -------
+    Iterator[str]
+        Iterator yielding segments in the input text.
     """
     for m in seg_regex.finditer(text):
         yield m.group(0)
 
 
 def fts(s: str) -> Set[Tuple[str, str]]:
-    """
-    Given string `s` with +/-[alphabetical sequence]s, return list of
+    """Extract features from a feature specification string.
+
+    Given string `s` with +/-[alphabetical sequence]s, return set of
     features.
 
-    Args:
-        s (str): string with segments of the sort "+son -syl 0cor"
+    Parameters
+    ----------
+    s : str
+        String with segments of the sort "+son -syl 0cor".
 
-    Return:
-        list: list of (value, feature) tuples
+    Returns
+    -------
+    Set[Tuple[str, str]]
+        Set of (value, feature) tuples where value is '+', '-', or '0'.
     """
     return {m.groups() for m in FT_REGEX.finditer(s)}
 
 
 def pat(p: str) -> List[Set[Tuple[str, str]]]:
-    """Given a string `p` with feature matrices (features grouped with square
-    brackets into segments, return a list of sets of (value, feature) tuples.
+    """Parse feature pattern string into list of feature sets.
 
-    Args:
-        p (str): list of feature matrices as strings
+    Given a string `p` with feature matrices (features grouped with square
+    brackets into segments), return a list of sets of (value, feature) tuples.
 
-    Return:
-        list: list of sets of (value, feature) tuples
+    Parameters
+    ----------
+    p : str
+        String containing feature matrices as bracketed segments.
+
+    Returns
+    -------
+    List[Set[Tuple[str, str]]]
+        List of sets of (value, feature) tuples, one set per segment.
     """
     pattern = []
     for matrix in [m.group(0) for m in MT_REGEX.finditer(p)]:
@@ -75,23 +91,26 @@ def pat(p: str) -> List[Set[Tuple[str, str]]]:
 
 
 def word2array(ft_names: List[str], word: List[List[Tuple[str, str]]]) -> np.ndarray:
-    """Converts `word` [[(value, feature),...],...] to a NumPy array
+    """Convert word feature representation to NumPy array.
 
     Given a word consisting of lists of lists/sets of (value, feature) tuples,
     return a NumPy array where each row is a segment and each column is a
     feature.
 
-    Args:
-        ft_names (list): list of feature names (as strings) in order; this
-                         argument controls what features are included in the
-                         array that is output and their order vis-a-vis the
-                         columns of the array
-        word (list): list of lists of feature tuples (output by
-                     FeatureTable.word_fts)
+    Parameters
+    ----------
+    ft_names : List[str]
+        List of feature names (as strings) in order. This argument controls
+        what features are included in the array that is output and their
+        order vis-a-vis the columns of the array.
+    word : List[List[Tuple[str, str]]]
+        List of lists of feature tuples (output by FeatureTable.word_fts).
 
-    Returns:
-        ndarray: array in which each row is a segment and each column
-                         is a feature
+    Returns
+    -------
+    np.ndarray
+        Array in which each row is a segment and each column is a feature.
+        Values are 1 for '+', -1 for '-', and 0 for '0'.
     """
     vdict = {'+': 1, '-': -1, '0': 0}
 
@@ -102,17 +121,21 @@ def word2array(ft_names: List[str], word: List[List[Tuple[str, str]]]) -> np.nda
 
 
 class FeatureTable(object):
-    """Encapsulate the segment <=> feature mapping in the file
-    "data/ipa_all.csv".
+    """Encapsulate the segment <=> feature mapping.
+
+    This class provides access to the segment-to-feature mapping stored in
+    the data file "data/ipa_all.csv" and related functionality for working
+    with phonological features.
     """
 
     def __init__(self, feature_set: str = 'spe+') -> None:
-        """Construct a FeatureTable object
+        """Construct a FeatureTable object.
 
-        Args:
-            feature_set (str): the feature set that the FeatureTable will use;
-                               currently, there is only one of these ("spe+")
-
+        Parameters
+        ----------
+        feature_set : str, optional
+            The feature set that the FeatureTable will use. Currently,
+            there is only one of these ("spe+"). Default is "spe+".
         """
         filename = filenames[feature_set]
         self.segments, self.seg_dict, self.names = self._read_table(filename)
@@ -172,29 +195,40 @@ class FeatureTable(object):
         return re.compile(r'(?P<all>{})'.format('|'.join(segs)))
 
     def fts(self, segment: str) -> List[Tuple[str, str]]:
-        """Returns features corresponding to `segment` as list of (value,
+        """Return features corresponding to segment.
+
+        Returns features corresponding to `segment` as list of (value,
         feature) tuples.
 
-        Args:
-           segment (str): segment for which features are to be returned as
-                              Unicode IPA string.
+        Parameters
+        ----------
+        segment : str
+            Segment for which features are to be returned as Unicode IPA string.
 
-        Returns:
-            set: set of (value, feature) tuples, if `segment` is valid;
-            otherwise,
-                 None
+        Returns
+        -------
+        List[Tuple[str, str]]
+            List of (value, feature) tuples if `segment` is valid,
+            otherwise empty list.
         """
         return self.seg_dict.get(segment, [])
 
     def match(self, ft_mask: Set[Tuple[str, str]], ft_seg: Set[Tuple[str, str]]) -> bool:
-        """Answer question "are `ft_mask`'s features a subset of ft_seg?"
+        """Check if feature mask matches segment features.
 
-        Args:
-            ft_mask (set): pattern defined as set of (value, feature) tuples
-            ft_seg (set): segment defined as a set of (value, feature) tuples
+        Answer question "are `ft_mask`'s features a subset of ft_seg?"
 
-        Returns:
-            bool: True iff all features in `ft_mask` are also in `ft_seg`
+        Parameters
+        ----------
+        ft_mask : Set[Tuple[str, str]]
+            Pattern defined as set of (value, feature) tuples.
+        ft_seg : Set[Tuple[str, str]]
+            Segment defined as a set of (value, feature) tuples.
+
+        Returns
+        -------
+        bool
+            True if and only if all features in `ft_mask` are also in `ft_seg`.
         """
         return set(ft_mask) <= set(ft_seg)
 
@@ -202,18 +236,24 @@ class FeatureTable(object):
             self,
             features: Iterable[tuple[str, str]],
             segment: str | None):
-        """Answer question "are `ft_mask`'s features a subset of ft_seg?"
+        """Check if features match segment with validity checking.
 
+        Answer question "are `features` a subset of segment's features?"
         This is like `FeatureTable.match` except that it checks whether a
         segment is valid and returns None if it is not.
 
-        Args:
-            features (set): pattern defined as set of (value, feature) tuples
-            segment (set): segment defined as a set of (value, feature) tuples
+        Parameters
+        ----------
+        features : Iterable[Tuple[str, str]]
+            Pattern defined as iterable of (value, feature) tuples.
+        segment : str or None
+            Segment string to check against, or None.
 
-        Returns:
-            bool: True iff all features in `ft_mask` are also in `ft_seg`; None
-                  if segment is not valid
+        Returns
+        -------
+        bool or None
+            True if and only if all features in `features` are also in segment's
+            features; None if segment is not valid or is None.
         """
         feature_set: set[tuple[str, str]] = set(features)
         seg_fts: list[tuple[str, str]] | None = self.fts(segment)
@@ -223,13 +263,20 @@ class FeatureTable(object):
             return None
 
     def longest_one_seg_prefix(self, word, normalize=True):
-        """Return longest Unicode IPA prefix of a word
+        """Return longest single-segment prefix of a word.
 
-        Args:
-            word (str): input word as Unicode IPA string
+        Parameters
+        ----------
+        word : str
+            Input word as Unicode IPA string.
+        normalize : bool, optional
+            Whether to normalize the word using Unicode NFD. Default is True.
 
-        Returns:
-            str: longest single-segment prefix of `word` in database
+        Returns
+        -------
+        str
+            Longest single-segment prefix of `word` found in database,
+            or empty string if no valid prefix exists.
         """
         if normalize:
             word = FeatureTable.normalize(word)
@@ -240,15 +287,18 @@ class FeatureTable(object):
         return ''
 
     def validate_word(self, word: str) -> bool:
-        """Returns True if `word` consists exhaustively of valid IPA segments
+        """Check if word consists exhaustively of valid IPA segments.
 
-        Args:
-            word (str): input word as Unicode IPA string
+        Parameters
+        ----------
+        word : str
+            Input word as Unicode IPA string.
 
-        Returns:
-            bool: True if `word` can be divided exhaustively into IPA segments
-                  that exist in the database
-
+        Returns
+        -------
+        bool
+            True if `word` can be divided exhaustively into IPA segments
+            that exist in the database, False otherwise.
         """
         while word:
             match = self.seg_regex.match(word)
@@ -259,63 +309,86 @@ class FeatureTable(object):
         return True
 
     def segs(self, word: str) -> List[str]:
-        """Returns a list of segments from a word
+        """Extract segments from a word.
 
-        Args:
-            word (str): input word as Unicode IPA string
+        Parameters
+        ----------
+        word : str
+            Input word as Unicode IPA string.
 
-        Returns:
-            list: list of strings corresponding to segments found in `word`
+        Returns
+        -------
+        List[str]
+            List of strings corresponding to segments found in `word`.
         """
         return [m.group('all') for m in self.seg_regex.finditer(word)]
 
     def word_fts(self, word: str) -> List[List[Tuple[str, str]]]:
-        """Return featural analysis of `word`
+        """Return featural analysis of word.
 
-        Args:
-            word (str):  one or more IPA segments
+        Parameters
+        ----------
+        word : str
+            One or more IPA segments.
 
-        Returns:
-            list: list of lists (value, feature) tuples where each inner list
-                  corresponds to a segment in `word`
+        Returns
+        -------
+        List[List[Tuple[str, str]]]
+            List of lists of (value, feature) tuples where each inner list
+            corresponds to a segment in `word`.
         """
         return list(map(self.fts, self.segs(word)))
 
     def word_array(self, ft_names: List[str], word: str) -> np.ndarray:
-        """Return `word` as [-1, 0, 1] features in a NumPy array
+        """Return word as feature array.
 
-        Args:
-            ft_names (list): list of feature names in order
-            word (str): word as an IPA string
+        Return `word` as [-1, 0, 1] features in a NumPy array.
 
-        Returns:
-            ndarray: segments in rows, features in columns as [-1, 0 , 1]
+        Parameters
+        ----------
+        ft_names : List[str]
+            List of feature names in order.
+        word : str
+            Word as an IPA string.
+
+        Returns
+        -------
+        np.ndarray
+            Array with segments in rows, features in columns as [-1, 0, 1].
         """
         return word2array(ft_names, self.word_fts(word))
 
     def seg_known(self, segment: str) -> bool:
-        """Return True if `segment` is in segment <=> features database
+        """Check if segment is in the features database.
 
-        Args:
-            segment (str): consonant or vowel
+        Parameters
+        ----------
+        segment : str
+            Consonant or vowel segment.
 
-        Returns:
-            bool: True, if `segment` is in the database
+        Returns
+        -------
+        bool
+            True if `segment` is in the database, False otherwise.
         """
         return segment in self.seg_dict
 
     def segs_safe(self, word: str) -> List[str]:
-        """Return a list of segments (as strings) from a word
+        """Extract segments from word with fallback for invalid characters.
 
         Characters that are not valid segments are included in the list as
         individual characters.
 
-        Args:
-            word (str): word as an IPA string
+        Parameters
+        ----------
+        word : str
+            Word as an IPA string.
 
-        Returns:
-            list: list of Unicode IPA strings corresponding to segments in
-                  `word`
+        Returns
+        -------
+        List[str]
+            List of Unicode IPA strings corresponding to segments in `word`.
+            Invalid segments are included as individual characters.
         """
         segs = []
         while word:
@@ -329,14 +402,20 @@ class FeatureTable(object):
         return segs
 
     def filter_segs(self, segs: List[str]) -> List[str]:
-        """Given list of strings, return only those which are valid segments
+        """Filter list to include only valid segments.
 
-        Args:
-            segs (list): list of IPA Unicode strings
+        Given list of strings, return only those which are valid segments.
 
-        Return:
-            list: list of IPA Unicode strings identical to `segs` but with
-                  invalid segments filtered out
+        Parameters
+        ----------
+        segs : List[str]
+            List of IPA Unicode strings.
+
+        Returns
+        -------
+        List[str]
+            List of IPA Unicode strings identical to `segs` but with
+            invalid segments filtered out.
         """
         return list(filter(self.seg_known, segs))
 

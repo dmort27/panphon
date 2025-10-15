@@ -51,7 +51,11 @@ class SegmentSorter:
 class FeatureTable(object):
     """The basic PanPhon object for representing the features of sets of segments.
 
-    :param feature_set str: The set of fetures to be used by the FeatureTable object.
+    Parameters
+    ----------
+    feature_set : str, optional
+        The set of features to be used by the FeatureTable object.
+        Default is 'spe+'.
     """
     TRIE_LEAF_MARKER = None
 

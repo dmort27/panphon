@@ -11,7 +11,10 @@ class Validator(object):
     def __init__(self, infile: TextIO = sys.stdin) -> None:
         """Validate Unicode IPA from file relative to panphon database.
 
-        infile -- File from which input is taken; by default, STDIN.
+        Parameters
+        ----------
+        infile : TextIO, optional
+            File from which input is taken. Default is sys.stdin.
         """
         self.ws_punc_regex = re.compile(r'[," \t\n]', re.V1 | re.U)
         self.ft = panphon.FeatureTable()
@@ -24,8 +27,11 @@ class Validator(object):
     def validate_line(self, line: str) -> None:
         """Validate Unicode IPA string relative to panphon.
 
-        line -- String of IPA characters. Can contain whitespace and limited
-        punctuation.
+        Parameters
+        ----------
+        line : str
+            String of IPA characters. Can contain whitespace and limited
+            punctuation.
         """
         line0 = line
         pos = 0
