@@ -8,22 +8,19 @@ version = "0.22.2"
 description = "Tools for using the International Phonetic Alphabet with phonological features"
 readme = "README.md"
 license = {text = "MIT-Modern-Variant"}
-license-files = ["LICENSE.txt"]
 authors = [
     {name = "David R. Mortensen", email = "dmortens@cs.cmu.edu"}
 ]
 classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9", 
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Text Processing :: Linguistic",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
     "setuptools",
     "PyYAML",
