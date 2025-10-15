@@ -58,7 +58,8 @@ def main(wordlist1, wordlist2, dist_funcs):
         print('Done.')
 
 
-if __name__ == '__main__':
+def cli_main():
+    """Entry point for the align_wordlists script."""
     parser = argparse.ArgumentParser(usage='Align two lists of "cognates" using a specified distance metric.')
     parser.add_argument('wordlists', nargs=2, help='Filenames of two wordlists in corresponding order.')
     parser.add_argument('-d', '--dist', default='hamming', help='Distance metric (e.g. Hamming).')
@@ -70,3 +71,7 @@ if __name__ == '__main__':
     dist = panphon.distance.Distance()
     dist_funcs = partial(dists[args.dist], dist)
     main(args.wordlists[0], args.wordlists[1], dist_funcs)
+
+
+if __name__ == '__main__':
+    cli_main()

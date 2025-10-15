@@ -172,7 +172,8 @@ def main(ipa_bases, ipa_all, dia_defs, sort_order):
     write_ipa_all(ipa_bases, ipa_all, all_segments, sort_order)
 
 
-if __name__ == '__main__':
+def cli_main():
+    """Entry point for the generate_ipa_all script."""
     parser = argparse.ArgumentParser()
     parser.add_argument('bases', help='File containing IPA bases (ipa_bases.csv)')
     parser.add_argument('all', help='File to which all IPA segments is to be written (ipa_all.csv)')
@@ -180,3 +181,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--sort-order', required=True, help='File definiting sort order.')
     args = parser.parse_args()
     main(args.bases, args.all, args.dia, args.sort_order)
+
+
+if __name__ == '__main__':
+    cli_main()
