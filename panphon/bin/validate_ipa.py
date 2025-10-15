@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from typing import TextIO, Optional
+from typing import TextIO
 import panphon
 import regex as re
 import sys
@@ -55,7 +55,7 @@ class Validator(object):
 
 def main():
     """Entry point for the validate_ipa script."""
-    validator = Validator(sys.stdin)
+    Validator(sys.stdin)
 
 
 if __name__ == '__main__':

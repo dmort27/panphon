@@ -1,7 +1,7 @@
 import os.path
 from functools import partial
 from importlib.resources import files
-from typing import Callable, Any, List, Dict, Tuple, Optional, Union
+from typing import Callable, Any, Dict
 
 import editdistance
 import numpy as np

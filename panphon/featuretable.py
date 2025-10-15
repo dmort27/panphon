@@ -5,7 +5,7 @@ import os.path
 import unicodedata
 from functools import reduce
 from importlib.resources import files
-from typing import Any, Pattern, List, Dict, Tuple, Optional, Union, Set
+from typing import Any, List, Dict, Tuple
 
 import numpy
 import pandas as pd

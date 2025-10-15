@@ -13,7 +13,7 @@ def levenshtein_dist(_, a, b):
     return Levenshtein.distance(a, b)
 
 
-def dogol_leven_dist(_, a, b):
+def dogol_leven_dist(dist, a, b):
     return Levenshtein.distance(dist.map_to_dogol_prime(a),
                                 dist.map_to_dogol_prime(b))
 
