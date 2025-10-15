@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterator, Mapping, ItemsView
 from typing import TypeVar, List, Dict
 import regex as re
 
@@ -105,7 +105,7 @@ class Segment(Mapping[str, int]):
         """
         return iter(self.names)
 
-    def items(self) -> List[tuple[str, int]]:
+    def items(self) -> List[tuple[str, int]]:  # type: ignore[override]
         """Return a list of the features as (name, value) pairs.
 
         Returns

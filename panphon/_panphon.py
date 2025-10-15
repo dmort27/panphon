@@ -4,7 +4,7 @@ import os.path
 import unicodedata
 from functools import reduce
 from importlib.resources import files
-from typing import Iterable, Iterator, List, Set, Tuple
+from typing import Iterable, Iterator, List, Set, Tuple, cast
 
 import numpy as np
 import pandas as pd
@@ -64,7 +64,7 @@ def fts(s: str) -> Set[Tuple[str, str]]:
     Set[Tuple[str, str]]
         Set of (value, feature) tuples where value is '+', '-', or '0'.
     """
-    return {m.groups() for m in FT_REGEX.finditer(s)}
+    return {cast(Tuple[str, str], m.groups()) for m in FT_REGEX.finditer(s)}
 
 
 def pat(p: str) -> List[Set[Tuple[str, str]]]:
@@ -85,7 +85,7 @@ def pat(p: str) -> List[Set[Tuple[str, str]]]:
     """
     pattern = []
     for matrix in [m.group(0) for m in MT_REGEX.finditer(p)]:
-        segment = set([m.groups() for m in FT_REGEX.finditer(matrix)])
+        segment = set([cast(Tuple[str, str], m.groups()) for m in FT_REGEX.finditer(matrix)])
         pattern.append(segment)
     return pattern
 
@@ -115,8 +115,8 @@ def word2array(ft_names: List[str], word: List[List[Tuple[str, str]]]) -> np.nda
     vdict = {'+': 1, '-': -1, '0': 0}
 
     def seg2col(seg: List[Tuple[str, str]]) -> List[int]:
-        seg = dict([(k, v) for (v, k) in seg])
-        return [vdict[seg[ft]] for ft in ft_names]
+        seg_dict = dict([(k, v) for (v, k) in seg])
+        return [vdict[seg_dict[ft]] for ft in ft_names]
     return np.array([seg2col(s) for s in word], order='F')
 
 
@@ -256,11 +256,11 @@ class FeatureTable(object):
             features; None if segment is not valid or is None.
         """
         feature_set: set[tuple[str, str]] = set(features)
-        seg_fts: list[tuple[str, str]] | None = self.fts(segment)
-        if (segment is not None) and seg_fts is not None:
-            return feature_set <= set(seg_fts)
-        else:
-            return None
+        if segment is not None:
+            seg_fts: list[tuple[str, str]] = self.fts(segment)
+            if seg_fts:  # Check if seg_fts is not empty
+                return feature_set <= set(seg_fts)
+        return None
 
     def longest_one_seg_prefix(self, word, normalize=True):
         """Return longest single-segment prefix of a word.
@@ -444,9 +444,9 @@ class FeatureTable(object):
             set: set of (value, feature) tuples shared by the valid segments in
                  `segs`
         """
-        fts_vecs: list[tuple[str, str]] | None = [
+        fts_vecs: list[list[tuple[str, str]]] = [
             self.fts(s) for s in self.filter_segs(segs)]
-        return reduce(lambda a, b: set(a) & set(b), fts_vecs)
+        return reduce(lambda a, b: a & b, [set(fts_vec) for fts_vec in fts_vecs])
 
     def fts_match_any(self, fts, inv):
         """Return `True` if any segment in `inv` matches the features in `fts`

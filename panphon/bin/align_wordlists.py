@@ -3,8 +3,8 @@
 import csv
 import argparse
 import panphon
-import Levenshtein
-import munkres
+import Levenshtein  # type: ignore
+import munkres  # type: ignore
 import panphon.distance
 from functools import partial
 
