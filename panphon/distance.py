@@ -43,12 +43,15 @@ class Distance(object):
     """Measures of phonological distance."""
 
     def __init__(self, feature_set: str = 'spe+', feature_model: str = 'segment') -> None:
-        """Construct a `Distance` object
+        """Construct a Distance object.
 
-        Args:
-            feature_set (str): feature set to be used by the `Distance` object
-            feature_model (str): feature parsing model to be used by the
-                                 `Distance` object
+        Parameters
+        ----------
+        feature_set : str, optional
+            Feature set to be used by the Distance object. Default is 'spe+'.
+        feature_model : str, optional
+            Feature parsing model to be used by the Distance object.
+            Options are 'strict', 'permissive', or 'segment'. Default is 'segment'.
         """
         fm = {'strict': _panphon.FeatureTable,
               'permissive': permissive.PermissiveFeatureTable,
@@ -58,11 +61,18 @@ class Distance(object):
         self.dolgo_prime = self._dolgopolsky_prime()
 
     def _dolgopolsky_prime(self, filename=os.path.join('data', 'dolgopolsky_prime.yml')):
-        """Reads dolgopolsky classes and constructs function cascade
+        """Read Dolgopolsky classes and construct function cascade.
 
-        Args:
-            filename (str): path to YAML file (from panphon root) containing
-                            dolgopolsky classes
+        Parameters
+        ----------
+        filename : str, optional
+            Path to YAML file (from panphon root) containing Dolgopolsky classes.
+            Default is 'data/dolgopolsky_prime.yml'.
+
+        Returns
+        -------
+        List[Tuple[Dict[str, int], str]]
+            List of (feature_mask, label) tuples for Dolgopolsky classification.
         """
         with files('panphon').joinpath(filename).open('r') as f:
             rules = []
@@ -72,13 +82,17 @@ class Distance(object):
         return rules
 
     def map_to_dolgo_prime(self, s):
-        """Map a string to dolgopolsky' classes
+        """Map string to Dolgopolsky prime classes.
 
-        Args:
-            s (str): IPA word
+        Parameters
+        ----------
+        s : str
+            IPA word.
 
-        Returns:
-            (str): word with all segments collapsed to D' classes
+        Returns
+        -------
+        str
+            Word with all segments collapsed to Dolgopolsky prime classes.
         """
         segs = []
         for seg in self.fm.seg_regex.finditer(s):
@@ -90,15 +104,22 @@ class Distance(object):
         return ''.join(segs)
 
     def levenshtein_distance(self, source, target):
-        """Slow implementation of Levenshtein distance using NumPy arrays
+        """Compute Levenshtein distance using NumPy arrays.
 
-        Args:
-            source (str): source word
-            target (str): target word
+        Slow implementation of Levenshtein distance using NumPy arrays.
 
-        Returns:
-            int: minimum number of Levenshtein edits required to get from
-                 `source` to `target`
+        Parameters
+        ----------
+        source : str
+            Source word.
+        target : str
+            Target word.
+
+        Returns
+        -------
+        int
+            Minimum number of Levenshtein edits required to get from
+            `source` to `target`.
         """
         if len(source) < len(target):
             return self.levenshtein_distance(target, source)
@@ -126,48 +147,66 @@ class Distance(object):
         return previous_row[-1]
 
     def fast_levenshtein_distance(self, source, target):
-        """Wrapper for the distance function in the Levenshtein module
+        """Compute Levenshtein distance using fast implementation.
 
-        Args:
-            source (str): source word
-            target (str): target word
+        Wrapper for the distance function in the editdistance module.
 
-        Returns:
-            int: minimum number of Levenshtein edits required to get from
-                 `source` to `target`
+        Parameters
+        ----------
+        source : str
+            Source word.
+        target : str
+            Target word.
+
+        Returns
+        -------
+        int
+            Minimum number of Levenshtein edits required to get from
+            `source` to `target`.
         """
         return int(editdistance.eval(source, target))
 
     def fast_levenshtein_distance_div_maxlen(self, source, target):
-        """Levenshtein distance divided by maxlen
+        """Compute normalized Levenshtein distance.
 
-        Args:
-            source (str): source word
-            target (str): target word
+        Levenshtein distance divided by maximum length of the two words.
 
-        Returns:
-            int: minimum number of Levenshtein edits required to get from
-                 `source` to `target` divided by the length of the longest
-                 of these arguments
+        Parameters
+        ----------
+        source : str
+            Source word.
+        target : str
+            Target word.
+
+        Returns
+        -------
+        float
+            Minimum number of Levenshtein edits required to get from
+            `source` to `target` divided by the length of the longest
+            of these arguments.
         """
         maxlen = max(len(source), len(target))
         return int(editdistance.eval(source, target)) / maxlen
 
     def dolgo_prime_distance(self, source, target):
-        """Levenshtein distance using D' phonetic equivalence classes
+        """Compute Levenshtein distance using Dolgopolsky prime classes.
 
-        `source` and `target` are converted to dolgopolsky' equivalence classes
-        (each segment is mapped to the appropriate class) and then the
-        Levenshtein distance between the resulting representations is
-        computed.
+        `source` and `target` are converted to Dolgopolsky prime equivalence 
+        classes (each segment is mapped to the appropriate class) and then the
+        Levenshtein distance between the resulting representations is computed.
 
-        Args:
-            source (str): source word
-            target (str): target word
+        Parameters
+        ----------
+        source : str
+            Source word.
+        target : str
+            Target word.
 
-        Returns:
-            int: minimum number of Levenshtein edits required to get from
-                 dolgopolsky' versions of `source` to `target`
+        Returns
+        -------
+        int
+            Minimum number of Levenshtein edits required to get from
+            Dolgopolsky prime versions of `source` to `target`.
         """
         source = self.map_to_dolgo_prime(source)
         target = self.map_to_dolgo_prime(target)

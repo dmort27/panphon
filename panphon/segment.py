@@ -8,12 +8,23 @@ import regex as re
 T = TypeVar('T')
 
 class Segment(Mapping[str, int]):
-    """Constructs a `Segment` object that models a phonological segment as a vector of features.
-    
-    :param names list[str]: An ordered list of feature names.
-    :param feature dict[str, int]: name-feature pairs for specified features.
-    :param ftstr str: A string, each /(+|0|-)\\w+/ sequence of which is interpreted as a feature specification.
-    :param weights list[float]: An ordered list of feature weights/saliences.
+    """Model a phonological segment as a vector of features.
+
+    Constructs a `Segment` object that models a phonological segment as a 
+    vector of features.
+
+    Parameters
+    ----------
+    names : List[str]
+        An ordered list of feature names.
+    features : Dict[str, int], optional
+        Name-feature pairs for specified features. Default is empty dict.
+    ftstr : str, optional
+        A string, each /(+|0|-)\\w+/ sequence of which is interpreted as a 
+        feature specification. Default is empty string.
+    weights : List[float], optional
+        An ordered list of feature weights/saliences. Default is empty list,
+        which results in uniform weights of 1.0.
     """
     def __init__(self, names: List[str], features: Dict[str, int] = {}, ftstr: str = '', weights: List[float] = []) -> None:
         self.n2s = {-1: '-', 0: '0', 1: '+'}
@@ -38,73 +49,134 @@ class Segment(Mapping[str, int]):
         return len(self.data)
 
     def __getitem__(self, key: str) -> int:
-        """Get a feature specification"""
+        """Get a feature specification.
+
+        Parameters
+        ----------
+        key : str
+            Feature name.
+
+        Returns
+        -------
+        int
+            Feature value (-1, 0, or 1).
+        """
         return self.data[key]
 
     def __setitem__(self, key: str, value: int):
-        """Set a feature specification"""
+        """Set a feature specification.
+
+        Parameters
+        ----------
+        key : str
+            Feature name.
+        value : int
+            Feature value (-1, 0, or 1).
+
+        Raises
+        ------
+        KeyError
+            If the feature name is not in the list of known features.
+        """
         if key in self.names:
             self.data[key] = value
         else:
             raise KeyError('Unknown feature name.')
 
     def __repr__(self) -> str:
-        """Return a string representation of a feature vector"""
+        """Return a string representation of a feature vector.
+
+        Returns
+        -------
+        str
+            String representation showing all features and their values.
+        """
         pairs = [(self.n2s[self.data[k]], k) for k in self.names]
         fts = ', '.join(['{}{}'.format(*pair) for pair in pairs])
         return '<Segment [{}]>'.format(fts)
 
     def __iter__(self) -> Iterator[str]:
-        """Return an iterator over the feature names"""
+        """Return an iterator over the feature names.
+
+        Returns
+        -------
+        Iterator[str]
+            Iterator over feature names.
+        """
         return iter(self.names)
 
     def items(self) -> List[tuple[str, int]]:
-        """Return a list of the features as (name, value) pairs
-        
-        :return: List of features as (name, value) pairs
-        :rtype: list[tuple[str, int]]
+        """Return a list of the features as (name, value) pairs.
+
+        Returns
+        -------
+        List[Tuple[str, int]]
+            List of features as (name, value) pairs.
         """
         return [(k, self.data[k]) for k in self.names]
 
     def iteritems(self) -> Iterator[tuple[str, int]]:
-        """Return an iterator over the features as (name, value) pairs
-        
-        :return: Iterator over features as (name, value) pairs
-        :rtype: Iterator[tuple[str, int]]
+        """Return an iterator over the features as (name, value) pairs.
+
+        Returns
+        -------
+        Iterator[Tuple[str, int]]
+            Iterator over features as (name, value) pairs.
         """
         return ((k, self.data[k]) for k in self.names)
 
     def update(self, features: Dict[str, int]) -> None:
-        """Update the objects features to match `features`.
+        """Update the object's features to match `features`.
 
-        Args:
-            features (dict): dictionary containing the new feature values
+        Parameters
+        ----------
+        features : Dict[str, int]
+            Dictionary containing the new feature values.
         """
         self.data.update(features)
 
     def match(self, ft_mask: 'Segment') -> bool:
-        """Determine whether `self`'s features are a superset of `features`'s
+        """Determine whether self's features are a superset of ft_mask's.
 
-        Args:
-            features (dict): (name, value) pairs
+        Parameters
+        ----------
+        ft_mask : Segment
+            Segment object with feature specifications to match against.
 
-        Returns:
-           (bool): True if superset relationship holds else False
+        Returns
+        -------
+        bool
+            True if superset relationship holds, False otherwise.
         """
         return all([self.data[k] == v for (k, v) in ft_mask.items()])
 
     def __ge__(self, other: "Segment") -> bool:
-        """Determine whether `self`'s features are a superset of `other`'s"""
+        """Determine whether self's features are a superset of other's.
+
+        Parameters
+        ----------
+        other : Segment
+            Segment to compare against.
+
+        Returns
+        -------
+        bool
+            True if self's features are a superset of other's.
+        """
         return self.match(other)
 
     def intersection(self, other: "Segment") -> "Segment":
-        """Return dict of features shared by `self` and `other`
+        """Return Segment of features shared by self and other.
 
-        Args:
-            other (Segment): object with feature specifications
+        Parameters
+        ----------
+        other : Segment
+            Object with feature specifications.
 
-        Returns:
-            Segment: (name, value) pairs for each shared feature
+        Returns
+        -------
+        Segment
+            New Segment containing (name, value) pairs for each shared feature.
         """
         data = dict(set(self.items()) & set(other.items()))
         names = list(filter(lambda a: a in data, self.names))
