@@ -47,5 +47,10 @@ class Validator(object):
                 pos += 1
 
 
-if __name__ == '__main__':
+def main():
+    """Entry point for the validate_ipa script."""
     validator = Validator(sys.stdin)
+
+
+if __name__ == '__main__':
+    main()
