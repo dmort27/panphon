@@ -148,10 +148,10 @@ def generate_modifiers(
         vector = compute_mod_vector(modifier['content'])
         if modifier['position'] == 'pre':
             prefix.append(marker)
-            transforms[marker] = (vector, lambda x, m=marker: m + x)
+            transforms[marker] = (vector, (lambda m: lambda x: m + x)(marker))
         else:
             postfix.append(marker)
-            transforms[marker] = (vector, lambda x, m=marker: x + m)
+            transforms[marker] = (vector, (lambda m: lambda x: x + m)(marker))
     return Modifiers(prefix, postfix, transforms)
 
 

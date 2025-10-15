@@ -2,7 +2,7 @@
 from . import _panphon
 from . import permissive
 
-from ._panphon import FeatureTable, fts
+from ._panphon import fts
 
 
 class BoolTree(object):
