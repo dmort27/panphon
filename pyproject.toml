@@ -29,6 +29,7 @@ dependencies = [
     "editdistance",
     "munkres",
     "pandas",
+    "marisa-trie",
 ]
 
 [project.urls]
