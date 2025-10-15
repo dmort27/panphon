@@ -125,7 +125,7 @@ class FeatureTable(object):
             node[self.TRIE_LEAF_MARKER] = None
         return trie
 
-    def fts(self, ipa: str, normalize: bool=True) -> dict[str, int]:
+    def fts(self, ipa: str, normalize: bool = True) -> dict[str, int]:
         if normalize:
             ipa = FeatureTable.normalize(ipa)
         if ipa in self.seg_dict:
@@ -133,7 +133,7 @@ class FeatureTable(object):
         else:
             return {}
 
-    def longest_one_seg_prefix(self, word: str, normalize: bool=True) -> str:
+    def longest_one_seg_prefix(self, word: str, normalize: bool = True) -> str:
         """Return longest Unicode IPA prefix of a word
 
         Args:
@@ -155,7 +155,7 @@ class FeatureTable(object):
                 last_found_length = pos + 1
         return ''
 
-    def ipa_segs(self, word: str, normalize: bool=True) -> list[str]:
+    def ipa_segs(self, word: str, normalize: bool = True) -> list[str]:
         """Returns a list of segments from a word
 
         Args:
@@ -169,7 +169,7 @@ class FeatureTable(object):
             word = FeatureTable.normalize(word)
         return self._segs(word, include_invalid=False, normalize=normalize)
 
-    def validate_word(self, word: str, normalize: bool=True):
+    def validate_word(self, word: str, normalize: bool = True):
         """Returns True if `word` consists exhaustively of valid IPA segments
 
         Args:
@@ -183,7 +183,7 @@ class FeatureTable(object):
         """
         return not self._segs(word, include_valid=False, include_invalid=True, normalize=normalize)
 
-    def word_fts(self, word: str, normalize: bool=True):
+    def word_fts(self, word: str, normalize: bool = True):
         """Return a list of Segment objects corresponding to the segments in
            word.
 
@@ -196,7 +196,10 @@ class FeatureTable(object):
         """
         return [self.fts(ipa, False) for ipa in self.ipa_segs(word, normalize)]
 
-    def word_array(self, ft_names: list[str], word: str, normalize: bool=True) -> numpy.ndarray:
+    def word_array(self,
+                   ft_names: list[str],
+                   word: str,
+                   normalize: bool = True) -> numpy.ndarray:
         """Return a ndarray of features namd in ft_name for the segments in word
 
         Args:
