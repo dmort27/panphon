@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import annotations
 
 from collections.abc import Iterator, Iterable, Mapping
 from typing import TypeVar
@@ -13,7 +12,7 @@ class Segment(Mapping[str, int]):
     
     :param names list[str]: An ordered list of feature names.
     :param feature dict[str, int]: name-feature pairs for specified features.
-    :param ftstr str: A string, each /(+|0|-)\w+/ sequence of which is interpreted as a feature specification.
+    :param ftstr str: A string, each /(+|0|-)\\w+/ sequence of which is interpreted as a feature specification.
     :param weights list[float]: An ordered list of feature weights/saliences.
     """
     def __init__(self, names: list[str], features: dict[str, int]={}, ftstr: str='', weights: "list[float]"=[]):
@@ -83,7 +82,7 @@ class Segment(Mapping[str, int]):
         """
         self.data.update(features)
 
-    def match(self, ft_mask: Segment) -> bool:
+    def match(self, ft_mask: 'Segment') -> bool:
         """Determine whether `self`'s features are a superset of `features`'s
 
         Args:
@@ -94,11 +93,11 @@ class Segment(Mapping[str, int]):
         """
         return all([self.data[k] == v for (k, v) in ft_mask.items()])
 
-    def __ge__(self, other: Segment) -> bool:
+    def __ge__(self, other: "Segment") -> bool:
         """Determine whether `self`'s features are a superset of `other`'s"""
         return self.match(other)
 
-    def intersection(self, other: Segment) -> Segment:
+    def intersection(self, other: "Segment") -> "Segment":
         """Return dict of features shared by `self` and `other`
 
         Args:
@@ -111,7 +110,7 @@ class Segment(Mapping[str, int]):
         names = list(filter(lambda a: a in data, self.names))
         return Segment(names, data)
 
-    def __and__(self, other: Segment) -> Segment:
+    def __and__(self, other: "Segment") -> "Segment":
         """Return Segment of features shared by `self` and `other`"""
         return self.intersection(other)
 
@@ -127,7 +126,7 @@ class Segment(Mapping[str, int]):
             names = self.names
         return list(map(lambda x: self.n2s[x], self.numeric()))
 
-    def distance(self, other: Segment) -> int:
+    def distance(self, other: "Segment") -> int:
         """Compute a distance between `self` and `other`
 
         Args:
@@ -139,7 +138,7 @@ class Segment(Mapping[str, int]):
         """
         return sum(abs(a - b) for (a, b) in zip(self.numeric(), other.numeric()))
 
-    def norm_distance(self, other: Segment) -> float:
+    def norm_distance(self, other: "Segment") -> float:
         """Compute a distance, normalized by vector length
 
         Args:
@@ -152,7 +151,7 @@ class Segment(Mapping[str, int]):
         """
         return self.distance(other) / len(self.names)
 
-    def __sub__(self, other: Segment) -> float:
+    def __sub__(self, other: "Segment") -> float:
         """Distance between segments, normalized by vector length"""
         return self.norm_distance(other)
 
@@ -167,7 +166,7 @@ class Segment(Mapping[str, int]):
         """
         return sum(int(a != b) for (a, b) in zip(self.numeric(), other.numeric()))
 
-    def norm_hamming_distance(self, other: Segment) -> float:
+    def norm_hamming_distance(self, other: "Segment") -> float:
         """Compute Hamming distance, normalized by vector length
 
         Args:
@@ -178,7 +177,7 @@ class Segment(Mapping[str, int]):
         """
         return self.hamming_distance(other) / len(self.names)
 
-    def weighted_distance(self, other: Segment) -> float:
+    def weighted_distance(self, other: "Segment") -> float:
         """Compute weighted distance
 
         Args:
@@ -190,7 +189,7 @@ class Segment(Mapping[str, int]):
         return sum([abs(a - b) * c for (a, b, c)
                    in zip(self.numeric(), other.numeric(), self.weights)])
 
-    def norm_weighted_distance(self, other: Segment) -> float:
+    def norm_weighted_distance(self, other: "Segment") -> float:
         """Compute weighted distance, normalized by vector length
 
         Args:
@@ -210,7 +209,7 @@ class Segment(Mapping[str, int]):
         """
         return {k: v for (k, v) in self.data.items() if v != 0}
 
-    def differing_specs(self, other: Segment) -> list[str]:
+    def differing_specs(self, other: "Segment") -> list[str]:
         """Return a list of feature names that differ in their specified values
 
         Args:

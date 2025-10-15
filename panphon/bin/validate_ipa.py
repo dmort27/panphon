@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import panphon
 import regex as re
@@ -20,7 +18,6 @@ class Validator(object):
 
     def _validate_file(self, infile):
         for line in infile:
-            line = unicode(line, 'utf-8')
             self.validate_line(line)
 
     def validate_line(self, line):

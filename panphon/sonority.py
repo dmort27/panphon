@@ -1,4 +1,3 @@
-from __future__ import print_function, absolute_import, unicode_literals
 
 from . import _panphon
 from . import permissive
@@ -77,7 +76,7 @@ class Sonority(object):
            a scale of 1 to 9.
 
         Args:
-            seg (unicode): IPA consonant or vowel
+            seg (str): IPA consonant or vowel
 
         Returns:
            int: sonority of `seg` between 1 and 9

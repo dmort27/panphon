@@ -1,11 +1,10 @@
-from __future__ import absolute_import, print_function, unicode_literals
 
 import copy
 import os.path
 from importlib.resources import files
 
 import regex as re
-# import unicodecsv as csv
+
 import pandas as pd
 import yaml
 
@@ -117,7 +116,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         feature) tuples
 
         Args:
-            segment (unicode): segment for which features are to be returned as
+            segment (str): segment for which features are to be returned as
                                Unicode string
 
         Returns:
@@ -145,7 +144,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
 
         Args:
             fts_mask (list): list of (value, feature)
-                             tuples segment (unicode):
+                             tuples segment (str):
             IPA string corresponding to segment
                             (consonant or vowel)
         Returns:
@@ -163,10 +162,10 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         """Return longest IPA Unicode prefix of `word`
 
         Args:
-            word (unicode): word as IPA string
+            word (str): word as IPA string
 
         Returns:
-            unicode: longest single-segment prefix of `word`
+            str: longest single-segment prefix of `word`
         """
         match = self.seg_regex.match(word)
         if match:
@@ -178,7 +177,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         """Return True if the segment is valid
 
         Args:
-            segment (unicode): a string which may or may not be a valid segment
+            segment (str): a string which may or may not be a valid segment
 
         Returns:
             bool: True if segment can be parsed given the database of bases and
@@ -193,7 +192,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
         """Given list of strings, return only those which are valid segments.
 
         Args:
-            segs (list): list of unicode values
+            segs (list): list of str values
 
         Returns:
             list: values in `segs` that are valid segments (according to the
