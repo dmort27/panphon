@@ -48,7 +48,6 @@ class Validator(object):
                 pos += length
             else:
                 msg = 'IPA not valid at position {} in "{}".'.format(pos, line0.strip())
-                # msg = msg.decode('utf-8')
                 print(msg, file=sys.stderr)
                 line = line[1:]
                 pos += 1

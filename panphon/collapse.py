@@ -1,5 +1,3 @@
-                        unicode_literals)
-
 import os.path
 from importlib.resources import files
 
@@ -10,7 +8,7 @@ from panphon import _panphon, permissive
 
 class Collapser(object):
     def __init__(
-            self, tablename='dogolpolsky_prime.yml', feature_set='spe+', feature_model='strict'
+            self, tablename='dolgopolsky_prime.yml', feature_set='spe+', feature_model='strict'
     ):
         fm = {'strict': _panphon.FeatureTable,
               'permissive': permissive.PermissiveFeatureTable}
