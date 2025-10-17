@@ -2,7 +2,7 @@ import unicodedata
 from typing import List
 from importlib import resources
 import pandas as pd
-import marisa_trie
+import marisa_trie  # type: ignore
 
 
 class Tokenizer:

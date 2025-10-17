@@ -5,7 +5,7 @@ import os.path
 import unicodedata
 from functools import reduce
 from importlib.resources import files
-from typing import Any, Pattern, List, Dict, Tuple, Optional, Union, Set
+from typing import Any, List, Dict, Tuple
 
 import numpy
 import pandas as pd
@@ -115,7 +115,7 @@ class FeatureTable(object):
         return re.compile(r'(?P<all>{})'.format('|'.join(segs)))
 
     def _build_seg_trie(self) -> dict:
-        trie = {}
+        trie: dict = {}
         for seg in self.seg_dict.keys():
             node = trie
             for char in seg:
@@ -125,13 +125,13 @@ class FeatureTable(object):
             node[self.TRIE_LEAF_MARKER] = None
         return trie
 
-    def fts(self, ipa: str, normalize: bool = True) -> dict[str, int]:
+    def fts(self, ipa: str, normalize: bool = True) -> Segment:
         if normalize:
             ipa = FeatureTable.normalize(ipa)
         if ipa in self.seg_dict:
             return self.seg_dict[ipa]
         else:
-            return {}
+            return Segment(self.names, {name: 0 for name in self.names}, weights=self.weights)
 
     def longest_one_seg_prefix(self, word: str, normalize: bool = True) -> str:
         """Return longest Unicode IPA prefix of a word
@@ -183,7 +183,7 @@ class FeatureTable(object):
         """
         return not self._segs(word, include_valid=False, include_invalid=True, normalize=normalize)
 
-    def word_fts(self, word: str, normalize: bool = True):
+    def word_fts(self, word: str, normalize: bool = True) -> list[Segment]:
         """Return a list of Segment objects corresponding to the segments in
            word.
 
@@ -210,7 +210,7 @@ class FeatureTable(object):
         Returns:
             ndarray: segments in rows, features in columns as [-1, 0, 1]
         """
-        return numpy.array([s.numeric(ft_names) for s in self.word_fts(word, normalize)])
+        return numpy.array([[s.data.get(ft, 0) for ft in ft_names] for s in self.word_fts(word, normalize)])
 
     def bag_of_features(self, word: str, normalize: bool=True) -> numpy.ndarray:
         """Return a vector in which each dimension is the number of times a feature-value pair occurs in the word
@@ -333,7 +333,9 @@ class FeatureTable(object):
         Returns:
             bool: `True` if all segments in `inv` match the features in `fts`
         """
-        return all([self.fts(s, normalize) >= fts for s in inv])
+        def matches_fts(seg: Segment, fts_dict: dict[str, int]) -> bool:
+            return all(seg.data.get(k, 0) == v for k, v in fts_dict.items())
+        return all(matches_fts(self.fts(s, normalize), fts) for s in inv)
 
     def fts_match_any(self, fts: dict[str, int], inv: list[str], normalize: bool=True) -> bool:
         """Return `True` if any segments in `inv` matches the features in fts
@@ -347,7 +349,9 @@ class FeatureTable(object):
         Returns:
             bool: `True` if any segments in `inv` matches the features in `fts`
         """
-        return any([self.fts(s, normalize) >= fts for s in inv])
+        def matches_fts(seg: Segment, fts_dict: dict[str, int]) -> bool:
+            return all(seg.data.get(k, 0) == v for k, v in fts_dict.items())
+        return any(matches_fts(self.fts(s, normalize), fts) for s in inv)
 
     def fts_contrast(self, fs: dict[str, int], ft_name: str, inv: list[str], normalize: bool=True) -> bool:
         """Return `True` if there is a segment in `inv` that contrasts in feature
@@ -363,7 +367,9 @@ class FeatureTable(object):
             bool: `True` if two segments in `inv` are identical in features except
                   for feature `ft_name`
         """
-        inv_segs = filter(lambda x: x >= fs, map(lambda seg: self.fts(seg, normalize), inv))
+        def matches_fts(seg: Segment, fts_dict: dict[str, int]) -> bool:
+            return all(seg.data.get(k, 0) == v for k, v in fts_dict.items())
+        inv_segs: filter = filter(lambda x: matches_fts(x, fs), map(lambda seg: self.fts(seg, normalize), inv))
         for a in inv_segs:
             for b in inv_segs:
                 if a != b:
@@ -383,9 +389,11 @@ class FeatureTable(object):
         Returns:
             int: number of segments in `inv` that match feature mask `fts`
         """
-        return len(list(filter(lambda s: self.fts(s, normalize) >= fts, inv)))
+        def matches_fts(seg: Segment, fts_dict: dict[str, int]) -> bool:
+            return all(seg.data.get(k, 0) == v for k, v in fts_dict.items())
+        return len(list(filter(lambda s: matches_fts(self.fts(s, normalize), fts), inv)))
 
-    def match_pattern(self, pat: list[str], word: str, normalize: bool=True) -> list[dict[str, int]]:
+    def match_pattern(self, pat: list[dict[str, int]], word: str, normalize: bool=True) -> list[Segment] | None:
         """Implements fixed-width pattern matching.
 
         Matches just in case pattern is the same length (in segments) as the
@@ -400,15 +408,20 @@ class FeatureTable(object):
            normalize (bool): whether to pre-normalize the word
 
         Returns:
-            list: corresponding list of feature dicts or, if there is no match,
+            list: corresponding list of Segment objects or, if there is no match,
                   None
         """
         segs = self.word_fts(word, normalize)
         if len(pat) != len(segs):
             return None
         else:
-            if all([s >= p for (s, p) in zip(segs, pat)]):
+            def matches_pattern(seg: Segment, pattern: dict[str, int]) -> bool:
+                return all(seg.data.get(k, 0) == v for k, v in pattern.items())
+            
+            if all(matches_pattern(s, p) for s, p in zip(segs, pat)):
                 return segs
+            else:
+                return None
 
     def match_pattern_seq(self, pat, const, normalize=True):
         """Implements limited pattern matching. Matches just in case pattern is
@@ -430,7 +443,9 @@ class FeatureTable(object):
         if len(pat) != len(segs):
             return False
         else:
-            return all([s >= p for (s, p) in zip(segs, pat)])
+            def matches_pattern(seg: Segment, pattern: dict[str, int]) -> bool:
+                return all(seg.data.get(k, 0) == v for k, v in pattern.items())
+            return all(matches_pattern(s, p) for s, p in zip(segs, pat))
 
     def all_segs_matching_fts(self, ft_mask):
         """Return segments matching a feature mask, a dict of features
