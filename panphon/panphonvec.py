@@ -36,7 +36,7 @@ _features = None
 _segment_re = None
 
 # Mapping between string and numeric representation of features
-plus_minus_to_int = {'+': 1, '0': 0, '-': -1}
+plus_minus_to_int = {"+": 1, "0": 0, "-": -1}
 
 
 def vector_to_tuple(vector: np.ndarray) -> tuple:
@@ -46,7 +46,7 @@ def vector_to_tuple(vector: np.ndarray) -> tuple:
     return tuple(vector)
 
 
-def generate_feature_vectors(feature_table='ipa_bases.csv') -> FeatureVectors:
+def generate_feature_vectors(feature_table="ipa_bases.csv") -> FeatureVectors:
     """
     Build a FeatureVectors object based on the contents of a feature table
     file.
@@ -63,29 +63,23 @@ def generate_feature_vectors(feature_table='ipa_bases.csv') -> FeatureVectors:
         as well as the names of the features, the phonemes themselves, and the
         feature vectors.
     """
-    feature_table = files('panphon') / 'data' / feature_table
-    with feature_table.open('r') as f:
+    feature_table = files("panphon") / "data" / feature_table
+    with feature_table.open("r") as f:
         df = pd.read_csv(f)
     feature_names = df.columns[1:]
-    df = df.sort_values(
-        by='ipa',
-        key=lambda col: col.str.len(),
-        ascending=False
-        )
-    phonemes = df['ipa']
-    df[feature_names] = df[feature_names].map(
-        lambda s: plus_minus_to_int[s]
-        )  # type: ignore
+    df = df.sort_values(by="ipa", key=lambda col: col.str.len(), ascending=False)
+    phonemes = df["ipa"]
+    df[feature_names] = df[feature_names].map(lambda s: plus_minus_to_int[s])  # type: ignore
     df[feature_names] = df[feature_names].astype(int)
     feature_vectors = np.array(df[feature_names])
     vector_map = dict(zip(phonemes, feature_vectors))
 
     feature_cols = df.columns[1:]  # all columns after 'ipa'
 
-    grouped_df = df.groupby(
-        list(feature_cols), sort=False
-    )['ipa'].agg(';'.join).reset_index()
-    grouped_df = grouped_df[['ipa'] + list(feature_cols)]
+    grouped_df = (
+        df.groupby(list(feature_cols), sort=False)["ipa"].agg(";".join).reset_index()
+    )
+    grouped_df = grouped_df[["ipa"] + list(feature_cols)]
 
     # Now build the phoneme_map
     numeric_cols = grouped_df.columns[1:]
@@ -95,18 +89,14 @@ def generate_feature_vectors(feature_table='ipa_bases.csv') -> FeatureVectors:
         return tuple(int(x) for x in row[numeric_cols])
 
     phoneme_map_items = grouped_df.apply(
-        lambda row: (
-            row_key(row),
-            sorted(row['ipa'].split(';'))
-        ),
-        axis=1
+        lambda row: (row_key(row), sorted(row["ipa"].split(";"))), axis=1
     ).tolist()
 
     phoneme_map = dict(phoneme_map_items)
 
     def handle_missing_vector(vector):
         warnings.warn(f"Vector not found as key={vector}")
-        return ''
+        return ""
 
     return FeatureVectors(
         vector_map,
@@ -124,10 +114,7 @@ def get_features():
     return _features
 
 
-def generate_modifiers(
-        definitions_fn: str =
-        'diacritic_definitions.yml'
-        ) -> Modifiers:
+def generate_modifiers(definitions_fn: str = "diacritic_definitions.yml") -> Modifiers:
     features = get_features()
 
     def compute_mod_vector(content: dict[str, str]) -> np.ndarray:
@@ -138,15 +125,15 @@ def generate_modifiers(
             vector[idx] = numeric_value
         return vector
 
-    with (files('panphon') / 'data' / definitions_fn).open() as f:
+    with (files("panphon") / "data" / definitions_fn).open() as f:
         definitions = safe_load(f)
     prefix = []
     postfix = []
     transforms = OrderedDict()
-    for modifier in definitions['diacritics']:
-        marker = modifier['marker']
-        vector = compute_mod_vector(modifier['content'])
-        if modifier['position'] == 'pre':
+    for modifier in definitions["diacritics"]:
+        marker = modifier["marker"]
+        vector = compute_mod_vector(modifier["content"])
+        if modifier["position"] == "pre":
             prefix.append(marker)
             transforms[marker] = (vector, lambda x, m=marker: m + x)
         else:
@@ -162,15 +149,17 @@ def get_modifiers():
     return _modifiers
 
 
-def build_segment_re() -> re.Pattern:
+def build_segment_re() -> re.Pattern[str]:
     feature_vectors = get_features()
     modifiers = get_modifiers()
     segment_re = re.compile(
         f"""
-        ([{''.join(modifiers.prefix_modifiers)}]*)
-        ({'|'.join(feature_vectors.phonemes)})
-        ([{''.join(modifiers.postfix_modifiers)}]*)
-        """, re.X)
+        ([{"".join(modifiers.prefix_modifiers)}]*)
+        ({"|".join(feature_vectors.phonemes)})
+        ([{"".join(modifiers.postfix_modifiers)}]*)
+        """,
+        re.X,
+    )
     return segment_re
 
 
@@ -194,7 +183,7 @@ def add_and_get_new_vector(ipa: str) -> np.ndarray:
         vector = features.vector_map[base].copy()
 
         # Iterate through the modifiers, updating the feature representations
-        for marker in (post + pre):
+        for marker in post + pre:
             feature_tr, _ = modifiers.transforms[marker]
             vector[feature_tr != 0] = feature_tr[feature_tr != 0]
         features.vector_map[ipa] = vector
@@ -202,7 +191,7 @@ def add_and_get_new_vector(ipa: str) -> np.ndarray:
         features.phoneme_map[tuple_vector] = [ipa]  # type: ignore
         return vector
     else:
-        warnings.warn(f'Phoneme {ipa} cannot be analyzed.')
+        warnings.warn(f"Phoneme {ipa} cannot be analyzed.")
         return np.zeros(len(features.feature_names))
 
 
@@ -306,4 +295,4 @@ def decode(matrix: np.ndarray) -> str:
         else:
             return add_and_get_new_phoneme(vector)[0]  # type: ignore
 
-    return ''.join([get_phoneme(row) for row in matrix])
+    return "".join([get_phoneme(row) for row in matrix])
