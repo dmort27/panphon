@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals, division, absolute_import
 
 import unittest
 import panphon.featuretable
@@ -23,10 +22,14 @@ class TestFeatureTable(unittest.TestCase):
         self.assertEqual(prefix, 'pʰʲ')
 
     def test_match_pattern(self):
-        self.assertTrue(self.ft.match_pattern([{'voi': -1},
-                                               {'voi': 1},
-                                               {'voi': -1}],
-                                              'pat'))
+        self.assertTrue(self.ft.match_pattern(
+            [
+                {'voi': -1},
+                {'voi': 1},
+                {'voi': -1}
+            ],
+            'pat')
+        )
 
     def test_all_segs_matching_fts(self):
         segs = self.ft.all_segs_matching_fts({'syl': -1, 'son': 1})
@@ -97,11 +100,10 @@ class TestIpaRe(unittest.TestCase):
         new_word_list=self.ft.vector_list_to_word(vector_list)
         self.assertEqual(input_word,new_word_list)
 
-
     def test_word_vector_list_french(self):
-        input_word=u'ʒəkɔ̃pytəʁɛilzoʁɛkɔ̃pyte'
-        vector_list =self.ft.word_to_vector_list(input_word,numeric=True)
-        new_word_list=self.ft.vector_list_to_word(vector_list)
+        input_word = 'ʒəkɔ̃pytəʁɛilzoʁɛkɔ̃pyte'
+        vector_list = self.ft.word_to_vector_list(input_word, numeric=True)
+        new_word_list = self.ft.vector_list_to_word(vector_list)
         self.assertEqual(input_word,new_word_list)
 
 

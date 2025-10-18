@@ -1,11 +1,10 @@
 #!/usr/bin/env python
-from __future__ import print_function
 
-import unicodecsv as csv
+import csv
 import argparse
 import panphon
-import Levenshtein
-import munkres
+import Levenshtein  # type: ignore
+import munkres  # type: ignore
 import panphon.distance
 from functools import partial
 
@@ -14,7 +13,7 @@ def levenshtein_dist(_, a, b):
     return Levenshtein.distance(a, b)
 
 
-def dogol_leven_dist(_, a, b):
+def dogol_leven_dist(dist, a, b):
     return Levenshtein.distance(dist.map_to_dogol_prime(a),
                                 dist.map_to_dogol_prime(b))
 
@@ -43,9 +42,9 @@ def score(indices):
 
 
 def main(wordlist1, wordlist2, dist_funcs):
-    with open(wordlist1, 'rb') as file_a, open(wordlist2, 'rb') as file_b:
-        reader_a = csv.reader(file_a, encoding='utf-8')
-        reader_b = csv.reader(file_b, encoding='utf-8')
+    with open(wordlist1, 'r', encoding='utf-8') as file_a, open(wordlist2, 'r', encoding='utf-8') as file_b:
+        reader_a = csv.reader(file_a)
+        reader_b = csv.reader(file_b)
         print('Reading word lists...')
         words = zip([(w, g) for (g, w) in reader_a],
                     [(w, g) for (g, w) in reader_b])
@@ -59,7 +58,8 @@ def main(wordlist1, wordlist2, dist_funcs):
         print('Done.')
 
 
-if __name__ == '__main__':
+def cli_main():
+    """Entry point for the align_wordlists script."""
     parser = argparse.ArgumentParser(usage='Align two lists of "cognates" using a specified distance metric.')
     parser.add_argument('wordlists', nargs=2, help='Filenames of two wordlists in corresponding order.')
     parser.add_argument('-d', '--dist', default='hamming', help='Distance metric (e.g. Hamming).')
@@ -71,3 +71,7 @@ if __name__ == '__main__':
     dist = panphon.distance.Distance()
     dist_funcs = partial(dists[args.dist], dist)
     main(args.wordlists[0], args.wordlists[1], dist_funcs)
+
+
+if __name__ == '__main__':
+    cli_main()

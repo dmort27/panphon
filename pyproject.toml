@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "panphon"
+version = "0.22.2"
+description = "Tools for using the International Phonetic Alphabet with phonological features"
+readme = "README.md"
+license = {text = "MIT-Modern-Variant"}
+authors = [
+    {name = "David R. Mortensen", email = "dmortens@cs.cmu.edu"}
+]
+classifiers = [
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing :: Linguistic",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "setuptools",
+    "PyYAML",
+    "regex",
+    "numpy>=1.20.2",
+    "editdistance",
+    "munkres",
+    "pandas",
+    "marisa-trie",
+]
+
+[project.urls]
+Homepage = "https://github.com/dmort27/panphon"
+Repository = "https://github.com/dmort27/panphon"
+Download = "https://github.com/dmort27/panphon/archive/0.21.1.tar.gz"
+
+[project.scripts]
+validate_ipa = "panphon.bin.validate_ipa:main"
+align_wordlists = "panphon.bin.align_wordlists:cli_main"
+generate_ipa_all = "panphon.bin.generate_ipa_all:cli_main"
+
+[tool.setuptools]
+zip-safe = true
+
+[tool.setuptools.packages.find]
+include = ["panphon*"]
+
+[tool.setuptools.package-data]
+panphon = ["data/*.csv", "data/*.yml"]

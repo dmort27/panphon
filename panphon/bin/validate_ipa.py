@@ -1,33 +1,37 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
-from __future__ import unicode_literals
 
+from typing import TextIO
 import panphon
 import regex as re
 import sys
 
 
 class Validator(object):
-    def __init__(self, infile=sys.stdin):
+    def __init__(self, infile: TextIO = sys.stdin) -> None:
         """Validate Unicode IPA from file relative to panphon database.
 
-        infile -- File from which input is taken; by default, STDIN.
+        Parameters
+        ----------
+        infile : TextIO, optional
+            File from which input is taken. Default is sys.stdin.
         """
         self.ws_punc_regex = re.compile(r'[," \t\n]', re.V1 | re.U)
         self.ft = panphon.FeatureTable()
         self._validate_file(infile)
 
-    def _validate_file(self, infile):
+    def _validate_file(self, infile: TextIO) -> None:
         for line in infile:
-            line = unicode(line, 'utf-8')
             self.validate_line(line)
 
-    def validate_line(self, line):
+    def validate_line(self, line: str) -> None:
         """Validate Unicode IPA string relative to panphon.
 
-        line -- String of IPA characters. Can contain whitespace and limited
-        punctuation.
+        Parameters
+        ----------
+        line : str
+            String of IPA characters. Can contain whitespace and limited
+            punctuation.
         """
         line0 = line
         pos = 0
@@ -44,11 +48,15 @@ class Validator(object):
                 pos += length
             else:
                 msg = 'IPA not valid at position {} in "{}".'.format(pos, line0.strip())
-                # msg = msg.decode('utf-8')
                 print(msg, file=sys.stderr)
                 line = line[1:]
                 pos += 1
 
 
+def main():
+    """Entry point for the validate_ipa script."""
+    Validator(sys.stdin)
+
+
 if __name__ == '__main__':
-    validator = Validator(sys.stdin)
+    main()

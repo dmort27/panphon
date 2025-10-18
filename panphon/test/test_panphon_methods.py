@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals, division, absolute_import
 
 import unittest
 import panphon._panphon as panphon
 
 dim = 24
+
 
 class TestFeatureTableAPI(unittest.TestCase):
 

@@ -1,26 +1,23 @@
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
 import os.path
+from importlib.resources import files
 
-import pkg_resources
 import yaml
 
-from panphon import _panphon
-from panphon import permissive
+from panphon import _panphon, permissive
 
 
 class Collapser(object):
-    def __init__(self, tablename='dogolpolsky_prime.yml', feature_set='spe+', feature_model='strict'):
+    def __init__(
+            self, tablename='dolgopolsky_prime.yml', feature_set='spe+', feature_model='strict'
+    ):
         fm = {'strict': _panphon.FeatureTable,
               'permissive': permissive.PermissiveFeatureTable}
         self.fm = fm[feature_model](feature_set=feature_set)
         self.rules = self._load_table(tablename)
 
-    def _load_table(self, tablename):
+    def _load_table(self, tablename: str):
         fn = os.path.join('data', tablename)
-        fn = pkg_resources.resource_filename(__name__, fn)
-        with open(fn, 'r') as f:
+        with files('panphon').joinpath(fn).open('r') as f:
             rules = []
             table = yaml.load(f.read(), Loader=yaml.FullLoader)
             for rule in table:

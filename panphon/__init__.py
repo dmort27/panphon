@@ -1,3 +1,2 @@
-from __future__ import absolute_import
-from panphon.featuretable import FeatureTable
-from panphon._panphon import pat
+from panphon.featuretable import FeatureTable as FeatureTable
+from panphon._panphon import pat as pat
