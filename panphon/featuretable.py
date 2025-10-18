@@ -83,7 +83,7 @@ class FeatureTable(object):
         spec_to_int = {"+": 1, "0": 0, "-": -1}
 
         # Read the file name with the phonemes and their feature specification
-        with files("panphon").joinpath(fn).open() as f:
+        with files("panphon").joinpath(fn).open(encoding='utf-8') as f:
             df = pd.read_csv(f)  
 
         # Normalize the IPA representations
@@ -105,7 +105,7 @@ class FeatureTable(object):
         return segments, seg_dict, feature_names
 
     def _read_weights(self, weights_fn: str) -> list[float]:
-        with files('panphon').joinpath(weights_fn).open() as f:
+        with files('panphon').joinpath(weights_fn).open(encoding='utf-8') as f:
             df = pd.read_csv(f)
         weights = df.iloc[0].astype(float).tolist()
         return weights

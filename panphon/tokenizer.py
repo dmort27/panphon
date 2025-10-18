@@ -8,7 +8,7 @@ import marisa_trie  # type: ignore
 class Tokenizer:
     """Tokenize strings into sequences of phonemes."""
     def __init__(self, ipa_file='ipa_all.csv'):
-        with resources.files("panphon.data").joinpath(ipa_file).open("r") as f:
+        with resources.files("panphon.data").joinpath(ipa_file).open("r", encoding='utf-8') as f:
             self.df = pd.read_csv(f)
         self.phonemes = list(self.df['ipa'])
         self.phonemes_bytes = [(p.encode('utf-8'), ) for p in self.df['ipa']]

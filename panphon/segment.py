@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from collections.abc import Iterator, Mapping, ItemsView
+from collections.abc import Iterator, Mapping
 from typing import TypeVar, List, Dict
 import regex as re
 

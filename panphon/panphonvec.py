@@ -64,7 +64,7 @@ def generate_feature_vectors(feature_table="ipa_bases.csv") -> FeatureVectors:
         feature vectors.
     """
     feature_table = files("panphon") / "data" / feature_table
-    with feature_table.open("r") as f:
+    with feature_table.open("r", encoding='utf-8') as f:
         df = pd.read_csv(f)
     feature_names = df.columns[1:]
     df = df.sort_values(by="ipa", key=lambda col: col.str.len(), ascending=False)
@@ -125,7 +125,7 @@ def generate_modifiers(definitions_fn: str = "diacritic_definitions.yml") -> Mod
             vector[idx] = numeric_value
         return vector
 
-    with (files("panphon") / "data" / definitions_fn).open() as f:
+    with (files("panphon") / "data" / definitions_fn).open(encoding='utf-8') as f:
         definitions = safe_load(f)
     prefix = []
     postfix = []
