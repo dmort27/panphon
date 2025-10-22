@@ -98,6 +98,9 @@ class FeatureTable(object):
             self.segments
         )  # used for quick binary searches
 
+        # Build hash table for feature vector to phoneme mapping
+        self.vector_hash_table = self._build_vector_hash_table()
+
     @staticmethod
     def normalize(data: str) -> str:
         return unicodedata.normalize("NFD", data)
@@ -155,13 +158,71 @@ class FeatureTable(object):
             node[self.TRIE_LEAF_MARKER] = None
         return trie
 
-    def _build_canonical_phonemes(self, fn="canonical_phonemes.csv") -> Set[str]:
-        phonemes = set()
+    def _build_canonical_phonemes(self, fn="canonical_phonemes.csv") -> List[str]:
+        phonemes = []
         with files("panphon").joinpath("data").joinpath(fn).open(encoding="utf-8") as f:
             reader = csv.reader(f)
             for row in reader:
-                phonemes.add(row[0])
+                phonemes.append(row[0])
         return phonemes
+
+    @staticmethod
+    def _vector_to_hash(vector: tuple) -> int:
+        """Convert a feature vector to a hashable key.
+
+        Args:
+            vector (tuple): Feature vector as a tuple of values
+
+        Returns:
+            int: Hash of the feature vector
+        """
+        return hash(vector)
+
+    def _build_vector_hash_table(self) -> Dict[int, str]:
+        """Build a hash table mapping feature vectors to phonemes.
+
+        When multiple phonemes share the same feature vector, prefers:
+        1. Phonemes in self.canonical_phonemes (preferring the first occurrence
+           in the canonical_phonemes list)
+        2. Otherwise, the first phoneme encountered in self.segments
+
+        Returns:
+            dict: Mapping from feature vector hash to phoneme string
+        """
+        # Build an index for canonical phonemes to track their order
+        canonical_order = {
+            phoneme: idx for idx, phoneme in enumerate(self.canonical_phonemes)
+        }
+
+        hash_table: Dict[int, str] = {}
+
+        for ipa, segment in self.segments:
+            # Convert segment data to a hashable tuple using the canonical order
+            vector_tuple = tuple(segment.data.get(name, 0) for name in self.names)
+            vector_hash = self._vector_to_hash(vector_tuple)
+
+            # Determine if we should use this phoneme for this feature vector
+            if vector_hash not in hash_table:
+                # First phoneme with this feature vector
+                hash_table[vector_hash] = ipa
+            else:
+                # Multiple phonemes with same feature vector
+                current_phoneme = hash_table[vector_hash]
+
+                # Get canonical status and order for both phonemes
+                current_is_canonical = current_phoneme in canonical_order
+                new_is_canonical = ipa in canonical_order
+
+                if new_is_canonical and not current_is_canonical:
+                    # Replace non-canonical with canonical phoneme
+                    hash_table[vector_hash] = ipa
+                elif new_is_canonical and current_is_canonical:
+                    # Both are canonical - prefer the one that appears first in canonical_phonemes
+                    if canonical_order[ipa] < canonical_order[current_phoneme]:
+                        hash_table[vector_hash] = ipa
+                # If both are non-canonical, keep the first one encountered
+
+        return hash_table
 
     def fts(self, ipa: str, normalize: bool = True) -> Segment:
         if normalize:
@@ -631,10 +692,10 @@ class FeatureTable(object):
         return 0  # Vectors are equal
 
     def _binary_search(self, segment_list, target, fuzzy_search=False):
-        """Binary search to find the segment matching the target vector.
+        """Hash-based lookup to find the segment matching the target vector.
 
         Args:
-            segment_list (list): List of segments where each segment is a tuple (IPA, feature vector).
+            segment_list (list): List of segments (unused, kept for API compatibility).
             target (list): Target feature vector to search for.
             fuzzy_search (bool): whether to search for the closest vector match if an exact match is not found.
                 If disabled and an exact match is not found, a None value is returned.
@@ -642,48 +703,39 @@ class FeatureTable(object):
         Returns:
             str: The IPA segment matching the target vector, or None if not found.
         """
-        low, high = 0, len(segment_list) - 1
-        best_match_index = None
+        # Convert target list to tuple for hashing
+        target_tuple = tuple(target)
+        target_hash = self._vector_to_hash(target_tuple)
 
-        while low <= high:
-            mid = (low + high) // 2
-            word_vec = self.sorted_segments.segment_key(segment_list[mid])
-            comparison = self._compare_vectors(word_vec, target)
-            if comparison == 0:
-                best_match_index = mid
-                break
-            elif comparison < 0:
-                low = mid + 1
-            else:
-                high = mid - 1
+        # Lookup in hash table
+        if target_hash in self.vector_hash_table:
+            return self.vector_hash_table[target_hash]
 
-        if best_match_index is None and fuzzy_search:
-            # Used for fuzzy searching
-            best_match_index = mid
+        # If fuzzy search is enabled and exact match not found, try to find closest match
+        if fuzzy_search:
+            # Fall back to finding the closest match by iterating through all segments
+            best_match = None
+            min_distance = float("inf")
 
-        if best_match_index is not None:
-            # Check neighboring rows within the range of +-5
-            best_match = segment_list[best_match_index]
-            for offset in range(-9, 10):
-                neighbor_index = best_match_index + offset
-                if 0 <= neighbor_index < len(segment_list):
-                    neighbor_segment = segment_list[neighbor_index]
-                    if not self._compare_vectors(
-                        self.sorted_segments.segment_key(neighbor_segment), target
+            for ipa, segment in self.segments:
+                # Calculate distance between target and this segment's feature vector
+                vector_tuple = tuple(segment.data.get(name, 0) for name in self.names)
+                distance = sum(abs(t - v) for t, v in zip(target, vector_tuple))
+
+                if distance < min_distance:
+                    min_distance = distance
+                    best_match = ipa
+                elif distance == min_distance and best_match is not None:
+                    # If tied, prefer canonical phoneme or shorter segment
+                    if (
+                        ipa in self.canonical_phonemes
+                        and best_match not in self.canonical_phonemes
                     ):
-                        # Prefer shorter segments, or if same length, prefer canonical forms
-                        neighbor_len = len(neighbor_segment[0])
-                        best_len = len(best_match[0])
-                        if neighbor_len < best_len:
-                            best_match = neighbor_segment
-                        elif neighbor_len == best_len:
-                            # If same length, prefer the one that's a key in seg_dict (canonical form)
-                            if (
-                                neighbor_segment[0] in self.canonical_phonemes
-                                and best_match[0] not in self.canonical_phonemes
-                            ):
-                                best_match = neighbor_segment
-            return best_match[0]
+                        best_match = ipa
+                    elif len(ipa) < len(best_match):
+                        best_match = ipa
+
+            return best_match
 
         return None
 
