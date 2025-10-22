@@ -74,7 +74,7 @@ class Distance(object):
         List[Tuple[Dict[str, int], str]]
             List of (feature_mask, label) tuples for Dolgopolsky classification.
         """
-        with files('panphon').joinpath(filename).open('r') as f:
+        with files('panphon').joinpath(filename).open('r', encoding='utf-8') as f:
             rules = []
             dolgo_prime = yaml.load(f.read(), Loader=yaml.FullLoader)
             for rule in dolgo_prime:

@@ -15,11 +15,11 @@ MAX_STEPS = 10
 
 # Data structure for representing mappings between feature vectors and phonemes
 class FeatureVectors(NamedTuple):
-    vector_map: dict[str, np.ndarray]
-    phoneme_map: dict[tuple[int, ...], list[str]]
-    feature_names: list[str]
     phonemes: list[str]
-    feature_vectors: np.ndarray
+    feature_matrix: np.ndarray
+    phoneme_to_index: dict[str, int]
+    vector_to_index: dict[bytes, int]
+    feature_names: list[str]
 
 
 # Data structure for representing modifiers and the corresponding transforms to
@@ -39,11 +39,11 @@ _segment_re = None
 plus_minus_to_int = {"+": 1, "0": 0, "-": -1}
 
 
-def vector_to_tuple(vector: np.ndarray) -> tuple:
+def vector_to_hash(vector: np.ndarray) -> bytes:
     """
-    Convert np.ndarray feature vectors to tuples of integers
+    Convert np.ndarray feature vector to hashable bytes representation.
     """
-    return tuple(vector)
+    return vector.tobytes()
 
 
 def generate_feature_vectors(feature_table="ipa_bases.csv") -> FeatureVectors:
@@ -58,52 +58,43 @@ def generate_feature_vectors(feature_table="ipa_bases.csv") -> FeatureVectors:
     Returns
     -------
     FeatureVectors
-        An object with mappings from phonemes to vectors and vectors to
-        phonemes
-        as well as the names of the features, the phonemes themselves, and the
-        feature vectors.
+        An object with a list of phonemes, a feature matrix, and mappings
+        from phonemes to row indices and from vectors to row indices.
     """
     feature_table = files("panphon") / "data" / feature_table
-    with feature_table.open("r") as f:
+    with feature_table.open("r", encoding="utf-8") as f:
         df = pd.read_csv(f)
-    feature_names = df.columns[1:]
+    feature_names: list[str] = list(df.columns[1:].astype(str))
+
+    # Sort by length descending for proper regex matching (longest first)
     df = df.sort_values(by="ipa", key=lambda col: col.str.len(), ascending=False)
-    phonemes = df["ipa"]
+
+    phonemes: list[str] = list(df["ipa"].astype(str))
+
+    # Convert feature values to integers
     df[feature_names] = df[feature_names].map(lambda s: plus_minus_to_int[s])  # type: ignore
     df[feature_names] = df[feature_names].astype(int)
-    feature_vectors = np.array(df[feature_names])
-    vector_map = dict(zip(phonemes, feature_vectors))
 
-    feature_cols = df.columns[1:]  # all columns after 'ipa'
+    # Create the feature matrix (single ndarray)
+    feature_matrix = np.array(df[feature_names], dtype=np.int8)
 
-    grouped_df = (
-        df.groupby(list(feature_cols), sort=False)["ipa"].agg(";".join).reset_index()
-    )
-    grouped_df = grouped_df[["ipa"] + list(feature_cols)]
+    # Build phoneme_to_index mapping
+    phoneme_to_index = {phoneme: idx for idx, phoneme in enumerate(phonemes)}
 
-    # Now build the phoneme_map
-    numeric_cols = grouped_df.columns[1:]
-
-    # Ensure tuple values are plain Python ints, not np.int64
-    def row_key(row):
-        return tuple(int(x) for x in row[numeric_cols])
-
-    phoneme_map_items = grouped_df.apply(
-        lambda row: (row_key(row), sorted(row["ipa"].split(";"))), axis=1
-    ).tolist()
-
-    phoneme_map = dict(phoneme_map_items)
-
-    def handle_missing_vector(vector):
-        warnings.warn(f"Vector not found as key={vector}")
-        return ""
+    # Build vector_to_index mapping (hash of vector -> row index)
+    vector_to_index = {}
+    for idx, vector in enumerate(feature_matrix):
+        vector_hash = vector_to_hash(vector)
+        # For duplicate vectors, we keep only the first occurrence
+        if vector_hash not in vector_to_index:
+            vector_to_index[vector_hash] = idx
 
     return FeatureVectors(
-        vector_map,
-        phoneme_map,
+        phonemes,
+        feature_matrix,
+        phoneme_to_index,
+        vector_to_index,
         list(feature_names),
-        list(phonemes),
-        feature_vectors,
     )
 
 
@@ -125,7 +116,7 @@ def generate_modifiers(definitions_fn: str = "diacritic_definitions.yml") -> Mod
             vector[idx] = numeric_value
         return vector
 
-    with (files("panphon") / "data" / definitions_fn).open() as f:
+    with (files("panphon") / "data" / definitions_fn).open(encoding="utf-8") as f:
         definitions = safe_load(f)
     prefix = []
     postfix = []
@@ -170,32 +161,35 @@ def get_segment_re() -> re.Pattern:
     return _segment_re
 
 
-def add_and_get_new_vector(ipa: str) -> np.ndarray:
-    # Access the shared data structure
+def compute_phoneme_vector(ipa: str) -> tuple[np.ndarray, str] | None:
+    """
+    Compute the feature vector for a phoneme that may include diacritics.
+
+    Returns tuple of (vector, canonical_form) or None if phoneme cannot be analyzed.
+    """
     features = get_features()
     modifiers = get_modifiers()
     segment_re = get_segment_re()
 
-    # Check whether the input string matches the regular expression for
-    # segments
+    # Check whether the input string matches the regular expression for segments
     if match := segment_re.match(ipa):
         pre, base, post = match.groups()
-        vector = features.vector_map[base].copy()
+
+        # Get base phoneme index and copy its vector
+        base_idx = features.phoneme_to_index[base]
+        vector = features.feature_matrix[base_idx].copy()
 
         # Iterate through the modifiers, updating the feature representations
         for marker in post + pre:
             feature_tr, _ = modifiers.transforms[marker]
             vector[feature_tr != 0] = feature_tr[feature_tr != 0]
-        features.vector_map[ipa] = vector
-        tuple_vector = vector_to_tuple(vector)
-        features.phoneme_map[tuple_vector] = [ipa]  # type: ignore
-        return vector
+
+        return vector, ipa
     else:
-        warnings.warn(f"Phoneme {ipa} cannot be analyzed.")
-        return np.zeros(len(features.feature_names))
+        return None
 
 
-@lru_cache
+@lru_cache(maxsize=10000)
 def encode(ipa: str) -> np.ndarray:
     """
     Encode an IPA string as a NumPy array representing the features of each
@@ -210,33 +204,52 @@ def encode(ipa: str) -> np.ndarray:
     -------
     np.ndarray
         An array of integers in which each row corresponds to a phoneme. The
-        value 1 indicates an active feature (+), the value -1 indicates and
+        value 1 indicates an active feature (+), the value -1 indicates an
         inactive feature (-), and the value 0 indicates an irrelevant feature.
     """
     segment_re = get_segment_re()
     features = get_features()
-    rows = [
-        features.vector_map.get(m.group(0), add_and_get_new_vector(m.group(0)))
-        for m in segment_re.finditer(ipa)
-    ]
-    return np.stack(rows)
+
+    rows = []
+    for m in segment_re.finditer(ipa):
+        phoneme = m.group(0)
+
+        # Try to get from phoneme_to_index first (for base phonemes)
+        if phoneme in features.phoneme_to_index:
+            idx = features.phoneme_to_index[phoneme]
+            rows.append(features.feature_matrix[idx])
+        else:
+            # Compute vector for phoneme with diacritics
+            result = compute_phoneme_vector(phoneme)
+            if result is not None:
+                vector, _ = result
+                rows.append(vector)
+            else:
+                warnings.warn(f"Phoneme {phoneme} cannot be analyzed.")
+                rows.append(np.zeros(len(features.feature_names), dtype=np.int8))
+
+    return (
+        np.stack(rows) if rows else np.array([]).reshape(0, len(features.feature_names))
+    )
 
 
 def hamming_distance(u: np.ndarray, v: np.ndarray) -> int:
     return int(np.sum(u != v))
 
 
-def add_and_get_new_phoneme(target_vector: np.ndarray) -> list[str]:
-    # Obtain shared resources
+def find_closest_phoneme(target_vector: np.ndarray) -> str:
+    """
+    Find the closest phoneme to the target vector by applying diacritics.
+    """
     features = get_features()
     modifiers = get_modifiers()
 
     # Find the closest known vector to the target vector (as well as the
     # corresponding phoneme)
-    distances = np.sum(features.feature_vectors != target_vector, axis=1)
-    idx = np.argmin(distances)
+    distances = np.sum(features.feature_matrix != target_vector, axis=1)
+    idx = int(np.argmin(distances))
     phoneme = features.phonemes[idx]
-    vector = features.vector_map[phoneme].copy()
+    vector = features.feature_matrix[idx].copy()
 
     # Iterate through the modifiers in multiple passes
     for _ in range(MAX_STEPS):
@@ -260,14 +273,16 @@ def add_and_get_new_phoneme(target_vector: np.ndarray) -> list[str]:
         if found:
             break
         else:
+            if not candidates:
+                break
             candidates = sorted(candidates, key=lambda x: x[0])
             best_loss, best_vector, best_phoneme = candidates.pop(0)
             if best_loss >= hamming_distance(target_vector, vector):
                 break
             else:
                 vector, phoneme = best_vector, best_phoneme
-    features.phoneme_map[vector_to_tuple(target_vector)] = [phoneme]
-    return [phoneme]
+
+    return phoneme
 
 
 def decode(matrix: np.ndarray) -> str:
@@ -284,15 +299,34 @@ def decode(matrix: np.ndarray) -> str:
     str
         A string of phonemes corresponding the the input feature matrix.
     """
-
     features = get_features()
 
-    def get_phoneme(vector):
-        vector = vector_to_tuple(vector)
-        if vector in features.phoneme_map:
-            phonemes = features.phoneme_map[vector]
-            return phonemes[0]
+    phonemes = []
+    for vector in matrix:
+        # Try exact match first
+        vector_hash = vector_to_hash(vector)
+        if vector_hash in features.vector_to_index:
+            idx = features.vector_to_index[vector_hash]
+            phonemes.append(features.phonemes[idx])
         else:
-            return add_and_get_new_phoneme(vector)[0]  # type: ignore
+            # Find closest phoneme using diacritics
+            phoneme = find_closest_phoneme(vector)
+            phonemes.append(phoneme)
 
-    return "".join([get_phoneme(row) for row in matrix])
+    return "".join(phonemes)
+
+
+# Legacy compatibility - maintain old interface
+def get_vector_for_phoneme(phoneme: str) -> np.ndarray:
+    """Get feature vector for a phoneme (including those with diacritics)."""
+    features = get_features()
+    if phoneme in features.phoneme_to_index:
+        idx = features.phoneme_to_index[phoneme]
+        return features.feature_matrix[idx].copy()
+    else:
+        result = compute_phoneme_vector(phoneme)
+        if result is not None:
+            return result[0]
+        else:
+            warnings.warn(f"Phoneme {phoneme} not found.")
+            return np.zeros(len(features.feature_names), dtype=np.int8)

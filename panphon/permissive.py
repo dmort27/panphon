@@ -62,7 +62,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
     ) -> tuple[dict[str, set[tuple[str, str]]], list[str]]:
         # Open file from package
         path = files("panphon") / fn
-        with path.open() as f:
+        with path.open(encoding='utf-8') as f:
             df = pd.read_csv(f)
 
         # Compute the
@@ -76,7 +76,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
 
     def _read_dias(self, dias):
         prefix, postfix = {}, {}
-        with dias.open('r') as f:
+        with dias.open('r', encoding='utf-8') as f:
             defs = yaml.load(f.read(), Loader=yaml.FullLoader)
             for dia in defs['diacritics']:
                 if dia['position'] == 'pre':
@@ -104,7 +104,7 @@ class PermissiveFeatureTable(_panphon.FeatureTable):
             filename=os.path.join(
                 "data", "feature_weights.csv")):
         path = files("panphon").joinpath(filename)
-        with path.open() as f:
+        with path.open(encoding='utf-8') as f:
             df = pd.read_csv(f)
 
         # Weights are in first row

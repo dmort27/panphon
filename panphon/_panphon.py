@@ -184,7 +184,7 @@ class FeatureTable(object):
     def _read_weights(self, filename: str = os.path.join(
             'data', 'feature_weights.csv')
     ) -> List[float]:
-        with files('panphon').joinpath(filename).open() as f:
+        with files('panphon').joinpath(filename).open(encoding='utf-8') as f:
             df = pd.read_csv(f)
         weights = df.iloc[0].astype(float).tolist()
         return weights

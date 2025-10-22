@@ -23,8 +23,7 @@ class Segment(object):
 
     def __repr__(self):
         """Output string representation of Segment."""
-        return 'Segment("{}", {})'.format(self.form,
-                                          repr(self.features))
+        return 'Segment("{}", {})'.format(self.form, repr(self.features))
 
     def feature_vector(self, feature_names):
         """Return feature vector for segment.
@@ -39,7 +38,7 @@ class Segment(object):
 
 
 class Diacritic(object):
-    """An object encapsulating a diacritics properties."""
+    """An object encapsulating a diacritic's properties."""
 
     def __init__(self, marker, position, conditions, exclude, content):
         """Construct a diacritic object.
@@ -57,7 +56,7 @@ class Diacritic(object):
                             is applied
         """
         self.marker = marker
-        assert position in ['pre', 'post']
+        assert position in ["pre", "post"]
         self.position = position
         self.exclude = exclude
         self.conditions = conditions
@@ -66,6 +65,9 @@ class Diacritic(object):
     def match(self, segment):
         if segment.form not in self.exclude:
             for condition in self.conditions:
+                # Skip empty conditions - they should not match all segments
+                if not condition:
+                    continue
                 if set(condition.items()) <= set(segment.features.items()):
                     return True
             return False
@@ -77,10 +79,10 @@ class Diacritic(object):
             new_seg = copy.deepcopy(segment)
             for k, v in self.content.items():
                 new_seg.features[k] = v
-            if self.position == 'post':
-                new_seg.form = '{}{}'.format(new_seg.form, self.marker)
+            if self.position == "post":
+                new_seg.form = "{}{}".format(new_seg.form, self.marker)
             else:
-                new_seg.form = '{}{}'.format(self.marker, new_seg.form)
+                new_seg.form = "{}{}".format(self.marker, new_seg.form)
             return new_seg
         else:
             return None
@@ -103,11 +105,11 @@ class Combination(object):
 
 def read_ipa_bases(ipa_bases):
     segments = []
-    with open(ipa_bases, 'r', encoding='utf-8') as f:
+    with open(ipa_bases, "r", encoding="utf-8") as f:
         dictreader = csv.DictReader(f)
         for record in dictreader:
-            form = record['ipa']
-            features = {k: v for k, v in record.items() if k != 'ipa'}
+            form = record["ipa"]
+            features = {k: v for k, v in record.items() if k != "ipa"}
             segments.append(Segment(form, features))
     return segments
 
@@ -116,42 +118,42 @@ def parse_dia_defs(dia_defs):
     with open(dia_defs, "r", encoding="utf-8") as f:
         defs = yaml.load(f.read(), Loader=yaml.FullLoader)
     diacritics = {}
-    for dia in defs['diacritics']:
-        if 'exclude' in dia:
-            exclude = dia['exclude']
+    for dia in defs["diacritics"]:
+        if "exclude" in dia:
+            exclude = dia["exclude"]
         else:
             exclude = []
-        diacritics[dia['name']] = Diacritic(dia['marker'], dia['position'],
-                                            dia['conditions'], exclude,
-                                            dia['content'])
+        diacritics[dia["name"]] = Diacritic(
+            dia["marker"], dia["position"], dia["conditions"], exclude, dia["content"]
+        )
     combinations = []
-    for comb in defs['combinations']:
-        combinations.append(Combination(diacritics, comb['name'],
-                                        comb['combines']))
+    for comb in defs["combinations"]:
+        combinations.append(Combination(diacritics, comb["name"], comb["combines"]))
     return diacritics, combinations
 
 
 def sort_all_segments(sort_order, all_segments):
     all_segments_list = list(all_segments)
-    with open(sort_order, 'r', encoding='utf-8') as f:
+    with open(sort_order, "r", encoding="utf-8") as f:
         field_order = reversed(yaml.load(f.read(), Loader=yaml.FullLoader))
     for field in field_order:
-        all_segments_list.sort(key=lambda seg: seg.features[field['name']],
-                               reverse=field['reverse'])
+        all_segments_list.sort(
+            key=lambda seg: seg.features[field["name"]], reverse=field["reverse"]
+        )
     return all_segments_list
 
 
 def write_ipa_all(ipa_bases, ipa_all, all_segments, sort_order):
-    with open(ipa_bases, 'r', encoding='utf-8') as f:
+    with open(ipa_bases, "r", encoding="utf-8") as f:
         reader = csv.reader(f)
         fieldnames = next(reader)
-    with open(ipa_all, 'w', encoding='utf-8', newline='') as f:
+    with open(ipa_all, "w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         all_segments_list = sort_all_segments(sort_order, all_segments)
         for segment in all_segments_list:
             fields = copy.copy(segment.features)
-            fields['ipa'] = segment.form
+            fields["ipa"] = segment.form
             writer.writerow(fields)
 
 
@@ -175,13 +177,22 @@ def main(ipa_bases, ipa_all, dia_defs, sort_order):
 def cli_main():
     """Entry point for the generate_ipa_all script."""
     parser = argparse.ArgumentParser()
-    parser.add_argument('bases', help='File containing IPA bases (ipa_bases.csv)')
-    parser.add_argument('all', help='File to which all IPA segments is to be written (ipa_all.csv)')
-    parser.add_argument('-d', '--dia', required=True, help='Diacritic definition file (default=diacritic_definitions.yml)')
-    parser.add_argument('-s', '--sort-order', required=True, help='File definiting sort order.')
+    parser.add_argument("bases", help="File containing IPA bases (ipa_bases.csv)")
+    parser.add_argument(
+        "all", help="File to which all IPA segments is to be written (ipa_all.csv)"
+    )
+    parser.add_argument(
+        "-d",
+        "--dia",
+        required=True,
+        help="Diacritic definition file (default=diacritic_definitions.yml)",
+    )
+    parser.add_argument(
+        "-s", "--sort-order", required=True, help="File definiting sort order."
+    )
     args = parser.parse_args()
     main(args.bases, args.all, args.dia, args.sort_order)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli_main()

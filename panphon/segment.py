@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
-from typing import Iterator, Mapping, TypeVar, List, Dict
+from collections.abc import Iterator, Mapping
+from typing import TypeVar, List, Dict
 import regex as re
 
 T = TypeVar('T')
