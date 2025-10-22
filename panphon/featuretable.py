@@ -2,6 +2,8 @@
 
 import collections
 import os.path
+import csv
+from typing_extensions import Set
 import unicodedata
 from functools import reduce
 from importlib.resources import files
@@ -15,15 +17,17 @@ from . import xsampa
 from .segment import Segment
 
 feature_sets = {
-    'spe+': (os.path.join('data', 'ipa_all.csv'),
-             os.path.join('data', 'feature_weights.csv'))
+    "spe+": (
+        os.path.join("data", "ipa_all.csv"),
+        os.path.join("data", "feature_weights.csv"),
+    )
 }
 
 
 class SegmentSorter:
     def __init__(self, segments: List[Any]) -> None:
         self._segments = segments
-        self._sorted=False
+        self._sorted = False
 
     @property
     def segments(self) -> List[Any]:
@@ -37,14 +41,32 @@ class SegmentSorter:
 
     @staticmethod
     def segment_key(segment_tuple: Tuple[str, Dict[str, Any]]) -> Tuple[Any, ...]:
-        segment_data=segment_tuple[1]
+        segment_data = segment_tuple[1]
         return (
-            segment_data['syl'], segment_data['son'], segment_data['cons'], segment_data['cont'],
-            segment_data['delrel'], segment_data['lat'], segment_data['nas'], segment_data['strid'],
-            segment_data['voi'], segment_data['sg'], segment_data['cg'], segment_data['ant'],
-            segment_data['cor'], segment_data['distr'], segment_data['lab'], segment_data['hi'],
-            segment_data['lo'], segment_data['back'], segment_data['round'], segment_data['velaric'],
-            segment_data['tense'], segment_data['long'], segment_data['hitone'], segment_data['hireg']
+            segment_data["syl"],
+            segment_data["son"],
+            segment_data["cons"],
+            segment_data["cont"],
+            segment_data["delrel"],
+            segment_data["lat"],
+            segment_data["nas"],
+            segment_data["strid"],
+            segment_data["voi"],
+            segment_data["sg"],
+            segment_data["cg"],
+            segment_data["ant"],
+            segment_data["cor"],
+            segment_data["distr"],
+            segment_data["lab"],
+            segment_data["hi"],
+            segment_data["lo"],
+            segment_data["back"],
+            segment_data["round"],
+            segment_data["velaric"],
+            segment_data["tense"],
+            segment_data["long"],
+            segment_data["hitone"],
+            segment_data["hireg"],
         )
 
 
@@ -57,24 +79,32 @@ class FeatureTable(object):
         The set of features to be used by the FeatureTable object.
         Default is 'spe+'.
     """
+
     TRIE_LEAF_MARKER = None
 
-    def __init__(self, feature_set: str='spe+'):
+    def __init__(self, feature_set: str = "spe+"):
         bases_fn, weights_fn = feature_sets[feature_set]
         self.weights = self._read_weights(weights_fn)
-        self.segments, self.seg_dict, self.names = self._read_bases(bases_fn, self.weights)
+        self.segments, self.seg_dict, self.names = self._read_bases(
+            bases_fn, self.weights
+        )
         self.seg_regex = self._build_seg_regex()
         self.seg_trie = self._build_seg_trie()
         self.longest_seg = max([len(x) for x in self.seg_dict.keys()])
         self.xsampa = xsampa.XSampa()
+        self.canonical_phonemes = self._build_canonical_phonemes()
 
-        self.sorted_segments = SegmentSorter(self.segments) # used for quick binary searches
+        self.sorted_segments = SegmentSorter(
+            self.segments
+        )  # used for quick binary searches
 
     @staticmethod
     def normalize(data: str) -> str:
-        return unicodedata.normalize('NFD', data)
+        return unicodedata.normalize("NFD", data)
 
-    def _read_bases(self, fn: str, weights) -> tuple[
+    def _read_bases(
+        self, fn: str, weights
+    ) -> tuple[
         list[tuple[str, Segment]],
         dict[str, Segment],
         list[str],
@@ -83,8 +113,8 @@ class FeatureTable(object):
         spec_to_int = {"+": 1, "0": 0, "-": -1}
 
         # Read the file name with the phonemes and their feature specification
-        with files("panphon").joinpath(fn).open(encoding='utf-8') as f:
-            df = pd.read_csv(f)  
+        with files("panphon").joinpath(fn).open(encoding="utf-8") as f:
+            df = pd.read_csv(f)
 
         # Normalize the IPA representations
         df["ipa"] = df["ipa"].apply(self.normalize)
@@ -105,14 +135,14 @@ class FeatureTable(object):
         return segments, seg_dict, feature_names
 
     def _read_weights(self, weights_fn: str) -> list[float]:
-        with files('panphon').joinpath(weights_fn).open(encoding='utf-8') as f:
+        with files("panphon").joinpath(weights_fn).open(encoding="utf-8") as f:
             df = pd.read_csv(f)
         weights = df.iloc[0].astype(float).tolist()
         return weights
 
     def _build_seg_regex(self) -> re.Pattern:
         segs = sorted(self.seg_dict.keys(), key=lambda x: len(x), reverse=True)
-        return re.compile(r'(?P<all>{})'.format('|'.join(segs)))
+        return re.compile(r"(?P<all>{})".format("|".join(segs)))
 
     def _build_seg_trie(self) -> dict:
         trie: dict = {}
@@ -125,13 +155,23 @@ class FeatureTable(object):
             node[self.TRIE_LEAF_MARKER] = None
         return trie
 
+    def _build_canonical_phonemes(self, fn="canonical_phonemes.csv") -> Set[str]:
+        phonemes = set()
+        with files("panphon").joinpath("data").joinpath(fn).open(encoding="utf-8") as f:
+            reader = csv.reader(f)
+            for row in reader:
+                phonemes.add(row[0])
+        return phonemes
+
     def fts(self, ipa: str, normalize: bool = True) -> Segment:
         if normalize:
             ipa = FeatureTable.normalize(ipa)
         if ipa in self.seg_dict:
             return self.seg_dict[ipa]
         else:
-            return Segment(self.names, {name: 0 for name in self.names}, weights=self.weights)
+            return Segment(
+                self.names, {name: 0 for name in self.names}, weights=self.weights
+            )
 
     def longest_one_seg_prefix(self, word: str, normalize: bool = True) -> str:
         """Return longest Unicode IPA prefix of a word
@@ -153,7 +193,7 @@ class FeatureTable(object):
             node = node[word[pos]]
             if self.TRIE_LEAF_MARKER in node:
                 last_found_length = pos + 1
-        return ''
+        return ""
 
     def ipa_segs(self, word: str, normalize: bool = True) -> list[str]:
         """Returns a list of segments from a word
@@ -181,7 +221,9 @@ class FeatureTable(object):
                   that exist in the database
 
         """
-        return not self._segs(word, include_valid=False, include_invalid=True, normalize=normalize)
+        return not self._segs(
+            word, include_valid=False, include_invalid=True, normalize=normalize
+        )
 
     def word_fts(self, word: str, normalize: bool = True) -> list[Segment]:
         """Return a list of Segment objects corresponding to the segments in
@@ -196,10 +238,9 @@ class FeatureTable(object):
         """
         return [self.fts(ipa, False) for ipa in self.ipa_segs(word, normalize)]
 
-    def word_array(self,
-                   ft_names: list[str],
-                   word: str,
-                   normalize: bool = True) -> numpy.ndarray:
+    def word_array(
+        self, ft_names: list[str], word: str, normalize: bool = True
+    ) -> numpy.ndarray:
         """Return a ndarray of features namd in ft_name for the segments in word
 
         Args:
@@ -210,11 +251,16 @@ class FeatureTable(object):
         Returns:
             ndarray: segments in rows, features in columns as [-1, 0, 1]
         """
-        return numpy.array([[s.data.get(ft, 0) for ft in ft_names] for s in self.word_fts(word, normalize)])
+        return numpy.array(
+            [
+                [s.data.get(ft, 0) for ft in ft_names]
+                for s in self.word_fts(word, normalize)
+            ]
+        )
 
-    def bag_of_features(self, word: str, normalize: bool=True) -> numpy.ndarray:
+    def bag_of_features(self, word: str, normalize: bool = True) -> numpy.ndarray:
         """Return a vector in which each dimension is the number of times a feature-value pair occurs in the word
-        
+
         Args:
             word (str): word consisting of IPA segments
             normalize (bool): whether to pre-normalize the word
@@ -223,17 +269,17 @@ class FeatureTable(object):
             array: array of integers corresponding to a bag of feature-value pair counts
         """
         word_features = self.word_fts(word, normalize)
-        features = [v + f for f in self.names for v in ['+', '0', '-']]
+        features = [v + f for f in self.names for v in ["+", "0", "-"]]
         bag = collections.OrderedDict()
         for f in features:
             bag[f] = 0
-        vdict = {-1: '-', 0: '0', 1: '+'}
+        vdict = {-1: "-", 0: "0", 1: "+"}
         for w in word_features:
-            for (f, v) in w.items():
+            for f, v in w.items():
                 bag[vdict[v] + f] += 1
         return numpy.array(list(bag.values()))
 
-    def seg_known(self, segment: str, normalize: bool=True) -> bool:
+    def seg_known(self, segment: str, normalize: bool = True) -> bool:
         """Return True if `segment` is in segment <=> features database
 
         Args:
@@ -247,7 +293,7 @@ class FeatureTable(object):
             segment = FeatureTable.normalize(segment)
         return segment in self.seg_dict
 
-    def segs_safe(self, word: str, normalize: bool=True):
+    def segs_safe(self, word: str, normalize: bool = True):
         """Return a list of segments (as strings) from a word
 
         Characters that are not valid segments are included in the list as
@@ -265,7 +311,14 @@ class FeatureTable(object):
             word = FeatureTable.normalize(word)
         return self._segs(word, include_invalid=True, normalize=normalize)
 
-    def _segs(self, word: str, *, include_valid: bool=True, include_invalid: bool, normalize: bool=True) -> list[str]:
+    def _segs(
+        self,
+        word: str,
+        *,
+        include_valid: bool = True,
+        include_invalid: bool,
+        normalize: bool = True,
+    ) -> list[str]:
         if normalize:
             word = FeatureTable.normalize(word)
         segs = []
@@ -274,14 +327,14 @@ class FeatureTable(object):
             if m:
                 if include_valid:
                     segs.append(m)
-                word = word[len(m):]
+                word = word[len(m) :]
             else:
                 if include_invalid:
                     segs.append(word[0])
                 word = word[1:]
         return segs
 
-    def filter_segs(self, segs: list[str], normalize: bool=True) -> list[str]:
+    def filter_segs(self, segs: list[str], normalize: bool = True) -> list[str]:
         """Given list of strings, return only those which are valid segments
 
         Args:
@@ -294,7 +347,7 @@ class FeatureTable(object):
         """
         return list(filter(lambda seg: self.seg_known(seg, normalize), segs))
 
-    def filter_string(self, word: str, normalize: bool=True) -> str:
+    def filter_string(self, word: str, normalize: bool = True) -> str:
         """Return a string like the input but containing only legal IPA segments
 
         Args:
@@ -306,9 +359,9 @@ class FeatureTable(object):
                      absent
 
         """
-        return ''.join(self.ipa_segs(word, normalize))
+        return "".join(self.ipa_segs(word, normalize))
 
-    def fts_intersection(self, segs: list[str], normalize: bool=True) -> Segment:
+    def fts_intersection(self, segs: list[str], normalize: bool = True) -> Segment:
         """Return a Segment object containing the features shared by all segments
 
         Args:
@@ -318,10 +371,14 @@ class FeatureTable(object):
         Returns:
             Segment: the features shared by all segments in segs
         """
-        return reduce(lambda a, b: a & b,
-                      [self.fts(s, normalize) for s in self.filter_segs(segs, normalize)])
+        return reduce(
+            lambda a, b: a & b,
+            [self.fts(s, normalize) for s in self.filter_segs(segs, normalize)],
+        )
 
-    def fts_match_all(self, fts: dict[str, int], inv: list[str], normalize: bool=True) -> bool:
+    def fts_match_all(
+        self, fts: dict[str, int], inv: list[str], normalize: bool = True
+    ) -> bool:
         """Return `True` if all segments in `inv` matches the features in fts
 
         Args:
@@ -333,11 +390,15 @@ class FeatureTable(object):
         Returns:
             bool: `True` if all segments in `inv` match the features in `fts`
         """
+
         def matches_fts(seg: Segment, fts_dict: dict[str, int]) -> bool:
             return all(seg.data.get(k, 0) == v for k, v in fts_dict.items())
+
         return all(matches_fts(self.fts(s, normalize), fts) for s in inv)
 
-    def fts_match_any(self, fts: dict[str, int], inv: list[str], normalize: bool=True) -> bool:
+    def fts_match_any(
+        self, fts: dict[str, int], inv: list[str], normalize: bool = True
+    ) -> bool:
         """Return `True` if any segments in `inv` matches the features in fts
 
         Args:
@@ -349,11 +410,15 @@ class FeatureTable(object):
         Returns:
             bool: `True` if any segments in `inv` matches the features in `fts`
         """
+
         def matches_fts(seg: Segment, fts_dict: dict[str, int]) -> bool:
             return all(seg.data.get(k, 0) == v for k, v in fts_dict.items())
+
         return any(matches_fts(self.fts(s, normalize), fts) for s in inv)
 
-    def fts_contrast(self, fs: dict[str, int], ft_name: str, inv: list[str], normalize: bool=True) -> bool:
+    def fts_contrast(
+        self, fs: dict[str, int], ft_name: str, inv: list[str], normalize: bool = True
+    ) -> bool:
         """Return `True` if there is a segment in `inv` that contrasts in feature
         `ft_name`.
 
@@ -367,9 +432,13 @@ class FeatureTable(object):
             bool: `True` if two segments in `inv` are identical in features except
                   for feature `ft_name`
         """
+
         def matches_fts(seg: Segment, fts_dict: dict[str, int]) -> bool:
             return all(seg.data.get(k, 0) == v for k, v in fts_dict.items())
-        inv_segs: filter = filter(lambda x: matches_fts(x, fs), map(lambda seg: self.fts(seg, normalize), inv))
+
+        inv_segs: filter = filter(
+            lambda x: matches_fts(x, fs), map(lambda seg: self.fts(seg, normalize), inv)
+        )
         for a in inv_segs:
             for b in inv_segs:
                 if a != b:
@@ -377,7 +446,9 @@ class FeatureTable(object):
                         return True
         return False
 
-    def fts_count(self, fts: dict[str, int], inv: list[str], normalize: bool=True) -> int:
+    def fts_count(
+        self, fts: dict[str, int], inv: list[str], normalize: bool = True
+    ) -> int:
         """Return the count of segments in an inventory matching a given
         feature mask.
 
@@ -389,11 +460,17 @@ class FeatureTable(object):
         Returns:
             int: number of segments in `inv` that match feature mask `fts`
         """
+
         def matches_fts(seg: Segment, fts_dict: dict[str, int]) -> bool:
             return all(seg.data.get(k, 0) == v for k, v in fts_dict.items())
-        return len(list(filter(lambda s: matches_fts(self.fts(s, normalize), fts), inv)))
 
-    def match_pattern(self, pat: list[dict[str, int]], word: str, normalize: bool=True) -> list[Segment] | None:
+        return len(
+            list(filter(lambda s: matches_fts(self.fts(s, normalize), fts), inv))
+        )
+
+    def match_pattern(
+        self, pat: list[dict[str, int]], word: str, normalize: bool = True
+    ) -> list[Segment] | None:
         """Implements fixed-width pattern matching.
 
         Matches just in case pattern is the same length (in segments) as the
@@ -415,9 +492,10 @@ class FeatureTable(object):
         if len(pat) != len(segs):
             return None
         else:
+
             def matches_pattern(seg: Segment, pattern: dict[str, int]) -> bool:
                 return all(seg.data.get(k, 0) == v for k, v in pattern.items())
-            
+
             if all(matches_pattern(s, p) for s, p in zip(segs, pat)):
                 return segs
             else:
@@ -443,8 +521,10 @@ class FeatureTable(object):
         if len(pat) != len(segs):
             return False
         else:
+
             def matches_pattern(seg: Segment, pattern: dict[str, int]) -> bool:
                 return all(seg.data.get(k, 0) == v for k, v in pattern.items())
+
             return all(matches_pattern(s, p) for s, p in zip(segs, pat))
 
     def all_segs_matching_fts(self, ft_mask):
@@ -470,13 +550,13 @@ class FeatureTable(object):
         Returns:
            Pattern: regular expression pattern equivalent to `pat`
         """
-        s2n = {'-': -1, '0': 0, '+': 1}
+        s2n = {"-": -1, "0": 0, "+": 1}
         seg_res = []
-        for mat in re.findall(r'\[[^]]+\]+', pat):
-            ft_mask = {k: s2n[v] for (v, k) in re.findall(r'([+-])(\w+)', mat)}
+        for mat in re.findall(r"\[[^]]+\]+", pat):
+            ft_mask = {k: s2n[v] for (v, k) in re.findall(r"([+-])(\w+)", mat)}
             segs = self.all_segs_matching_fts(ft_mask)
-            seg_res.append('({})'.format('|'.join(segs)))
-        regexp = ''.join(seg_res)
+            seg_res.append("({})".format("|".join(segs)))
+        regexp = "".join(seg_res)
         return re.compile(regexp)
 
     def segment_to_vector(self, seg, normalize=True):
@@ -493,13 +573,20 @@ class FeatureTable(object):
         """
         return self.fts(seg, normalize).strings()
 
-    def standardize_tones(self, word, nonstandard_tones=['¹','²','³','⁴','⁵']):
-        standard_tones = ['˩', '˨', '˧', '˦', '˥']
+    def standardize_tones(self, word, nonstandard_tones=["¹", "²", "³", "⁴", "⁵"]):
+        standard_tones = ["˩", "˨", "˧", "˦", "˥"]
         tone_map = dict(zip(nonstandard_tones, standard_tones))
-        standardized_word = ''.join(tone_map.get(char, char) for char in word)
+        standardized_word = "".join(tone_map.get(char, char) for char in word)
         return standardized_word
 
-    def word_to_vector_list(self, word, numeric=False, xsampa=False, nonstandard_tones=['¹','²','³','⁴','⁵'], normalize=True):
+    def word_to_vector_list(
+        self,
+        word,
+        numeric=False,
+        xsampa=False,
+        nonstandard_tones=["¹", "²", "³", "⁴", "⁵"],
+        normalize=True,
+    ):
         """Return a list of feature vectors, given a Unicode IPA word.
 
         Args:
@@ -517,7 +604,7 @@ class FeatureTable(object):
         if xsampa:
             word = self.xsampa.convert(word)
         if nonstandard_tones:
-            word=self.standardize_tones(word,nonstandard_tones)
+            word = self.standardize_tones(word, nonstandard_tones)
         segs = self.word_fts(word, normalize or xsampa)
 
         if numeric:
@@ -526,7 +613,7 @@ class FeatureTable(object):
             tensor = [x.strings() for x in segs]
         return tensor
 
-    def _compare_vectors(self,vector1, vector2):
+    def _compare_vectors(self, vector1, vector2):
         """Compare two feature vectors digit by digit.
 
         Args:
@@ -581,7 +668,9 @@ class FeatureTable(object):
                 neighbor_index = best_match_index + offset
                 if 0 <= neighbor_index < len(segment_list):
                     neighbor_segment = segment_list[neighbor_index]
-                    if not self._compare_vectors(self.sorted_segments.segment_key(neighbor_segment),target):
+                    if not self._compare_vectors(
+                        self.sorted_segments.segment_key(neighbor_segment), target
+                    ):
                         # Prefer shorter segments, or if same length, prefer canonical forms
                         neighbor_len = len(neighbor_segment[0])
                         best_len = len(best_match[0])
@@ -589,13 +678,16 @@ class FeatureTable(object):
                             best_match = neighbor_segment
                         elif neighbor_len == best_len:
                             # If same length, prefer the one that's a key in seg_dict (canonical form)
-                            if neighbor_segment[0] in self.seg_dict and best_match[0] not in self.seg_dict:
+                            if (
+                                neighbor_segment[0] in self.canonical_phonemes
+                                and best_match[0] not in self.canonical_phonemes
+                            ):
                                 best_match = neighbor_segment
             return best_match[0]
 
         return None
 
-    def vector_list_to_word(self, tensor, xsampa=False,fuzzy_search=False):
+    def vector_list_to_word(self, tensor, xsampa=False, fuzzy_search=False):
         """Return a Unicode IPA word, given a list of feature vectors.
 
         Args:
@@ -609,7 +701,9 @@ class FeatureTable(object):
 
         word = ""
         for vector in tensor:
-            match = self._binary_search(self.sorted_segments.segments, vector, fuzzy_search)
+            match = self._binary_search(
+                self.sorted_segments.segments, vector, fuzzy_search
+            )
             if match:
                 word += match
             else:
