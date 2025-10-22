@@ -1,7 +1,6 @@
 # DIACRITICS AND MODIFIERS
 diacritics:
-
-# Airstream mechanism
+  # Airstream mechanism
 
   - marker: ʼ
     name: Ejective
@@ -12,7 +11,7 @@ diacritics:
     content:
       cg: "+"
 
-# Laryngeal features
+  # Laryngeal features
 
   - marker: ̥
     name: Voiceless
@@ -36,7 +35,7 @@ diacritics:
     content:
       sg: "+"
 
-# Backness modifications
+  # Backness modifications
 
   - marker: ̟
     name: "Advanced"
@@ -63,7 +62,7 @@ diacritics:
       - ə
     content: {}
 
-# Syllabicity
+  # Syllabicity
 
   - marker: ̩
     name: "Syllabic"
@@ -87,7 +86,7 @@ diacritics:
     content:
       syl: "-"
 
-# Rhoticity
+  # Rhoticity
 
   - marker: ˞
     name: "Rhotacized"
@@ -99,7 +98,7 @@ diacritics:
       hi: "+"
       round: "+"
 
-# Voice quality
+  # Voice quality
 
   - marker: ̤
     name: "Breathy Voiced"
@@ -138,7 +137,7 @@ diacritics:
     content:
       cg: "+"
 
-# Secondary articulations
+  # Secondary articulations
 
   - marker: ̼
     name: Linguolabial
@@ -161,15 +160,15 @@ diacritics:
     name: Labialized
     position: post
     conditions:
-      - syl:  "-"
+      - syl: "-"
     exclude:
       - w
       - ʍ
       - ɥ
     content:
       round: "+"
-      back:  "+"
-      hi:  "+"
+      back: "+"
+      hi: "+"
 
   - marker: ʲ
     name: Palatalized
@@ -180,7 +179,7 @@ diacritics:
       - j
       - ɥ
     content:
-      hi:   "+"
+      hi: "+"
       back: "-"
 
   - marker: ᶣ
@@ -199,8 +198,8 @@ diacritics:
     position: post
     conditions:
       - syl: "-"
-      - hi: "-"
-      - back: "-"
+        hi: "-"
+        back: "-"
     exclude:
       - k
       - ɡ
@@ -210,7 +209,7 @@ diacritics:
       - ɰ
       - ʟ
     content:
-      hi:   "+"
+      hi: "+"
       back: "+"
 
   - marker: ˤ
@@ -223,7 +222,7 @@ diacritics:
       - ʕ
       - ħ
     content:
-      lo:   "+"
+      lo: "+"
       back: "+"
 
   - marker: ̴
@@ -234,10 +233,10 @@ diacritics:
         lat: "+"
         delrel: "-"
     content:
-      hi:   "+"
+      hi: "+"
       back: "+"
 
-# Height modifications
+  # Height modifications
 
   - marker: ̝
     name: Raised
@@ -253,7 +252,7 @@ diacritics:
       - cont: "+"
     content: {}
 
-# Tongue root state
+  # Tongue root state
 
   - marker: ̘
     name: ATR
@@ -271,7 +270,7 @@ diacritics:
     content:
       tense: "-"
 
-# Coronal modifications
+  # Coronal modifications
 
   - marker: ̺
     name: Apical
@@ -289,7 +288,7 @@ diacritics:
     content:
       distr: "+"
 
-# Nasality
+  # Nasality
 
   - marker: ̃
     name: Nasalized
@@ -303,7 +302,7 @@ diacritics:
     content:
       nas: "+"
 
-# Properties of release
+  # Properties of release
 
   - marker: ⁿ
     name: "Nasal Release"
@@ -327,7 +326,7 @@ diacritics:
       lat: "+"
       delrel: "+"
 
-# Suprasegmentals
+  # Suprasegmentals
 
   - marker: ː
     name: Long
@@ -347,323 +346,322 @@ diacritics:
 
 # COMBINATIONS OF DIACRITICS AND MODIFIERS
 combinations:
-
-# Quantity
+  # Quantity
 
   - name: Long Labialized
     combines:
-    - Long
-    - Labialized
+      - Long
+      - Labialized
 
   - name: Long Palatalized
     combines:
-    - Long
-    - Palatalized
+      - Long
+      - Palatalized
 
   - name: Long Velarized
     combines:
-    - Long
-    - Velarized
+      - Long
+      - Velarized
 
   - name: Long Pharyngealized
     combines:
-    - Long
-    - Pharyngealized
+      - Long
+      - Pharyngealized
 
-# Airstream mechanisms
+  # Airstream mechanisms
 
-## Ejective
+  ## Ejective
 
   - name: Ejective Labialized
     combines:
-    - Ejective
-    - Labialized
+      - Ejective
+      - Labialized
 
   - name: Ejective Palatalized
     combines:
-    - Ejective
-    - Palatalized
+      - Ejective
+      - Palatalized
 
   - name: Ejective Long
     combines:
-    - Ejective
-    - Long
+      - Ejective
+      - Long
 
-# Laryngeal features
+  # Laryngeal features
 
-## Voiceless
+  ## Voiceless
 
   - name: Voiceless Labialized
     combines:
-    - Voiceless
-    - Labialized
+      - Voiceless
+      - Labialized
 
   - name: Voiceless Palatalized
     combines:
-    - Voiceless
-    - Palatalized
+      - Voiceless
+      - Palatalized
 
   - name: Voiceless Velarized
     combines:
-    - Voiceless
-    - Velarized
+      - Voiceless
+      - Velarized
 
   - name: Voiceless Pharyngealized
     combines:
-    - Voiceless
-    - Pharyngealized
+      - Voiceless
+      - Pharyngealized
 
   - name: Voiceless Long
     combines:
-    - Voiceless
-    - Long
+      - Voiceless
+      - Long
 
-## Aspirated
+  ## Aspirated
 
   - name: Aspirated Labialized
     combines:
-    - Aspirated
-    - Labialized
+      - Aspirated
+      - Labialized
 
   - name: Aspirated Palatalized
     combines:
-    - Aspirated
-    - Palatalized
+      - Aspirated
+      - Palatalized
 
   - name: Aspirated Velarized
     combines:
-    - Aspirated
-    - Velarized
+      - Aspirated
+      - Velarized
 
   - name: Aspirated Labiopalatalized
     combines:
-    - Aspirated
-    - Labiopalatalized
+      - Aspirated
+      - Labiopalatalized
 
   - name: Aspirated Pharyngealized
     combines:
-    - Aspirated
-    - Pharyngealized
+      - Aspirated
+      - Pharyngealized
 
   - name: Aspirated Long
     combines:
-    - Aspirated
-    - Long
+      - Aspirated
+      - Long
 
-# Syllabicity
+  # Syllabicity
 
   - name: Syllabic Labialized
     combines:
-    - Syllabic
-    - Labialized
+      - Syllabic
+      - Labialized
 
-# Rhoticity
+  # Rhoticity
 
-# Voice quality
+  # Voice quality
 
-## Breathy voice
+  ## Breathy voice
 
   - name: Breathy Devoiced
     combines:
-    - "Breathy Voiced"
-    - Voiceless
+      - "Breathy Voiced"
+      - Voiceless
 
   - name: Breathy Labialized
     combines:
-    - "Breathy Voiced"
-    - Labialized
+      - "Breathy Voiced"
+      - Labialized
 
   - name: Breathy Palatalized
     combines:
-    - "Breathy Voiced"
-    - Palatalized
+      - "Breathy Voiced"
+      - Palatalized
 
   - name: Breathy Velarized
     combines:
-    - "Breathy Voiced"
-    - Velarized
+      - "Breathy Voiced"
+      - Velarized
 
   - name: Breathy Pharyngealized
     combines:
-    - "Breathy Voiced"
-    - Pharyngealized
+      - "Breathy Voiced"
+      - Pharyngealized
 
   - name: Breathy Long
     combines:
-    - "Breathy Voiced"
-    - Long
+      - "Breathy Voiced"
+      - Long
 
-## Creaky voice
+  ## Creaky voice
 
   - name: Creaky Labialized
     combines:
-    - Creaky Voiced
-    - Labialized
+      - Creaky Voiced
+      - Labialized
 
   - name: Creaky Palatalized
     combines:
-    - Creaky Voiced
-    - Palatalized
+      - Creaky Voiced
+      - Palatalized
 
   - name: Creaky Velarized
     combines:
-    - Creaky Voiced
-    - Velarized
+      - Creaky Voiced
+      - Velarized
 
   - name: Creaky Pharyngealized
     combines:
-    - Creaky Voiced
-    - Pharyngealized
+      - Creaky Voiced
+      - Pharyngealized
 
   - name: Creaky Long
     combines:
-    - Creaky Voiced
-    - Long
+      - Creaky Voiced
+      - Long
 
-# Secondary articulations
+  # Secondary articulations
 
-## Linguolabial
+  ## Linguolabial
 
-## Labialized
+  ## Labialized
 
   - name: Labialized Aspirated
     combines:
-    - Labialized
-    - Aspirated
+      - Labialized
+      - Aspirated
 
   - name: Labialized Aspirated Long
     combines:
-    - Labialized
-    - Aspirated
-    - Long
+      - Labialized
+      - Aspirated
+      - Long
 
   - name: Labialized Ejective
     combines:
-    - Labialized
-    - Ejective
+      - Labialized
+      - Ejective
 
   - name: Labialized Glottalized
     combines:
-    - Labialized
-    - Glottalized
+      - Labialized
+      - Glottalized
 
   - name: Labialized Velarized
     combines:
-    - Labialized
-    - Velarized
+      - Labialized
+      - Velarized
 
   - name: Labialized Velarized Aspirated
     combines:
-    - Labialized
-    - Velarized
-    - Aspirated
+      - Labialized
+      - Velarized
+      - Aspirated
 
   - name: Labialized Pharyngealized
     combines:
-    - Labialized
-    - Pharyngealized
+      - Labialized
+      - Pharyngealized
 
   - name: Labialized Pharyngealized Ejective
     combines:
-    - Labialized
-    - Pharyngealized
-    - Ejective
+      - Labialized
+      - Pharyngealized
+      - Ejective
 
   - name: Labialized Pharyngealized Aspirated
     combines:
-    - Labialized
-    - Pharyngealized
-    - Aspirated
+      - Labialized
+      - Pharyngealized
+      - Aspirated
 
   - name: Labialized Long
     combines:
-    - Labialized
-    - Long
+      - Labialized
+      - Long
 
-## Palatalized
+  ## Palatalized
 
   - name: Palatalized Ejective
     combines:
-    - Palatalized
-    - Ejective
+      - Palatalized
+      - Ejective
 
   - name: Palatalized Labialized
     combines:
-    - Palatalized
-    - Labialized
+      - Palatalized
+      - Labialized
 
   - name: Palatalized Long
     combines:
-    - Palatalized
-    - Long
+      - Palatalized
+      - Long
 
   - name: Palatalized Aspirated
     combines:
-    - Palatalized
-    - Aspirated
+      - Palatalized
+      - Aspirated
 
   - name: Palatalized Labialized Aspirated
     combines:
-    - Palatalized
-    - Labialized
-    - Aspirated
+      - Palatalized
+      - Labialized
+      - Aspirated
 
-# Pharyngealized
+  # Pharyngealized
 
   - name: Pharyngealized Ejective
     combines:
-    - Pharyngealized
-    - Ejective
+      - Pharyngealized
+      - Ejective
 
   - name: Pharyngealized Aspirated
     combines:
-    - Pharyngealized
-    - Aspirated
+      - Pharyngealized
+      - Aspirated
 
   - name: Pharyngealized Long
     combines:
-    - Pharyngealized
-    - Long
+      - Pharyngealized
+      - Long
 
- # Tongue root state
+  # Tongue root state
 
-## ATR
+  ## ATR
 
   - name: ATR Velarized
     combines:
-    - ATR
-    - Velarized
+      - ATR
+      - Velarized
 
   - name: ATR Long
     combines:
-    - ATR
-    - Long
+      - ATR
+      - Long
 
-## RTR
+  ## RTR
 
   - name: RTR Velarized
     combines:
-    - RTR
-    - Velarized
+      - RTR
+      - Velarized
 
   - name: RTR Long
     combines:
-    - RTR
-    - Long
+      - RTR
+      - Long
 
-# Nasality
+  # Nasality
 
   - name: Nasalized Creaky
     combines:
-    - Nasalized
-    - Creaky Voiced
+      - Nasalized
+      - Creaky Voiced
 
   - name: Nasalized Pharyngealized
     combines:
-    - Nasalized
-    - Pharyngealized
+      - Nasalized
+      - Pharyngealized
 
   - name: Nasalized Long
     combines:
-    - Nasalized
-    - Long
+      - Nasalized
+      - Long

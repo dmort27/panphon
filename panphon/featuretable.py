@@ -577,14 +577,20 @@ class FeatureTable(object):
         if best_match_index is not None:
             # Check neighboring rows within the range of +-5
             best_match = segment_list[best_match_index]
-            for offset in range(-9, 5):
+            for offset in range(-9, 10):
                 neighbor_index = best_match_index + offset
                 if 0 <= neighbor_index < len(segment_list):
                     neighbor_segment = segment_list[neighbor_index]
                     if not self._compare_vectors(self.sorted_segments.segment_key(neighbor_segment),target):
-                        # Check if the neighbor segment has a shorter name
-                        if len(neighbor_segment[0]) < len(best_match[0]):
+                        # Prefer shorter segments, or if same length, prefer canonical forms
+                        neighbor_len = len(neighbor_segment[0])
+                        best_len = len(best_match[0])
+                        if neighbor_len < best_len:
                             best_match = neighbor_segment
+                        elif neighbor_len == best_len:
+                            # If same length, prefer the one that's a key in seg_dict (canonical form)
+                            if neighbor_segment[0] in self.seg_dict and best_match[0] not in self.seg_dict:
+                                best_match = neighbor_segment
             return best_match[0]
 
         return None
