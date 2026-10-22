@@ -70,6 +70,24 @@ class TestWeightedFeatureEditDist(unittest.TestCase):
         self.assertGreater(self.dist.weighted_feature_edit_distance('ti', 'te'),
                            self.dist.weighted_feature_edit_distance('ti', 'tḭ'))
 
+    def test_length_and_tenseness_weights(self):
+        # The named weights are 0.125 for length and 0.25 for tenseness.
+        # Changing a feature from -1 to +1 costs twice its weight.
+        for model in ['segment', 'strict', 'permissive']:
+            dist = distance.Distance(feature_model=model)
+            for target, expected in [('biːt', 0.25), ('bɪt', 0.5)]:
+                with self.subTest(model=model, target=target):
+                    self.assertEqual(
+                        dist.weighted_feature_edit_distance('bit', target),
+                        expected)
+
+    def test_segment_length_and_tenseness_weights(self):
+        table = self.dist.fm
+        for target, expected in [('iː', 0.25), ('ɪ', 0.5)]:
+            with self.subTest(target=target):
+                self.assertEqual(table.fts('i').weighted_distance(table.fts(target)),
+                                 expected)
+
 
 class TestHammingFeatureEditDistanceDivMaxlen(unittest.TestCase):
     def setUp(self):
