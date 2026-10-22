@@ -742,8 +742,8 @@ class Distance(object):
                    `target` divided by the length of the longest of these
                    arguments
         """
-        source = self.fm.word_to_vector_list(source, numeric=True, xsampa=xsampa)
-        target = self.fm.word_to_vector_list(target, numeric=True, xsampa=xsampa)
+        source = self.fm.word_to_vector_list(source, numeric=True)
+        target = self.fm.word_to_vector_list(target, numeric=True)
         maxlen = max(len(source), len(target))
         return self.min_edit_distance(self.weighted_deletion_cost,
                                       self.weighted_insertion_cost,

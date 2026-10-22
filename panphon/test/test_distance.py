@@ -138,3 +138,21 @@ class TestXSampa(unittest.TestCase):
 
     def test_feature_edit_distance(self):
         self.assertEqual(self.dist.feature_edit_distance("p_h", "p", xsampa=True), 1 / dim)
+
+    def test_normalized_weighted_distance(self):
+        pairs = [
+            (('bit', 'biːt'), ('bit', 'bi:t')),
+            (('bit', 'bɪt'), ('bit', 'bIt')),
+            (('t͡ʃ', 'ʃ'), ('tS', 'S')),
+            (('a', 'ã'), ('a', 'a~')),
+            (('p', 'pʰ'), ('p', 'p_h')),
+            (('', 'ʃ'), ('', 'S')),
+            (('', ''), ('', '')),
+        ]
+        for model in ('segment', 'strict', 'permissive'):
+            dist = distance.Distance(feature_model=model)
+            normalized = dist.weighted_feature_edit_distance_div_maxlen
+            for ipa, xs in pairs:
+                with self.subTest(model=model, ipa=ipa):
+                    self.assertEqual(normalized(*ipa),
+                                     normalized(*xs, xsampa=True))
